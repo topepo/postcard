@@ -1,0 +1,19 @@
+Package: digital.twins
+Type: Package
+Title: PROCOVA estimation of average treatment effect
+Version: 0.1.0
+Authors@R: 
+    person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = c("aut", "cre"))
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Convenient functions for conducting analysis using the PROCOVA approach. The package contain a
+    function that can generate normally distributed data in different data generating scenarios in order to
+    determine the finite sample properties of the PROCOVA method. This generated data can then be used as an
+    input for the lm_hist function, that estimates ATE, SD, power, type I error, etc. This function can also 
+    be used for a single pair of RCT and historical data. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+LazyData: true
+RoxygenNote: 7.2.0
+Imports: 
+    dplyr
