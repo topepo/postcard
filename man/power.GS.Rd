@@ -11,7 +11,7 @@ power.GS(
   rho = NULL,
   R2 = NULL,
   ATE = 0.6,
-  sup.margin = 0,
+  margin = 0,
   alpha = 0.05,
   method = c("ANOVA", "ANCOVA"),
   deflation = 1,
@@ -31,7 +31,7 @@ power.GS(
 
 \item{ATE}{Minimum effect size that we should be able to detect.}
 
-\item{sup.margin}{Superiority margin.}
+\item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
 \item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\\% is used.}
 

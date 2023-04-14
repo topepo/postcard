@@ -12,7 +12,7 @@ power.NC(
   R2 = NULL,
   n.adj = 0,
   ATE = 0.6,
-  sup.margin = 0,
+  margin = 0,
   alpha = 0.05,
   method = c("ANOVA", "ANCOVA"),
   deflation = 1,
@@ -30,11 +30,11 @@ power.NC(
 
 \item{R2}{The estimated pooled multiple correlation coefficient between outcome and covariates.}
 
-\item{n.adj}{Number of adjustement covariates.}
+\item{n.adj}{Number of adjustment covariates.}
 
 \item{ATE}{Minimum effect size that we should be able to detect.}
 
-\item{sup.margin}{Superiority margin.}
+\item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
 \item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\\% is used.}
 
@@ -54,7 +54,7 @@ This function calculates the power for ANOVA or ANCOVA based on the non-centrali
 The prospective power estimations are based on (Kieser M. Methods and Applications of Sample Size Calculation and Recalculation in Clinical Trials. Springer; 2020).
 The ANOVA power is calculated based on the non-centrality parameter given as
 
-\deqn{nc =\sqrt{\frac{r}{(1+r)^2}\cdot n}\cdot\frac{ATE-sup.margin}{\sigma},}
+\deqn{nc =\sqrt{\frac{r}{(1+r)^2}\cdot n}\cdot\frac{ATE-margin}{\sigma},}
 
 where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 
@@ -62,7 +62,7 @@ where we denote by \eqn{\sigma^2} the variance of the outcome, such that the pow
 
 The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 
-\deqn{nc =\sqrt{\frac{rn}{(1+r)^2}}\frac{ATE-sup.margin}{\sigma\sqrt{1-\rho^2}},}
+\deqn{nc =\sqrt{\frac{rn}{(1+r)^2}}\frac{ATE-margin}{\sigma\sqrt{1-\rho^2}},}
 
 such that the power can be estimated as
 
@@ -70,7 +70,7 @@ such that the power can be estimated as
 
 The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 
-\deqn{nc =\frac{ATE-sup.margin}{\sqrt{\left(\frac{1}{n_1}+\frac{1}{n_0} + X_d^\top\left((n-2)\Sigma_X\right)^{-1}X_d \right)\sigma^2\left(1-\frac{\sigma_{XY}^\top \Sigma_X^{-1}\sigma_{XY}}{\sigma^2}\right)}}.}
+\deqn{nc =\frac{ATE-margin}{\sqrt{\left(\frac{1}{n_1}+\frac{1}{n_0} + X_d^\top\left((n-2)\Sigma_X\right)^{-1}X_d \right)\sigma^2\left(1-\frac{\sigma_{XY}^\top \Sigma_X^{-1}\sigma_{XY}}{\sigma^2}\right)}}.}
 
 where \eqn{X_d \coloneqq \left(\overline{X}_1^1-\overline{X}_0^1, \ldots, \overline{X}_1^p-\overline{X}_0^p\right)^\top}, \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 \eqn{\Sigma_X} the covariance matrix of the covariates, and \eqn{\sigma_{XY}} a \eqn{p}-dimensional column vector consisting of the covariance

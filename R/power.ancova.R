@@ -18,9 +18,9 @@
 #' @param n               Number of participants in total. From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n} and the control group is \eqn{n1=(1/(1+r))n}.
 #' @param r               Allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation r=1.
 #' @param ATE             Minimum effect size that we should be able to detect.
-#' @param sup.margin      Superiority margin.
+#' @param margin          Superiority margin (for non-inferiority margin, a negative value can be provided).
 #'
-#' @importFrom dplyr rename select mutate case_when all_of select_if pull
+#' @importFrom dplyr pull select all_of select_if
 #' @importFrom magrittr "%>%"
 #'
 #' @return
@@ -37,7 +37,7 @@ power.ancova <- function(data.hist,
                          n,
                          r,
                          ATE,
-                         sup.margin){
+                         margin){
 
   stopifnot(is.data.frame(data.hist), is.numeric(n), is.numeric(r), is.character(adj.covs) | is.null(adj.covs),)
 
@@ -46,8 +46,8 @@ power.ancova <- function(data.hist,
 
   #### ANOVA
   if (is.null(adj.covs)) {
-    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, sup.margin = sup.margin, method = "ANOVA")
-    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, sup.margin = sup.margin, method = "ANOVA")
+    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, margin = margin, method = "ANOVA")
+    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, margin = margin, method = "ANOVA")
 
     prelim <- c(sigma, power_NC, power_GS) %>% setNames(c("sigma", "power_NC", "power_GS"))
   }
@@ -56,8 +56,8 @@ power.ancova <- function(data.hist,
   if (length(adj.covs) == 1 & interaction == FALSE) {
     rho <- cor(data.hist[, adj.covs], data.hist %>% dplyr::pull(outcome.var)) %>% as.numeric()
 
-    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, sup.margin = sup.margin, method = "ANCOVA")
-    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, sup.margin = sup.margin, method = "ANCOVA")
+    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, margin = margin, method = "ANCOVA")
+    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, margin = margin, method = "ANCOVA")
 
     prelim <- c(sigma, rho, power_NC, power_GS) %>% setNames(c("sigma", "rho", "power_NC", "power_GS"))
   }
@@ -83,8 +83,8 @@ power.ancova <- function(data.hist,
     R2 <- ( cov(data.hist %>% dplyr::pull(outcome.var), data.hist[, c(adj.covs, new_cols)]) %*% Sigma_X.I %*% cov(data.hist[, c(adj.covs, new_cols)], data.hist %>% dplyr::pull(outcome.var)) ) / sigma
     R2 <- R2 %>% as.numeric()
 
-    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, sup.margin = sup.margin, method = "ANCOVA")
-    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, sup.margin = sup.margin, method = "ANCOVA")
+    power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, margin = margin, method = "ANCOVA")
+    power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, margin = margin, method = "ANCOVA")
 
     prelim <- c(sigma, R2, power_NC, power_GS) %>% setNames(c("sigma", "R2", "power_NC", "power_GS"))
   }

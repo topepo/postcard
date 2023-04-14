@@ -5,9 +5,9 @@
 #' @param sigma           Variance of \eqn{Y(w)}, where w is the treatment indicator, and we assume homoskedasticity.
 #' @param rho             Correlation between outcome and adjustment covariate in univariable covariate adjustment.
 #' @param R2              The estimated pooled multiple correlation coefficient between outcome and covariates.
-#' @param n.adj           Number of adjustement covariates.
+#' @param n.adj           Number of adjustment covariates.
 #' @param ATE             Minimum effect size that we should be able to detect.
-#' @param sup.margin      Superiority margin.
+#' @param margin          Superiority margin (for non-inferiority margin, a negative value can be provided).
 #' @param alpha           Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\% is used.
 #' @param method          Method is specified as either ANOVA, where no adjustment covariates are used, or ANCOVA where either one or multiple covariates are adjusted for.
 #' @param deflation       Deflation parameter for decreasing rho or R2.
@@ -21,7 +21,7 @@
 #' The prospective power estimations are based on (Kieser M. Methods and Applications of Sample Size Calculation and Recalculation in Clinical Trials. Springer; 2020).
 #' The ANOVA power is calculated based on the non-centrality parameter given as
 #'
-#' \deqn{nc =\sqrt{\frac{r}{(1+r)^2}\cdot n}\cdot\frac{ATE-sup.margin}{\sigma},}
+#' \deqn{nc =\sqrt{\frac{r}{(1+r)^2}\cdot n}\cdot\frac{ATE-margin}{\sigma},}
 #'
 #' where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 #'
@@ -29,7 +29,7 @@
 #'
 #' The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 #'
-#' \deqn{nc =\sqrt{\frac{rn}{(1+r)^2}}\frac{ATE-sup.margin}{\sigma\sqrt{1-\rho^2}},}
+#' \deqn{nc =\sqrt{\frac{rn}{(1+r)^2}}\frac{ATE-margin}{\sigma\sqrt{1-\rho^2}},}
 #'
 #' such that the power can be estimated as
 #'
@@ -37,7 +37,7 @@
 #'
 #' The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 #'
-#' \deqn{nc =\frac{ATE-sup.margin}{\sqrt{\left(\frac{1}{n_1}+\frac{1}{n_0} + X_d^\top\left((n-2)\Sigma_X\right)^{-1}X_d \right)\sigma^2\left(1-\frac{\sigma_{XY}^\top \Sigma_X^{-1}\sigma_{XY}}{\sigma^2}\right)}}.}
+#' \deqn{nc =\frac{ATE-margin}{\sqrt{\left(\frac{1}{n_1}+\frac{1}{n_0} + X_d^\top\left((n-2)\Sigma_X\right)^{-1}X_d \right)\sigma^2\left(1-\frac{\sigma_{XY}^\top \Sigma_X^{-1}\sigma_{XY}}{\sigma^2}\right)}}.}
 #'
 #' where \eqn{X_d \coloneqq \left(\overline{X}_1^1-\overline{X}_0^1, \ldots, \overline{X}_1^p-\overline{X}_0^p\right)^\top}, \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 #' \eqn{\Sigma_X} the covariance matrix of the covariates, and \eqn{\sigma_{XY}} a \eqn{p}-dimensional column vector consisting of the covariance
@@ -62,7 +62,7 @@ power.NC <- function(n = 153,
                      R2 = NULL,
                      n.adj = 0,
                      ATE = 0.6,
-                     sup.margin = 0,
+                     margin = 0,
                      alpha = 0.05,
                      method = c("ANOVA", "ANCOVA"),
                      deflation = 1,
@@ -80,7 +80,7 @@ power.NC <- function(n = 153,
 
 
   if (method == "ANOVA") {
-    nc <- sqrt(r/(1 + r)^2*(n)) * (ATE - sup.margin)/sqrt(sigma)
+    nc <- sqrt(r/(1 + r)^2*(n)) * (ATE - margin)/sqrt(sigma)
     power <- 1 - pt(q = qt(1 - alpha/2, n - 2), df = n - 2, ncp = nc)
   }
 
@@ -88,13 +88,13 @@ power.NC <- function(n = 153,
 
 
     if (!is.null(rho) & is.null(R2)) {
-      nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - sup.margin)/(sqrt(sigma * (1 - rho^2)))
+      nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - margin)/(sqrt(sigma * (1 - rho^2)))
       power <- 1 - pt(q = qt(1 - alpha/2, n - 3), df = n - 3, ncp = nc)
     }
 
 
     if (is.null(rho) & !is.null(R2)) {
-      nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - sup.margin)/(sqrt(sigma * (1 - R2)))
+      nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - margin)/(sqrt(sigma * (1 - R2)))
       power <- 1 - pt(q = qt(1 - alpha/2, n - 2 - n.adj), df = n - 2 - n.adj, ncp = nc)
     }
 

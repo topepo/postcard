@@ -13,7 +13,7 @@ power.ancova(
   n,
   r,
   ATE,
-  sup.margin
+  margin
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ power.ancova(
 
 \item{ATE}{Minimum effect size that we should be able to detect.}
 
-\item{sup.margin}{Superiority margin.}
+\item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 }
 \value{
 Vector of the estimated entities sigma, rho/R2, power_NC, and power_GS.
@@ -46,4 +46,8 @@ This function calculates the prospective power based on theoretical non-centrali
 using historical data provided in data.hist. The entities sigma, rho, and R2 are calculated using the historical data, and these can not
 be specified by the user. Look at power.NC or power.GS if you want a power calculation based on user specified entities.
 In addition, the necessary entities for these calculations are outputted.
+
+When wanting to estimate the power for the PROCOVA method add a column to data.hist with the predicted values using the prognostic model and add the
+name of this column to the adj.covs. Note that data.hist should be independent of the data used to build the the prognostic model to obtain accurate
+power estimations.
 }

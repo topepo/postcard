@@ -6,24 +6,26 @@
 \usage{
 lm.hist(
   data.list,
-  method = c("None", "PROCOVA", "PSM"),
-  sup.margin = 0,
+  method = c("None", "PROCOVA"),
+  margin = 0,
   alpha = 0.05,
   outcome.var = "y",
   treatment.var = "w",
   adj.covs = NULL,
   pred.model = NULL,
-  interaction = FALSE
+  interaction = FALSE,
+  B = 100,
+  ...
 )
 }
 \arguments{
 \item{data.list}{A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively.}
 
-\item{method}{Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified).}
+\item{method}{Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). If method = "Procova" and data.list$hist contains treatment patients, then the ANCOVA model is adjusted by \eqn{(\hat{E[Y(0)|X]}, \hat{E[Y(1)|X]})}, that is the prediction for both control and treatment medicine.}
 
-\item{sup.margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
+\item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
-\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\\% is used.}
+\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
 
 \item{outcome.var}{Character with the name of the outcome variable in both the $rct and $hist data set.}
 
@@ -31,17 +33,28 @@ lm.hist(
 
 \item{adj.covs}{Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.}
 
-\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA" or method == "PSM". The model object obtained from the function should be a valid argument for \link[stats]{predict}.}
+\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}}
 
 \item{interaction}{Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.}
+
+\item{B}{Only relevant for method = PSM. Number of bootstraps for estimating bias between HC and CC groups.}
+
+\item{...}{For method = "Procova", this is extra arguments for stats::predict(). For example using lasso.hist there are some extra arguments s = "lambda.min" and newx = data.hist \%>\% dplyr::select(method.covs) \%>\% as.matrix() needed for using stats::predict. Note that in general newdata = data.list$rct for the predict function, however for models such as the glmnet, the new data is given as the input newx, and hence the newx should be provided as an additional argument for lm.hist.
+For method = "PSM", this is extra arguments for MatchIt::matchit(). The default formula is "w ~ . - y - HC" which is all the covariates in the data set except from the response y and indicator of being in the historical data HC.}
 }
 \value{
-lm.hist returns an object of \link[base]{class} "lm". The functions summary and \code{\link[stats:anova]{stats::anova()}} are used to obtain and print
+lm.hist returns an object of \code{\link[base]{class}} "lm". The functions summary and \code{\link[stats]{anova}} are used to obtain and print
 a summary and analysis of variance table of the results. The generic accessor functions coefficients, effects, fitted.values and residuals
 extract various useful features of the value returned by lm. The object contains a list of the same components as an object of class "lm"
-but with the extra component $test_sup.margin, which is a list of the  t-test statistic value 'test_stat' and the result of the t-test 'test_result'
-based on the superiority margin. Look at \href{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/lm}{lm} for further information on the class.
+but with the extra component $test_margin, which is a list of the  t-test statistic value 'test_stat' and the result of the t-test 'test_result'
+based on the superiority margin. Look at \code{\link[stats]{lm}} for further information on the class.
 }
 \description{
-The function fits ANCOVA models using the function \link[stats]{lm} but potentially leveraging a historical data set.
+The function fits ANCOVA models using the function \code{\link[stats]{lm}} but potentially leveraging a historical data set. Historical data can be
+leveraged through the PROCOVA method and PSM. Setting method = "Procova" the functions will fit the pred.model to $hist and use this to predict
+the outcome for $rct.
+
+If the prediction model is fitted separately the predicted values can be added to the $rct data set and then using method = "None" and adding
+the name of the column with the predicted values to adj.covs will result in using the PROCOVA method. This could be the case when a model has
+already been fitted to the historical data before the trial data is available.
 }
