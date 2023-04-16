@@ -18,10 +18,10 @@
 #' @param N.control         Number of patients in current RCT control groups
 #' @param N.treatment       Number of patients in current RCT treatment groups
 #' @param N.sim             Number of generated historical and RCT datasets
-#' @param N.cores           Number of cores to use for parallelisation
+#' @param workers           Number of cores to use for parallelisation. Note that the number of workers you choose should depend on the number of available cores on your computer and the amount of memory required for each task. Setting the number of workers too high can lead to slow performance or even crashes if your computer runs out of memory.
 #'
 #' @return
-#' List object consisting of $hist (historical data), $hist_test (test data
+#' List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
 #' with same distribution of the historical data), $rct (current RCT data)
 #' and multiple attributes.
 #'
@@ -32,7 +32,8 @@
 #' generate_data(N.sim = 1, N.hist.control = 10, N.hist.treatment = 0,
 #'               N.control = 1, N.treatment = 1)
 #'
-#' @importFrom parallel mclapply
+#' @importFrom future plan
+#' @importFrom future.apply future_lapply
 #' @importFrom magrittr "%>%"
 #' @importFrom MASS mvrnorm
 #'
@@ -52,8 +53,24 @@ generate_data <- function(ATE = 3,
                           N.control = 200,
                           N.treatment = 300,
                           N.sim = 1000,
-                          N.cores = 16
+                          workers = future::availableCores()
                           ){
+
+  ####### Check if variables are defined correctly ##########
+  stopifnot(is.numeric(ATE), length(ATE) == 1L,
+            is.numeric(ATE.shift), length(ATE.shift) == 1L,
+            is.numeric(N.covs), length(N.covs) == 1L,
+            is.numeric(N.overspec), length(N.overspec) == 1L,
+            is.numeric(coefs), length(coefs) == 3L,
+            is.matrix(cov), length(cov) == (N.covs + N.overspec)^2,
+            is.numeric(noise), length(noise) == 1L,
+            is.numeric(N.hist.control), length(N.hist.control) == 1L,
+            is.numeric(N.hist.treatment), length(N.hist.treatment) == 1L,
+            is.numeric(N.test.control), length(N.test.control) == 1L,
+            is.numeric(N.test.treatment), length(N.test.treatment) == 1L,
+            is.numeric(N.control), length(N.control) == 1L,
+            is.numeric(N.treatment), length(N.treatment) == 1L,
+            is.numeric(N.sim), length(N.sim) == 1L)
 
 
   out <- list()
@@ -69,30 +86,27 @@ generate_data <- function(ATE = 3,
   attr(out, "N.test.treatment") <- N.test.treatment
 
   varnames <- paste0("x", 1:(N.covs + N.overspec))
+  ATE_new <- ATE + ATE.shift
+  future::plan(multiprocess, workers = workers)
 
+  out <- future.apply::future_lapply(1:N.sim, function(k){
 
-  if (!is.null(N.hist.control) & !is.null(N.hist.treatment)) {
+    res <- list()
 
-    out$hist <- parallel::mclapply(1:N.sim, function(k){
+    if (!is.null(N.hist.control) & !is.null(N.hist.treatment)) {
 
       data.hist <- MASS::mvrnorm(n = N.hist.control + N.hist.treatment + N.test.control + N.test.treatment,
-                           mu = rep(mu.shift, N.covs + N.overspec),
-                           Sigma = cov) %>% as.data.frame()
+                                 mu = rep(mu.shift, N.covs + N.overspec),
+                                 Sigma = cov) %>% as.data.frame()
 
       colnames(data.hist) <- varnames
       rownames(data.hist) <- 1:nrow(data.hist)
 
       data.hist$w <- c(rep(0, N.hist.control), rep(1, N.hist.treatment), rep(0, N.test.control), rep(1, N.test.treatment))
-
-      ATE_new <- ATE + ATE.shift
-
-
       data.hist$y <- ATE_new*data.hist$w + rnorm(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment, 0, noise)
 
       X <- model.matrix(formula(paste0("y ~ ",
-                                       paste0("(",
-                                              paste0("x", 1:N.covs, collapse = "+"),
-                                              ")^2"),
+                                       paste0("(", paste0("x", 1:N.covs, collapse = "+"),")^2"),
                                        "+",
                                        paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
                                        "+",
@@ -100,27 +114,17 @@ generate_data <- function(ATE = 3,
                         data = data.hist)[,-1]
 
       data.hist$y <- data.hist$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
-                                         rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
+                                           rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
+      res$hist <- data.hist
+    }
 
-      data.hist
-    }, mc.cores = N.cores)
-
-  }
-
-
-  if (N.test.control + N.test.treatment > 0) {
-
-    out$hist_test <- lapply(out$hist, FUN = function(data) {data[(N.hist.control + N.hist.treatment + 1):(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment), ]})
-    out$hist <- lapply(out$hist, FUN = function(data) {data[1:(N.hist.control + N.hist.treatment), ]})
-
+    if (N.test.control + N.test.treatment > 0) {
+      res$hist_test <- res$hist[(N.hist.control + N.hist.treatment + 1):(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment), ]
+      res$hist <- res$hist[1:(N.hist.control + N.hist.treatment), ]
     }
 
 
-
-
-  if (!is.null(N.control) & !is.null(N.treatment)) {
-
-    out$rct <- parallel::mclapply(1:N.sim, function(k){
+    if (!is.null(N.control) & !is.null(N.treatment)) {
 
       data.rct <- MASS::mvrnorm(n = N.control + N.treatment, mu = rep(0, N.covs + N.overspec), Sigma = cov) %>% as.data.frame()
 
@@ -130,26 +134,24 @@ generate_data <- function(ATE = 3,
       data.rct$y <- ATE*data.rct$w + rnorm(N.control + N.treatment, 0, noise)
 
       X <- model.matrix(formula(paste0("y ~ ",
-                                       paste0("(",
-                                              paste0("x", 1:N.covs, collapse = "+"),
-                                              ")^2"),
+                                       paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
                                        "+",
                                        paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
                                        "+",
                                        paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
                         data = data.rct)[,-1]
+
       data.rct$y <- data.rct$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
                                          rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
 
-      data.rct
-    }, mc.cores = N.cores)
+      res$rct <- data.rct
+    }
 
-  }
+    res
 
+  })
 
-  out
-
-
+  out <- as.list(out)
 }
 
 

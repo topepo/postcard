@@ -26,6 +26,8 @@
 #'
 #'
 #' @return
+#' List of the ATT estimate 'estimate', standard error 'std.err', t-test statistic value 'test_stat' and the result of the t-test 'test_result'
+#'
 #' @export
 #'
 #' @importFrom dplyr rename mutate across case_when

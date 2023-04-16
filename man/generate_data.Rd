@@ -20,7 +20,7 @@ generate_data(
   N.control = 200,
   N.treatment = 300,
   N.sim = 1000,
-  N.cores = 16
+  workers = future::availableCores()
 )
 }
 \arguments{
@@ -54,10 +54,10 @@ generate_data(
 
 \item{N.sim}{Number of generated historical and RCT datasets}
 
-\item{N.cores}{Number of cores to use for parallelisation}
+\item{workers}{Number of cores to use for parallelisation. Note that the number of workers you choose should depend on the number of available cores on your computer and the amount of memory required for each task. Setting the number of workers too high can lead to slow performance or even crashes if your computer runs out of memory.}
 }
 \value{
-List object consisting of $hist (historical data), $hist_test (test data
+List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
 with same distribution of the historical data), $rct (current RCT data)
 and multiple attributes.
 }
