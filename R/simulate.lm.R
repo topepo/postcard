@@ -1,6 +1,6 @@
 #' Generate pairs of historical and current data
 #'
-#' Current and historical data simulated from a normal distribution as \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
+#' Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
 #'
 #'
 #' @param ATE               The average treatment effect \eqn{ATE = \mathbb{E}[Y(1)] - \mathbb{E}[Y(0)] } data is generated from
@@ -29,7 +29,7 @@
 #'
 #'
 #' @examples
-#' generate_data(N.sim = 1, N.hist.control = 10, N.hist.treatment = 0,
+#' simulate.lm(N.sim = 1, N.hist.control = 10, N.hist.treatment = 0,
 #'               N.control = 1, N.treatment = 1)
 #'
 #' @importFrom future plan
@@ -38,23 +38,23 @@
 #' @importFrom MASS mvrnorm
 #'
 #' @export
-generate_data <- function(ATE = 3,
-                          ATE.shift = rnorm(1, 0, 0.1),
-                          N.covs = 10,
-                          N.overspec = 0,
-                          coefs = c(0.5, 1, 1),
-                          mu.shift = 0,
-                          cov = diag(1, N.covs + N.overspec),
-                          noise = 1,
-                          N.hist.control = 5000,
-                          N.hist.treatment = 100,
-                          N.test.control = 0,
-                          N.test.treatment = 0,
-                          N.control = 200,
-                          N.treatment = 300,
-                          N.sim = 1000,
-                          workers = future::availableCores()
-                          ){
+simulate.lm <- function(ATE = 3,
+                        ATE.shift = rnorm(1, 0, 0.1),
+                        N.covs = 10,
+                        N.overspec = 0,
+                        coefs = c(0.5, 1, 1),
+                        mu.shift = 0,
+                        cov = diag(1, N.covs + N.overspec),
+                        noise = 1,
+                        N.hist.control = 5000,
+                        N.hist.treatment = 100,
+                        N.test.control = 0,
+                        N.test.treatment = 0,
+                        N.control = 200,
+                        N.treatment = 300,
+                        N.sim = 1000,
+                        workers = future::availableCores()
+){
 
   ####### Check if variables are defined correctly ##########
   stopifnot(is.numeric(ATE), length(ATE) == 1L,
@@ -87,9 +87,9 @@ generate_data <- function(ATE = 3,
 
   varnames <- paste0("x", 1:(N.covs + N.overspec))
   ATE_new <- ATE + ATE.shift
-  future::plan(multiprocess, workers = workers)
+  future::plan(multisession, workers = workers)
 
-  out <- future.apply::future_lapply(1:N.sim, function(k){
+  out <- future.apply::future_lapply(1:N.sim, future.seed = TRUE, FUN = function(k){
 
     res <- list()
 
