@@ -13,7 +13,8 @@ power.ancova(
   n,
   r,
   ATE,
-  margin
+  margin = 0,
+  alpha = 0.05
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ power.ancova(
 
 \item{interaction}{Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating R2.}
 
-\item{n}{Number of participants in total. From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n} and the control group is \eqn{n1=(1/(1+r))n}.}
+\item{n}{Number of participants in total in the new data set. From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n} and the control group is \eqn{n1=(1/(1+r))n}.}
 
 \item{r}{Allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation r=1.}
 

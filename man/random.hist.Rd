@@ -8,7 +8,7 @@ determines the range of the outcome variable in the historical data, and returns
 range as a object of class "random". Then predict.random randomly predicts the outcome
 within this range.}
 \usage{
-random.hist(data.hist, outcome.var = "y")
+random.hist(data.hist)
 }
 \arguments{
 \item{data.hist}{Data.frame of the historical data used to find the range of the outcome variable in order to randomly predict a value.}

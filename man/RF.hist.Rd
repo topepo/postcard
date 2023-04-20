@@ -4,12 +4,10 @@
 \alias{RF.hist}
 \title{Random forest regression as a function of the historical data}
 \usage{
-RF.hist(data.hist, outcome.var = "y", method.covs = c("x1", "x2"))
+RF.hist(data.hist, method.covs = c("x1", "x2"))
 }
 \arguments{
 \item{data.hist}{Data.frame of the historical data used to build the regression model.}
-
-\item{outcome.var}{Character with the name of the outcome variable in both data.hist.}
 
 \item{method.covs}{Character vector with names of the covariates to use as baseline covariates in the prediction model. Make sure that categorical variables are considered as factors. If the function is intended for building a prediction model used in lm.hist, where historical treatment patients are present, then use the treatment indicator in the method.covs to build the model.}
 }

@@ -25,4 +25,6 @@ Imports:
     MASS, 
     randomForest,
     Matching,
-    extraDistr
+    extraDistr,
+    future.apply, 
+    future

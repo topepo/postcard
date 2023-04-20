@@ -9,14 +9,14 @@
 #' the name of the column with the predicted values to adj.covs will result in using the PROCOVA method. This could be the case when a model has
 #' already been fitted to the historical data before the trial data is available.
 #'
-#' @param data.list          A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively.
+#' @param data.list          A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively. The object can also include hist_test for prospective power estimation when setting est.power = TRUE.
 #' @param method             Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). If method = "Procova" and data.list$hist contains treatment patients, then the ANCOVA model is adjusted by \eqn{(\hat{E[Y(0)|X]}, \hat{E[Y(1)|X]})}, that is the prediction for both control and treatment medicine.
 #' @param margin             Superiority margin (for non-inferiority margin, a negative value can be provided).
 #' @param alpha              Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #' @param outcome.var        Character with the name of the outcome variable in both the $rct and $hist data set.
 #' @param treatment.var      Character with the name of the outcome treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.
 #' @param adj.covs           Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.
-#' @param pred.model         Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}
+#' @param pred.model         Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}
 #' @param interaction        Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.
 #' @param ...                For method = "Procova", this is extra arguments for stats::predict(). For example using lasso.hist there are some extra arguments s = "lambda.min" and newx = data.hist %>% dplyr::select(method.covs) %>% as.matrix() needed for using stats::predict. Note that in general newdata = data.list$rct for the predict function, however for models such as the glmnet, the new data is given as the input newx, and hence the newx should be provided as an additional argument for lm.hist.
 #'
@@ -29,10 +29,6 @@
 #'
 #' @importFrom dplyr rename mutate across case_when
 #' @importFrom magrittr "%>%"
-#' @importFrom MatchIt matchit
-#' @import     randomForest
-#' @importFrom Matching Match
-#' @importFrom extraDistr rinvchisq
 #'
 #' @export
 #'
@@ -56,7 +52,6 @@ lm.procova <- function(data.list,
             is.character(adj.covs) | is.null(adj.covs),
             is.function(pred.model) | is.null(pred.model),
             is.logical(interaction))
-
 
   ####### Preliminary setting of variables and adjustment of data sets ##########
   method <- tolower(method)
@@ -137,6 +132,7 @@ lm.procova <- function(data.list,
       test_stat <- (estimate - margin)/std.err
       test <- test_stat > crit.val.t
 
+      attr(mod_ANCOVA, "prediction_model") <- prediction_model
       mod_ANCOVA$test_margin <- list('test_stat' = test_stat, 'test_result' = test)
     }
 
@@ -156,14 +152,14 @@ lm.procova <- function(data.list,
       rct.dm$pred0 <- predict(prediction_model, newdata = rct, ...)
       rct.dm$pred0 <- rct.dm$pred0 - mean(rct.dm$pred0)
 
-      if (rct.dm$pred0 == rct.dm$pred1) {
+      if (identical(rct.dm$pred0,rct.dm$pred1)) {
         stop("The predicted values for treatment and control are equal.
              You probably didn't include the treatment indicator as a covariate
              in the pred.model.")
       }
 
       # Formula used for estimating ATE with PROCOVA. pred (estimated prognostic score) is estimated using pred.model
-      formula.PROCOVA  <- formula(paste0("y ~ w + pred1 + pred0", dplyr::case_when(
+      formula.PROCOVA  <- formula(paste0("y ~ w + pred1 + pred0 + ", dplyr::case_when(
         is.null(adj.covs) & !interaction ~ "1",
         !is.null(adj.covs) & interaction ~ paste0(paste0(adj.covs, collapse = " + "), "+", "pred1*w + pred0*w", "+", paste0(adj.covs, "*w", collapse = " + ")),
         is.null(adj.covs) & interaction ~ "w*pred1 + w*pred0",
@@ -176,9 +172,12 @@ lm.procova <- function(data.list,
       test_stat <- (estimate - margin)/std.err
       test <- test_stat > crit.val.t
 
+      attr(mod_ANCOVA, "prediction_model") <- prediction_model
       mod_ANCOVA$test_margin <- list('test_stat' = test_stat, 'test_result' = test)
     }
   }
+
+  attr(mod_ANCOVA, "crit.val.t") <- crit.val.t
 
   return(mod_ANCOVA)
 }

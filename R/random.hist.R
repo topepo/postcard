@@ -14,8 +14,8 @@
 #'
 #' @importFrom dplyr select
 #'
-random.hist <- function(data.hist, outcome.var = "y") {
-  ran <- data.hist %>% dplyr::select(outcome.var) %>% range()
+random.hist <- function(data.hist) {
+  ran <- data.hist %>% dplyr::select("y") %>% range()
   class(ran) <- "random"
   return(ran)
 }

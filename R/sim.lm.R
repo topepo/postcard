@@ -25,36 +25,32 @@
 #' with same distribution of the historical data), $rct (current RCT data)
 #' and multiple attributes.
 #'
-#'
-#'
-#'
 #' @examples
-#' simulate.lm(N.sim = 1, N.hist.control = 10, N.hist.treatment = 0,
-#'               N.control = 1, N.treatment = 1)
+#' sim.lm(N.sim = 10, N.hist.control = 200, N.hist.treatment = 200,
+#'               N.control = 100, N.treatment = 100)
 #'
-#' @importFrom future plan
+#' @importFrom future plan availableCores
 #' @importFrom future.apply future_lapply
 #' @importFrom magrittr "%>%"
 #' @importFrom MASS mvrnorm
 #'
 #' @export
-simulate.lm <- function(ATE = 3,
-                        ATE.shift = rnorm(1, 0, 0.1),
-                        N.covs = 10,
-                        N.overspec = 0,
-                        coefs = c(0.5, 1, 1),
-                        mu.shift = 0,
-                        cov = diag(1, N.covs + N.overspec),
-                        noise = 1,
-                        N.hist.control = 5000,
-                        N.hist.treatment = 100,
-                        N.test.control = 0,
-                        N.test.treatment = 0,
-                        N.control = 200,
-                        N.treatment = 300,
-                        N.sim = 1000,
-                        workers = future::availableCores()
-){
+sim.lm <- function(ATE = 3,
+                   ATE.shift = rnorm(1, 0, 0.1),
+                   N.covs = 10,
+                   N.overspec = 0,
+                   coefs = c(0.5, 1, 1),
+                   mu.shift = 0,
+                   cov = diag(1, N.covs + N.overspec),
+                   noise = 1,
+                   N.hist.control = 5000,
+                   N.hist.treatment = 100,
+                   N.test.control = 0,
+                   N.test.treatment = 0,
+                   N.control = 200,
+                   N.treatment = 300,
+                   N.sim = 1000,
+                   workers = future::availableCores()){
 
   ####### Check if variables are defined correctly ##########
   stopifnot(is.numeric(ATE), length(ATE) == 1L,
@@ -71,19 +67,6 @@ simulate.lm <- function(ATE = 3,
             is.numeric(N.control), length(N.control) == 1L,
             is.numeric(N.treatment), length(N.treatment) == 1L,
             is.numeric(N.sim), length(N.sim) == 1L)
-
-
-  out <- list()
-  attr(out, "ATE") <- ATE
-  attr(out, "ATE.shift") <- ATE.shift
-  attr(out, "N.covs") <- N.covs
-  attr(out, "coefs") <- coefs
-  attr(out, "N.hist.control") <- N.hist.control
-  attr(out, "N.hist.treatment") <- N.hist.treatment
-  attr(out, "N.control") <- N.control
-  attr(out, "N.treatment") <- N.treatment
-  attr(out, "N.test.control") <- N.test.control
-  attr(out, "N.test.treatment") <- N.test.treatment
 
   varnames <- paste0("x", 1:(N.covs + N.overspec))
   ATE_new <- ATE + ATE.shift
@@ -152,6 +135,18 @@ simulate.lm <- function(ATE = 3,
   })
 
   out <- as.list(out)
+  attr(out, "ATE") <- ATE
+  attr(out, "ATE.shift") <- ATE.shift
+  attr(out, "N.covs") <- N.covs
+  attr(out, "coefs") <- coefs
+  attr(out, "N.hist.control") <- N.hist.control
+  attr(out, "N.hist.treatment") <- N.hist.treatment
+  attr(out, "N.control") <- N.control
+  attr(out, "N.treatment") <- N.treatment
+  attr(out, "N.test.control") <- N.test.control
+  attr(out, "N.test.treatment") <- N.test.treatment
+
+  out
 }
 
 

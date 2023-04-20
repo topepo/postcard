@@ -3,7 +3,6 @@
 #' See glmn::cv.glmnet for further details
 #'
 #' @param data.hist    Data.frame of the historical data used to build the regression model.
-#' @param outcome.var  Character with the name of the outcome variable in both data.hist.
 #' @param method.covs  Character vector with names of the covariates to use as baseline covariates in the prediction model. Make sure that categorical variables are considered as factors.
 #'
 #' @return
@@ -17,10 +16,10 @@
 #'
 #' @export
 #'
-lasso.hist <- function(data.hist, outcome.var = "y", method.covs = c("x1", "x2")){
+lasso.hist <- function(data.hist, method.covs = c("x1", "x2")){
 
   glmnet::cv.glmnet(data.hist %>%
                       dplyr::select(method.covs) %>%
                       as.matrix(),
-                    data.hist %>% dplyr::pull(outcome.var))
+                    data.hist %>% dplyr::pull("y"))
 }

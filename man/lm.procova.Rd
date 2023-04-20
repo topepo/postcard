@@ -18,7 +18,7 @@ lm.procova(
 )
 }
 \arguments{
-\item{data.list}{A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively.}
+\item{data.list}{A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively. The object can also include hist_test for prospective power estimation when setting est.power = TRUE.}
 
 \item{method}{Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). If method = "Procova" and data.list$hist contains treatment patients, then the ANCOVA model is adjusted by \eqn{(\hat{E[Y(0)|X]}, \hat{E[Y(1)|X]})}, that is the prediction for both control and treatment medicine.}
 
@@ -32,7 +32,7 @@ lm.procova(
 
 \item{adj.covs}{Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.}
 
-\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}}
+\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}}
 
 \item{interaction}{Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.}
 
