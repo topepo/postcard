@@ -24,11 +24,19 @@
 #' lm.hist returns an object of \code{\link[base]{class}} "lm". The functions summary and \code{\link[stats]{anova}} are used to obtain and print
 #' a summary and analysis of variance table of the results. The generic accessor functions coefficients, effects, fitted.values and residuals
 #' extract various useful features of the value returned by lm. The object contains a list of the same components as an object of class "lm"
-#' but with the extra component $test_margin, which is a list of the  t-test statistic value 'test_stat' and the result of the t-test 'test_result'
+#' but with the extra component $test_margin, which is a list of the critical value 'crit.val.t' t-test statistic value 'test_stat' and the result of the t-test 'test_result'
 #' based on the superiority margin. Look at \code{\link[stats]{lm}} for further information on the class.
 #'
 #' @importFrom dplyr rename mutate across case_when
 #' @importFrom magrittr "%>%"
+#' @importFrom stats formula predict qt lm
+#'
+#'
+#' @examples
+#' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+#'               N.control = 50, N.treatment = 50)
+#'
+#' lm.procova(data[[1]], method = "PROCOVA", pred.model = random.hist)
 #'
 #' @export
 #'
@@ -79,23 +87,23 @@ lm.procova <- function(data.list,
   if (method == "none") {
     n <- nrow(data.list$rct)
     n.adj <- length(adj.covs) + ifelse(interaction, length(adj.covs), 0)
-    crit.val.t <- qt(1 - alpha/2, n - 2 - n.adj)
+    crit.val.t <- stats::qt(1 - alpha/2, n - 2 - n.adj)
     rct.dm <- data.list$rct.dm
 
     ## Treatment estimate without use of historical data
-    formula.ancova  <- formula(paste0("y ~ w + ",dplyr::case_when(
+    formula.ancova  <- stats::formula(paste0("y ~ w + ",dplyr::case_when(
       is.null(adj.covs) ~ "1",
       !is.null(adj.covs) & interaction ~ paste0(paste0(adj.covs, collapse = " + "), " + ", paste0(adj.covs, "*w", collapse = " + ")),
       T ~ paste0(adj.covs, collapse = " + "))))
 
-    mod_ANCOVA <- lm(formula = formula.ancova, data = rct.dm)
+    mod_ANCOVA <- stats::lm(formula = formula.ancova, data = rct.dm)
     s1 <- summary(mod_ANCOVA)
     estimate <- s1$coefficients["w", "Estimate"]
     std.err <- s1$coefficients["w", "Std. Error"]
     test_stat <- (estimate - margin)/std.err
     test <- test_stat > crit.val.t
 
-    mod_ANCOVA$test_margin <- list('test_stat' = test_stat, 'test_result' = test)
+    mod_ANCOVA$test_margin <- list('crit.val.t' = crit.val.t, 'test_stat' = test_stat, 'test_result' = test)
   }
 
   ######## PROCOVA model #########
@@ -111,21 +119,21 @@ lm.procova <- function(data.list,
 
     ## Check if there is 0 historical treatment patients
     if (n1_hist == 0) {
-      crit.val.t <- qt(1 - alpha/2, n - 3 - n.adj)
+      crit.val.t <- stats::qt(1 - alpha/2, n - 3 - n.adj)
 
       # Model build on non-demeaned baseline values and then the predicted values are determined from the rct and afterwards demeaned
       prediction_model <- pred.model(hist)
-      rct.dm$pred <- predict(prediction_model, newdata = rct, ...)
+      rct.dm$pred <- stats::predict(prediction_model, newdata = rct, ...)
       rct.dm$pred <- rct.dm$pred - mean(rct.dm$pred)
 
       # Formula used for estimating ATE with PROCOVA. pred (estimated prognostic score) is estimated using pred.model
-      formula.PROCOVA  <- formula(paste0("y ~ w + pred +", dplyr::case_when(
+      formula.PROCOVA  <- stats::formula(paste0("y ~ w + pred +", dplyr::case_when(
         is.null(adj.covs) & !interaction ~ "1",
         !is.null(adj.covs) & interaction ~ paste0(paste0(adj.covs, collapse = " + "), "+", "pred*w", "+", paste0(adj.covs, "*w", collapse = " + ")),
         is.null(adj.covs) & interaction ~ "w*pred",
         T ~ paste0(adj.covs, collapse = " + "))))
 
-      mod_ANCOVA <- lm(formula = formula.PROCOVA, data = rct.dm)
+      mod_ANCOVA <- stats::lm(formula = formula.PROCOVA, data = rct.dm)
       s1 <- summary(mod_ANCOVA)
       estimate <- s1$coefficients["w", "Estimate"]
       std.err <- s1$coefficients["w", "Std. Error"]
@@ -133,23 +141,23 @@ lm.procova <- function(data.list,
       test <- test_stat > crit.val.t
 
       attr(mod_ANCOVA, "prediction_model") <- prediction_model
-      mod_ANCOVA$test_margin <- list('test_stat' = test_stat, 'test_result' = test)
+      mod_ANCOVA$test_margin <- list('crit.val.t' = crit.val.t, 'test_stat' = test_stat, 'test_result' = test)
     }
 
     ## Check if there is there is any historical treatment patients
     if (n1_hist > 0) {
-      crit.val.t <- qt(1 - alpha/2, n - 4 - n.adj) #-4 because we predict both as if they receive control and treatment
+      crit.val.t <- stats::qt(1 - alpha/2, n - 4 - n.adj) #-4 because we predict both as if they receive control and treatment
 
       # Model build on non-demeaned baseline values and then the predicted values are determined from the rct and afterwards demeaned
       prediction_model <- pred.model(hist)
       # Predict as if they receive treatment
       rct <- rct %>% dplyr::rename(w_actual = "w")
       rct <- rct %>% dplyr::mutate("w" = 1)
-      rct.dm$pred1 <- predict(prediction_model, newdata = rct, ...)
+      rct.dm$pred1 <- stats::predict(prediction_model, newdata = rct, ...)
       rct.dm$pred1 <- rct.dm$pred1 - mean(rct.dm$pred1)
       # Predict as if they receive control
       rct <- rct %>% dplyr::mutate("w" = 0)
-      rct.dm$pred0 <- predict(prediction_model, newdata = rct, ...)
+      rct.dm$pred0 <- stats::predict(prediction_model, newdata = rct, ...)
       rct.dm$pred0 <- rct.dm$pred0 - mean(rct.dm$pred0)
 
       if (identical(rct.dm$pred0,rct.dm$pred1)) {
@@ -159,13 +167,13 @@ lm.procova <- function(data.list,
       }
 
       # Formula used for estimating ATE with PROCOVA. pred (estimated prognostic score) is estimated using pred.model
-      formula.PROCOVA  <- formula(paste0("y ~ w + pred1 + pred0 + ", dplyr::case_when(
+      formula.PROCOVA  <- stats::formula(paste0("y ~ w + pred1 + pred0 + ", dplyr::case_when(
         is.null(adj.covs) & !interaction ~ "1",
         !is.null(adj.covs) & interaction ~ paste0(paste0(adj.covs, collapse = " + "), "+", "pred1*w + pred0*w", "+", paste0(adj.covs, "*w", collapse = " + ")),
         is.null(adj.covs) & interaction ~ "w*pred1 + w*pred0",
         T ~ paste0(adj.covs, collapse = " + "))))
 
-      mod_ANCOVA <- lm(formula = formula.PROCOVA, data = rct.dm)
+      mod_ANCOVA <- stats::lm(formula = formula.PROCOVA, data = rct.dm)
       s1 <- summary(mod_ANCOVA)
       estimate <- s1$coefficients["w", "Estimate"]
       std.err <- s1$coefficients["w", "Std. Error"]
@@ -173,11 +181,9 @@ lm.procova <- function(data.list,
       test <- test_stat > crit.val.t
 
       attr(mod_ANCOVA, "prediction_model") <- prediction_model
-      mod_ANCOVA$test_margin <- list('test_stat' = test_stat, 'test_result' = test)
+      mod_ANCOVA$test_margin <- list('crit.val.t' = crit.val.t, 'test_stat' = test_stat, 'test_result' = test)
     }
   }
-
-  attr(mod_ANCOVA, "crit.val.t") <- crit.val.t
 
   return(mod_ANCOVA)
 }

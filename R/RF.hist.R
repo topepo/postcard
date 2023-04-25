@@ -13,11 +13,20 @@
 #' @importFrom magrittr "%>%"
 #' @importFrom parsnip rand_forest set_engine fit
 #' @importFrom ranger ranger
+#' @importFrom stats formula
+#'
+#' @examples
+#' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+#'               N.control = 50, N.treatment = 50)
+#'
+#' object <- RF.hist(data[[1]]$hist)
+#'
+#' predict(object, new_data = data[[1]]$rct)
 #'
 RF.hist <- function(data.hist, method.covs = c("x1", "x2")){
 
   k <- length(method.covs)
-  formula_RF <- formula(paste0("y", " ~ ", paste0(method.covs, collapse = " + ")))
+  formula_RF <- stats::formula(paste0("y", " ~ ", paste0(method.covs, collapse = " + ")))
 
   rf1 <- parsnip::rand_forest(
     mode = "regression",

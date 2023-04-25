@@ -42,7 +42,7 @@ lm.procova(
 lm.hist returns an object of \code{\link[base]{class}} "lm". The functions summary and \code{\link[stats]{anova}} are used to obtain and print
 a summary and analysis of variance table of the results. The generic accessor functions coefficients, effects, fitted.values and residuals
 extract various useful features of the value returned by lm. The object contains a list of the same components as an object of class "lm"
-but with the extra component $test_margin, which is a list of the  t-test statistic value 'test_stat' and the result of the t-test 'test_result'
+but with the extra component $test_margin, which is a list of the critical value 'crit.val.t' t-test statistic value 'test_stat' and the result of the t-test 'test_result'
 based on the superiority margin. Look at \code{\link[stats]{lm}} for further information on the class.
 }
 \description{
@@ -53,4 +53,11 @@ the outcome for $rct.
 If the prediction model is fitted separately the predicted values can be added to the $rct data set and then using method = "None" and adding
 the name of the column with the predicted values to adj.covs will result in using the PROCOVA method. This could be the case when a model has
 already been fitted to the historical data before the trial data is available.
+}
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+lm.procova(data[[1]], method = "PROCOVA", pred.model = random.hist)
+
 }

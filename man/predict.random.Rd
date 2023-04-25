@@ -4,16 +4,27 @@
 \alias{predict.random}
 \title{Predict for class random}
 \usage{
-\method{predict}{random}(ran, newdata)
+\method{predict}{random}(object, ..., newdata)
 }
 \arguments{
-\item{ran}{object of class random.}
+\item{object}{An object of class random, for example generated from random.hist.}
 
-\item{newdata}{The new data that}
+\item{...}{additional arguments for the predict function.}
+
+\item{newdata}{The new data that the randomly predicted values should be determined for.}
 }
 \value{
 Returns a numeric object with the "predicted" values.
 }
 \description{
 Predict for class random
+}
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+object <- random.hist(data[[1]]$hist)
+
+predict(object, newdata = data[[1]]$rct)
+
 }

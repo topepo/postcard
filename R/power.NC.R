@@ -8,7 +8,7 @@
 #' @param n.adj           Number of adjustment covariates.
 #' @param ATE             Minimum effect size that we should be able to detect.
 #' @param margin          Superiority margin (for non-inferiority margin, a negative value can be provided).
-#' @param alpha           Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\% is used.
+#' @param alpha           Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #' @param method          Method is specified as either ANOVA, where no adjustment covariates are used, or ANCOVA where either one or multiple covariates are adjusted for.
 #' @param deflation       Deflation parameter for decreasing rho or R2.
 #' @param inflation       Inflation parameter for increasing sigma.
@@ -53,6 +53,10 @@
 #' @return
 #' The function returns a power approximation based on the non-centrality parameter and the exact t-distribution.
 #'
+#' @examples
+#' power.NC(method = "ANCOVA", rho = 0.7)
+#'
+#' @importFrom stats qt pt
 #'
 #' @export
 power.NC <- function(n = 153,
@@ -81,7 +85,7 @@ power.NC <- function(n = 153,
 
   if (method == "ANOVA") {
     nc <- sqrt(r/(1 + r)^2*(n)) * (ATE - margin)/sqrt(sigma)
-    power <- 1 - pt(q = qt(1 - alpha/2, n - 2), df = n - 2, ncp = nc)
+    power <- 1 - stats::pt(q = stats::qt(1 - alpha/2, n - 2), df = n - 2, ncp = nc)
   }
 
   if (method == "ANCOVA") {
@@ -89,13 +93,13 @@ power.NC <- function(n = 153,
 
     if (!is.null(rho) & is.null(R2)) {
       nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - margin)/(sqrt(sigma * (1 - rho^2)))
-      power <- 1 - pt(q = qt(1 - alpha/2, n - 3), df = n - 3, ncp = nc)
+      power <- 1 - stats::pt(q = stats::qt(1 - alpha/2, n - 3), df = n - 3, ncp = nc)
     }
 
 
     if (is.null(rho) & !is.null(R2)) {
       nc <- sqrt(r/(1 + r)^2 * (n)) * (ATE - margin)/(sqrt(sigma * (1 - R2)))
-      power <- 1 - pt(q = qt(1 - alpha/2, n - 2 - n.adj), df = n - 2 - n.adj, ncp = nc)
+      power <- 1 - stats::pt(q = stats::qt(1 - alpha/2, n - 2 - n.adj), df = n - 2 - n.adj, ncp = nc)
     }
 
     if (!is.null(rho) & !is.null(R2)) {

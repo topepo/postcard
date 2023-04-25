@@ -7,7 +7,7 @@
 #' @param R2          The estimated pooled multiple correlation coefficient between outcome and covariates.
 #' @param ATE         Minimum effect size that we should be able to detect.
 #' @param margin      Superiority margin (for non-inferiority margin, a negative value can be provided).
-#' @param alpha       Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\% is used.
+#' @param alpha       Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #' @param method      Method is specified as either ANOVA, where no adjustment covariates are used, or ANCOVA where either one or multiple covariates are adjusted for.
 #' @param deflation   Deflation parameter for decreasing rho or R2.
 #' @param inflation   Inflation parameter for increasing sigma.
@@ -33,7 +33,9 @@
 #' The function returns a power approximation based on the Guenther-Schouten approximation
 #'
 #' @examples
-#' GS_power(method = "ANCOVA", rho = 0.7)
+#' power.GS(method = "ANCOVA", rho = 0.7)
+#'
+#' @importFrom stats pnorm qnorm
 #'
 #' @export
 #'
@@ -64,7 +66,7 @@ power.GS <- function(n = 153,
 
   if (method == "ANOVA") {
 
-    power <- pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/sigma*(n - qnorm(1 - alpha/2)^2/2)) - qnorm(1 - alpha/2))
+    power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/sigma*(n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
 
   }
 
@@ -73,13 +75,13 @@ power.GS <- function(n = 153,
 
     if (!is.null(rho) & is.null(R2)) {
 
-      power <- pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - rho^2)) * (n - qnorm(1 - alpha/2)^2/2)) - qnorm(1 - alpha/2))
+      power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - rho^2)) * (n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
     }
 
 
     if (is.null(rho) & !is.null(R2)) {
 
-      power <- pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - R2)) * (n - qnorm(1 - alpha/2)^2/2)) - qnorm(1 - alpha/2))
+      power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - R2)) * (n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
     }
 
     if (!is.null(rho) & !is.null(R2)) {

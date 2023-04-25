@@ -14,9 +14,16 @@
 #'
 #' @importFrom dplyr select
 #'
+#' @examples
+#' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+#'               N.control = 50, N.treatment = 50)
+#'
+#' random.hist(data[[1]]$hist)
+#'
+#'
 random.hist <- function(data.hist) {
   ran <- data.hist %>% dplyr::select("y") %>% range()
-  class(ran) <- "random"
+  class(ran) <- c("random", class(ran))
   return(ran)
 }
 

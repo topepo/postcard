@@ -18,3 +18,12 @@ parsnip::rand_forest.
 \description{
 Random forest regression as a function of the historical data
 }
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+object <- RF.hist(data[[1]]$hist)
+
+predict(object, new_data = data[[1]]$rct)
+
+}

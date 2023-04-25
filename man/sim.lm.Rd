@@ -6,7 +6,7 @@
 \usage{
 sim.lm(
   ATE = 3,
-  ATE.shift = rnorm(1, 0, 0.1),
+  ATE.shift = stats::rnorm(1, 0, 0.1),
   N.covs = 10,
   N.overspec = 0,
   coefs = c(0.5, 1, 1),
@@ -65,7 +65,7 @@ and multiple attributes.
 Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
 }
 \examples{
-sim.lm(N.sim = 10, N.hist.control = 200, N.hist.treatment = 200,
+sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,
               N.control = 100, N.treatment = 100)
 
 }

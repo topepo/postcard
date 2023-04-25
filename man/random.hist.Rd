@@ -23,3 +23,11 @@ determines the range of the outcome variable in the historical data, and returns
 range as a object of class "random". Then predict.random randomly predicts the outcome
 within this range.
 }
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+random.hist(data[[1]]$hist)
+
+
+}

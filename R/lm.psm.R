@@ -36,7 +36,14 @@
 #' @import     randomForest
 #' @importFrom Matching Match
 #' @importFrom extraDistr rinvchisq
+#' @importFrom stats formula qt lm terms coef rnorm
 #'
+#'
+#' @examples
+#' data <- sim.lm(N.sim = 1, N.hist.control = 1000, N.hist.treatment = 0,
+#'               N.control = 50, N.treatment = 100)
+#'
+#' lm.psm(data[[1]])
 #'
 #'
 lm.psm <- function(data.list,
@@ -90,7 +97,7 @@ lm.psm <- function(data.list,
   n0 <- rct[rct$w == 0, ] %>% nrow()
   n_hist <- hist %>%  nrow()
   n.adj <- length(adj.covs) + ifelse(interaction, length(adj.covs), 0)
-  crit.val.t <- qt(1 - alpha/2, n - 2 - n.adj)
+  crit.val.t <- stats::qt(1 - alpha/2, n - 2 - n.adj)
 
   if (n1 <= n0) {
     stop("The number of current treatment patients is lower than the number of
@@ -103,7 +110,7 @@ lm.psm <- function(data.list,
   }
 
   # Calculate propensity score
-  formula.psm <- formula(paste0("w ~ ", paste0(colnames(data.match)[!colnames(data.match) %in% c("w", "y", "HC")], collapse = "+")))
+  formula.psm <- stats::formula(paste0("w ~ ", paste0(colnames(data.match)[!colnames(data.match) %in% c("w", "y", "HC")], collapse = "+")))
   md <- MatchIt::matchit(f = formula.psm, data = data.match, ...)
   data.match$prop_score <- md$distance
 
@@ -143,12 +150,12 @@ lm.psm <- function(data.list,
   # Estimate bias in HC
   formula.input <- list(...)$formula
   if (!is.null(formula.input)) {
-    my_terms <- attr(terms(formula.input), "term.labels")
+    my_terms <- attr(stats::terms(formula.input), "term.labels")
   } else {
-    my_terms <- attr(terms(formula.psm), "term.labels")
+    my_terms <- attr(stats::terms(formula.psm), "term.labels")
   }
-  formula.bias  <- formula(paste0("y ~ HC +", paste0(my_terms, collapse = "+")))
-  bias_sum <- lm(formula.bias, data = CC.HC) %>% summary
+  formula.bias  <- stats::formula(paste0("y ~ HC +", paste0(my_terms, collapse = "+")))
+  bias_sum <- stats::lm(formula.bias, data = CC.HC) %>% summary
   sigma2 <- bias_sum$sigma^2
 
   n_c <- nrow(CC.HC)
@@ -157,20 +164,20 @@ lm.psm <- function(data.list,
   # Sampling estimates s^2 of sigma^2
   s2 <- extraDistr::rinvchisq(n = B, nu = n_c - p - 2, tau = sigma2)
   # Finding conditional variance of bias estimate
-  eta_var <- coef(bias_sum)["HC", "Std. Error"]^2 / sigma2 * s2
+  eta_var <- stats::coef(bias_sum)["HC", "Std. Error"]^2 / sigma2 * s2
   # Sample bias estimates using conditional variances
-  bias_est <- rnorm(B, coef(bias_sum)["HC", "Estimate"], eta_var)
+  bias_est <- stats::rnorm(B, stats::coef(bias_sum)["HC", "Estimate"], eta_var)
 
   # Subtract bias from response of HC patients
   data_m <- data_m.b <- rbind(AT.HC, CC.AT)
 
-  formula.lm <- formula(paste0("y ~ w + ",dplyr::case_when(is.null(adj.covs) ~ "1",
+  formula.lm <- stats::formula(paste0("y ~ w + ",dplyr::case_when(is.null(adj.covs) ~ "1",
                                                            !is.null(adj.covs) & interaction ~ paste0(paste0(adj.covs, collapse = " + "), " + ", paste0(adj.covs, "*w", collapse = " + ")),
                                                            T ~ paste0(adj.covs, collapse = " + "))))
 
   boot_est <- function(x){
     data_m.b$y[data_m.b$HC == 1] <- data_m$y[data_m$HC == 1] - x
-    fit_b <- lm(formula.lm, data = data_m.b) %>% summary %>% coef
+    fit_b <- stats::lm(formula.lm, data = data_m.b) %>% summary %>% stats::coef()
     list(estimate.b = fit_b["w", "Estimate"], std.err.b = fit_b["w", "Std. Error"])
   }
 
@@ -185,7 +192,7 @@ lm.psm <- function(data.list,
   test_stat <- (estimate - margin)/std.err
   test <- test_stat > crit.val.t
 
-  res <- list('estimate' = estimate, 'std.err' = std.err, 'test_stat' = test_stat, 'test_result' = test)
+  res <- list('estimate' = estimate, 'std.err' = std.err, 'crit.val.t' = crit.val.t, 'test_stat' = test_stat, 'test_result' = test)
 
 
   return(res)

@@ -9,7 +9,7 @@ power.ancova(
   outcome.var = "y",
   treatment.var = "w",
   adj.covs = NULL,
-  interaction = NULL,
+  interaction = FALSE,
   n,
   r,
   ATE,
@@ -35,6 +35,8 @@ power.ancova(
 \item{ATE}{Minimum effect size that we should be able to detect.}
 
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
+
+\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
 }
 \value{
 Vector of the estimated entities sigma, rho/R2, power_NC, and power_GS.
@@ -51,4 +53,12 @@ In addition, the necessary entities for these calculations are outputted.
 When wanting to estimate the power for the PROCOVA method add a column to data.hist with the predicted values using the prognostic model and add the
 name of this column to the adj.covs. Note that data.hist should be independent of the data used to build the the prognostic model to obtain accurate
 power estimations.
+}
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+power.ancova(data[[1]]$hist, n = 53, r = 1, ATE = 3)
+
+
 }

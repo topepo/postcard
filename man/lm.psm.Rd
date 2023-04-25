@@ -53,3 +53,11 @@ ensuring that all control arm patients from the current RCT are used in the trea
 where \eqn{\widehat y_{i}(0)} is the outcome of the matched control group patient to patient i.
 The description of the procedure can be found in further details in the article by Lim et al.
 }
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 1000, N.hist.treatment = 0,
+              N.control = 50, N.treatment = 100)
+
+lm.psm(data[[1]])
+
+
+}

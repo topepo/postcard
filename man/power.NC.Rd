@@ -36,7 +36,7 @@ power.NC(
 
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
-\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\\% is used.}
+\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
 
 \item{method}{Method is specified as either ANOVA, where no adjustment covariates are used, or ANCOVA where either one or multiple covariates are adjusted for.}
 
@@ -82,4 +82,8 @@ the non-centrality parameter as in the univariate case where \eqn{\rho} is repla
 Then the power for ANCOVA with k adjustement covariates can be estimated as
 
 \deqn{1-\beta = 1 - F_{t,n - 2 - n.adj,c(n)}\left(F_{t, n - 2 - n.adj,0), 0}^{-1}(1-\alpha/2)\right).}
+}
+\examples{
+power.NC(method = "ANCOVA", rho = 0.7)
+
 }

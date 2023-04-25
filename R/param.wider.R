@@ -17,12 +17,13 @@
 #'
 #'
 #' @examples
-#' data <- data.frame(subject_id = rep(1:3, rep(4,3)), visit = rep(1:2, rep(2,2)),
-#'                    parameter = rep(c("measure1", "measure2"), 6), analysis_val = rnorm(12, 100, 3))[1:10, ]
+#' data <- data.frame(subject_id = rep(1:3, rep(4,3)), visit = rep(1:2,
+#' rep(2,2)), parameter = rep(c("measure1", "measure2"), 6), analysis_val =
+#' rnorm(12, 100, 3))[1:10, ]
 #'
-#' param_wider(data = data, visit_name = visit, visit_n = 2, param_name = parameter,
-#'             parameters = c("measure1", "measure2"), analysis_value = analysis_val,
-#'             subject_id = subject_id, analysis_day = NULL)
+#' param.wider(data = data, visit_name = visit, visit_n = 2, param_name =
+#' parameter, parameters = c("measure1", "measure2"), analysis_value =
+#' analysis_val, subject_id = subject_id, analysis_day = NULL)
 #'
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr select filter group_by arrange desc slice
@@ -31,7 +32,7 @@
 #'
 #' @export
 #'
-param_wider <- function(data,
+param.wider <- function(data,
                         visit_name,
                         visit_n,
                         param_name,

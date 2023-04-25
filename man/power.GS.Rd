@@ -33,7 +33,7 @@ power.GS(
 
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
-\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 2.5\\% is used.}
+\item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
 
 \item{method}{Method is specified as either ANOVA, where no adjustment covariates are used, or ANCOVA where either one or multiple covariates are adjusted for.}
 
@@ -62,6 +62,6 @@ covariates, and \eqn{\sigma_{XY}} a \eqn{p}-dimensional column vector consisting
 between the outcome variable and each covariate. In the univariate case \eqn{R^2} is replaced by \eqn{\rho}.
 }
 \examples{
-GS_power(method = "ANCOVA", rho = 0.7)
+power.GS(method = "ANCOVA", rho = 0.7)
 
 }

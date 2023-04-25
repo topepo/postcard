@@ -19,3 +19,11 @@ glmnet::cv.glmnet.
 \description{
 See glmn::cv.glmnet for further details
 }
+\examples{
+data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+              N.control = 50, N.treatment = 50)
+
+lasso.hist(data[[1]]$hist)
+
+
+}

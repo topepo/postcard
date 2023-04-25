@@ -26,17 +26,18 @@
 #' and multiple attributes.
 #'
 #' @examples
-#' sim.lm(N.sim = 10, N.hist.control = 200, N.hist.treatment = 200,
+#' sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,
 #'               N.control = 100, N.treatment = 100)
 #'
-#' @importFrom future plan availableCores
+#' @importFrom future plan availableCores multisession
 #' @importFrom future.apply future_lapply
 #' @importFrom magrittr "%>%"
 #' @importFrom MASS mvrnorm
+#' @importFrom stats formula model.matrix
 #'
 #' @export
 sim.lm <- function(ATE = 3,
-                   ATE.shift = rnorm(1, 0, 0.1),
+                   ATE.shift = stats::rnorm(1, 0, 0.1),
                    N.covs = 10,
                    N.overspec = 0,
                    coefs = c(0.5, 1, 1),
@@ -70,8 +71,8 @@ sim.lm <- function(ATE = 3,
 
   varnames <- paste0("x", 1:(N.covs + N.overspec))
   ATE_new <- ATE + ATE.shift
-  future::plan(multisession, workers = workers)
 
+  future::plan(future::multisession, workers = workers)
   out <- future.apply::future_lapply(1:N.sim, future.seed = TRUE, FUN = function(k){
 
     res <- list()
@@ -86,9 +87,9 @@ sim.lm <- function(ATE = 3,
       rownames(data.hist) <- 1:nrow(data.hist)
 
       data.hist$w <- c(rep(0, N.hist.control), rep(1, N.hist.treatment), rep(0, N.test.control), rep(1, N.test.treatment))
-      data.hist$y <- ATE_new*data.hist$w + rnorm(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment, 0, noise)
+      data.hist$y <- ATE_new*data.hist$w + stats::rnorm(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment, 0, noise)
 
-      X <- model.matrix(formula(paste0("y ~ ",
+      X <- stats::model.matrix(stats::formula(paste0("y ~ ",
                                        paste0("(", paste0("x", 1:N.covs, collapse = "+"),")^2"),
                                        "+",
                                        paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
@@ -114,9 +115,9 @@ sim.lm <- function(ATE = 3,
       colnames(data.rct) <- varnames
       data.rct$w <- c(rep(0, N.control), rep(1, N.treatment))
 
-      data.rct$y <- ATE*data.rct$w + rnorm(N.control + N.treatment, 0, noise)
+      data.rct$y <- ATE*data.rct$w + stats::rnorm(N.control + N.treatment, 0, noise)
 
-      X <- model.matrix(formula(paste0("y ~ ",
+      X <- stats::model.matrix(stats::formula(paste0("y ~ ",
                                        paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
                                        "+",
                                        paste0("I(x", 1:N.covs, "^2)", collapse = "+"),

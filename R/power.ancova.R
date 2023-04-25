@@ -19,21 +19,29 @@
 #' @param r               Allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation r=1.
 #' @param ATE             Minimum effect size that we should be able to detect.
 #' @param margin          Superiority margin (for non-inferiority margin, a negative value can be provided).
+#' @param alpha           Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #'
 #' @importFrom dplyr pull select all_of select_if
 #' @importFrom magrittr "%>%"
+#' @importFrom stats setNames var cov cor
 #'
 #' @return
 #' Vector of the estimated entities sigma, rho/R2, power_NC, and power_GS.
 #'
 #' @export
 #'
+#' @examples
+#' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+#'               N.control = 50, N.treatment = 50)
+#'
+#' power.ancova(data[[1]]$hist, n = 53, r = 1, ATE = 3)
+#'
 #'
 power.ancova <- function(data.hist,
                          outcome.var = "y",
                          treatment.var = "w",
                          adj.covs = NULL,
-                         interaction = NULL,
+                         interaction = FALSE,
                          n,
                          r,
                          ATE,
@@ -52,24 +60,24 @@ power.ancova <- function(data.hist,
             is.numeric(r) | length(r) == 1L)
 
   # Calculate entities for power estimation
-  sigma <- data.hist %>% dplyr::pull(outcome.var) %>% var() %>% as.numeric()
+  sigma <- stats::var(x = data.hist %>% dplyr::pull(outcome.var)) %>% as.numeric()
 
   #### ANOVA
   if (is.null(adj.covs)) {
     power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, margin = margin, method = "ANOVA", alpha = alpha)
     power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, margin = margin, method = "ANOVA", alpha = alpha)
 
-    prelim <- c(sigma, power_NC, power_GS) %>% setNames(c("sigma", "power_NC", "power_GS"))
+    prelim <- c(sigma, power_NC, power_GS) %>% stats::setNames(nm = c("sigma", "power_NC", "power_GS"))
   }
 
   #### ANCOVA with 1 covariate and no interaction between W and the covariate
   if (length(adj.covs) == 1 & interaction == FALSE) {
-    rho <- cor(data.hist[, adj.covs], data.hist %>% dplyr::pull(outcome.var)) %>% as.numeric()
+    rho <- stats::cor(data.hist[, adj.covs], data.hist %>% dplyr::pull(outcome.var)) %>% as.numeric()
 
     power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, margin = margin, method = "ANCOVA", alpha = alpha)
     power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, rho = rho, margin = margin, method = "ANCOVA", alpha = alpha)
 
-    prelim <- c(sigma, rho, power_NC, power_GS) %>% setNames(c("sigma", "rho", "power_NC", "power_GS"))
+    prelim <- c(sigma, rho, power_NC, power_GS) %>% stats::setNames(nm = c("sigma", "rho", "power_NC", "power_GS"))
   }
 
 
@@ -90,13 +98,13 @@ power.ancova <- function(data.hist,
 
     # If W=0 for all participants R2 is calculated as if interaction = FALSE
     Sigma_X.I <- data.hist %>% dplyr::select(dplyr::all_of(c(adj.covs, new_cols))) %>% dplyr::select_if(~ sum(.) != 0) %>% cov() %>% chol() %>% chol2inv()
-    R2 <- ( cov(data.hist %>% dplyr::pull(outcome.var), data.hist[, c(adj.covs, new_cols)]) %*% Sigma_X.I %*% cov(data.hist[, c(adj.covs, new_cols)], data.hist %>% dplyr::pull(outcome.var)) ) / sigma
+    R2 <- ( stats::cov(data.hist %>% dplyr::pull(outcome.var), data.hist[, c(adj.covs, new_cols)]) %*% Sigma_X.I %*% stats::cov(data.hist[, c(adj.covs, new_cols)], data.hist %>% dplyr::pull(outcome.var)) ) / sigma
     R2 <- R2 %>% as.numeric()
 
     power_NC <- power.NC(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, margin = margin, method = "ANCOVA", alpha = alpha)
     power_GS <- power.GS(n = n, r = r, sigma = sigma, ATE = ATE, R2 = R2, margin = margin, method = "ANCOVA", alpha = alpha)
 
-    prelim <- c(sigma, R2, power_NC, power_GS) %>% setNames(c("sigma", "R2", "power_NC", "power_GS"))
+    prelim <- c(sigma, R2, power_NC, power_GS) %>% stats::setNames(nm = c("sigma", "R2", "power_NC", "power_GS"))
   }
 
   return(prelim)
