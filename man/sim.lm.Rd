@@ -19,7 +19,8 @@ sim.lm(
   N.test.treatment = 0,
   N.control = 200,
   N.treatment = 300,
-  N.sim = 1000,
+  N.sim = 10,
+  parallel = TRUE,
   workers = future::availableCores()
 )
 }
@@ -54,7 +55,9 @@ sim.lm(
 
 \item{N.sim}{Number of generated historical and RCT datasets}
 
-\item{workers}{Number of cores to use for parallelisation. Note that the number of workers you choose should depend on the number of available cores on your computer and the amount of memory required for each task. Setting the number of workers too high can lead to slow performance or even crashes if your computer runs out of memory.}
+\item{parallel}{Logical value. If TRUE the simulations are done using parallelisation using future::plan(future::multicore), which resolves futures asynchronously (in parallel) in separate forked R processes running in the background on the same machine.This is NOT supported on Windows. Reason for not using future::multisession is that this creates and error, probably stemming from a bug in future::multisession.}
+
+\item{workers}{Number of cores to use for parallelisation.}
 }
 \value{
 List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data

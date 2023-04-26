@@ -18,7 +18,8 @@
 #' @param N.control         Number of patients in current RCT control groups
 #' @param N.treatment       Number of patients in current RCT treatment groups
 #' @param N.sim             Number of generated historical and RCT datasets
-#' @param workers           Number of cores to use for parallelisation. Note that the number of workers you choose should depend on the number of available cores on your computer and the amount of memory required for each task. Setting the number of workers too high can lead to slow performance or even crashes if your computer runs out of memory.
+#' @param parallel          Logical value. If TRUE the simulations are done using parallelisation using future::plan(future::multicore), which resolves futures asynchronously (in parallel) in separate forked R processes running in the background on the same machine.This is NOT supported on Windows. Reason for not using future::multisession is that this creates and error, probably stemming from a bug in future::multisession.
+#' @param workers           Number of cores to use for parallelisation.
 #'
 #' @return
 #' List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
@@ -29,7 +30,7 @@
 #' sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,
 #'               N.control = 100, N.treatment = 100)
 #'
-#' @importFrom future plan availableCores multisession
+#' @importFrom future plan availableCores multicore
 #' @importFrom future.apply future_lapply
 #' @importFrom magrittr "%>%"
 #' @importFrom MASS mvrnorm
@@ -50,7 +51,8 @@ sim.lm <- function(ATE = 3,
                    N.test.treatment = 0,
                    N.control = 200,
                    N.treatment = 300,
-                   N.sim = 1000,
+                   N.sim = 10,
+                   parallel = TRUE,
                    workers = future::availableCores()){
 
   ####### Check if variables are defined correctly ##########
@@ -72,8 +74,7 @@ sim.lm <- function(ATE = 3,
   varnames <- paste0("x", 1:(N.covs + N.overspec))
   ATE_new <- ATE + ATE.shift
 
-  future::plan(future::multisession, workers = workers)
-  out <- future.apply::future_lapply(1:N.sim, future.seed = TRUE, FUN = function(k){
+  sim <- function(k){
 
     res <- list()
 
@@ -90,12 +91,12 @@ sim.lm <- function(ATE = 3,
       data.hist$y <- ATE_new*data.hist$w + stats::rnorm(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment, 0, noise)
 
       X <- stats::model.matrix(stats::formula(paste0("y ~ ",
-                                       paste0("(", paste0("x", 1:N.covs, collapse = "+"),")^2"),
-                                       "+",
-                                       paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
-                                       "+",
-                                       paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
-                        data = data.hist)[,-1]
+                                                     paste0("(", paste0("x", 1:N.covs, collapse = "+"),")^2"),
+                                                     "+",
+                                                     paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
+                                                     "+",
+                                                     paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
+                               data = data.hist)[,-1]
 
       data.hist$y <- data.hist$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
                                            rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
@@ -118,12 +119,12 @@ sim.lm <- function(ATE = 3,
       data.rct$y <- ATE*data.rct$w + stats::rnorm(N.control + N.treatment, 0, noise)
 
       X <- stats::model.matrix(stats::formula(paste0("y ~ ",
-                                       paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
-                                       "+",
-                                       paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
-                                       "+",
-                                       paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
-                        data = data.rct)[,-1]
+                                                     paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
+                                                     "+",
+                                                     paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
+                                                     "+",
+                                                     paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
+                               data = data.rct)[,-1]
 
       data.rct$y <- data.rct$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
                                          rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
@@ -132,8 +133,16 @@ sim.lm <- function(ATE = 3,
     }
 
     res
+  }
 
-  })
+
+  if (parallel) {
+    oplan <-  future::plan(future::multicore, workers = workers)
+    on.exit(plan(oplan))
+    out <- future.apply::future_lapply(X = 1:N.sim, future.seed = TRUE, FUN = sim)
+  } else {
+    out <- lapply(1:N.sim, FUN = sim)
+  }
 
   out <- as.list(out)
   attr(out, "ATE") <- ATE
