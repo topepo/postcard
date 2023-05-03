@@ -18,9 +18,9 @@ lm.procova(
 )
 }
 \arguments{
-\item{data.list}{A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively. The object can also include hist_test for prospective power estimation when setting est.power = TRUE.}
+\item{data.list}{A list of elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively.}
 
-\item{method}{Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). If method = "Procova" and data.list$hist contains treatment patients, then the ANCOVA model is adjusted by \eqn{(\hat{E[Y(0)|X]}, \hat{E[Y(1)|X]})}, that is the prediction for both control and treatment medicine.}
+\item{method}{Method for using historical data. Options: None, PROCOVA, PSM. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). If method = "PROCOVA" and data.list$hist contains treatment patients, then the ANCOVA model is adjusted by \eqn{(\hat{E[Y(0)|X]}, \hat{E[Y(1)|X]})}, that is the prediction for both control and treatment medicine.}
 
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
@@ -28,15 +28,15 @@ lm.procova(
 
 \item{outcome.var}{Character with the name of the outcome variable in both the $rct and $hist data set.}
 
-\item{treatment.var}{Character with the name of the outcome treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.}
+\item{treatment.var}{Character with the name of the treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.}
 
 \item{adj.covs}{Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.}
 
-\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}}
+\item{pred.model}{Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where new_data = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}}
 
 \item{interaction}{Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.}
 
-\item{...}{For method = "Procova", this is extra arguments for stats::predict(). For example using lasso.hist there are some extra arguments s = "lambda.min" and newx = data.hist \%>\% dplyr::select(method.covs) \%>\% as.matrix() needed for using stats::predict. Note that in general newdata = data.list$rct for the predict function, however for models such as the glmnet, the new data is given as the input newx, and hence the newx should be provided as an additional argument for lm.hist.}
+\item{...}{For method = "PROCOVA", this is extra arguments for stats::predict(). For example using lasso.hist there are some extra arguments s = "lambda.min" and newx = data.list$rct \%>\% dplyr::select(method.covs) \%>\% as.matrix() needed for using stats::predict. Note that in general new_data = data.list$rct for the predict function, however for models such as the glmnet, the new data is given as the input newx, and hence the newx should be provided as an additional argument for lm.hist.}
 }
 \value{
 lm.hist returns an object of \code{\link[base]{class}} "lm". The functions summary and \code{\link[stats]{anova}} are used to obtain and print
@@ -47,12 +47,12 @@ based on the superiority margin. Look at \code{\link[stats]{lm}} for further inf
 }
 \description{
 The function fits ANCOVA models using the function \code{\link[stats]{lm}} but potentially leveraging a historical data set. Historical data can be
-leveraged through the PROCOVA method and PSM. Setting method = "Procova" the functions will fit the pred.model to $hist and use this to predict
+leveraged through the PROCOVA method. Setting method = "PROCOVA" the functions will fit the pred.model to $hist and use this to predict
 the outcome for $rct.
 
 If the prediction model is fitted separately the predicted values can be added to the $rct data set and then using method = "None" and adding
 the name of the column with the predicted values to adj.covs will result in using the PROCOVA method. This could be the case when a model has
-already been fitted to the historical data before the trial data is available.
+already been fitted to the historical data before the new trial data is available.
 }
 \examples{
 data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,

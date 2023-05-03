@@ -2,7 +2,7 @@
 #'
 #' @param object   An object of class random, for example generated from random.hist.
 #' @param ...      additional arguments for the predict function.
-#' @param newdata  The new data that the randomly predicted values should be determined for.
+#' @param new_data  The new data that the randomly predicted values should be determined for.
 #'
 #' @return
 #' Returns a numeric object with the "predicted" values.
@@ -19,8 +19,8 @@
 #'
 #' predict(object, newdata = data[[1]]$rct)
 #'
-predict.random <- function(object, ..., newdata) {
-  fit <- stats::runif(nrow(newdata), object[1], object[2])
+predict.random <- function(object, ..., new_data) {
+  fit <- stats::runif(nrow(new_data), object[1], object[2])
   return(fit)
 }
 

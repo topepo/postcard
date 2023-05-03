@@ -59,7 +59,7 @@ The formula in the case of an ANCOVA model with multiple covariate adjustement i
 where \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 we denote by \eqn{\sigma^2} the variance of the outcome, \eqn{\Sigma_X} the covariance matrix of the
 covariates, and \eqn{\sigma_{XY}} a \eqn{p}-dimensional column vector consisting of the covariance
-between the outcome variable and each covariate. In the univariate case \eqn{R^2} is replaced by \eqn{\rho}.
+between the outcome variable and each covariate. In the univariate case \eqn{R^2} is replaced by \eqn{\rho^2}.
 }
 \examples{
 power.GS(method = "ANCOVA", rho = 0.7)

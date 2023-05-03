@@ -4,14 +4,14 @@
 \alias{predict.random}
 \title{Predict for class random}
 \usage{
-\method{predict}{random}(object, ..., newdata)
+\method{predict}{random}(object, ..., new_data)
 }
 \arguments{
 \item{object}{An object of class random, for example generated from random.hist.}
 
 \item{...}{additional arguments for the predict function.}
 
-\item{newdata}{The new data that the randomly predicted values should be determined for.}
+\item{new_data}{The new data that the randomly predicted values should be determined for.}
 }
 \value{
 Returns a numeric object with the "predicted" values.

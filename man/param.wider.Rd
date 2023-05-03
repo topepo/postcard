@@ -28,12 +28,12 @@ param.wider(
 
 \item{analysis_value}{Name of column with the value of the parameter}
 
-\item{subject_id}{Name of the column with subject identifikation}
+\item{subject_id}{Name of the column with subject identification}
 
 \item{analysis_day}{Name of column with the relative analysis date}
 }
 \value{
-Data set in wide format with a column for each entrence of the parameters vector.
+Data set in wide format with a column for each entrance of the parameters vector.
 }
 \description{
 Function that take a data set and write it to wide format and take baseline measurement as the latest

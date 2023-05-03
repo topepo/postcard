@@ -1,9 +1,18 @@
 #' LASSO regression as function of historical data
 #'
-#' See glmn::cv.glmnet for further details
+#' The function constructs a cv.glmnet model trained on the historical data input data.hist.
+#' The covariates used to train the model can be specified by the argument method.covs. If the
+#' function should be used as the pred.model input for lm.procova or lm.hist.sim a new function
+#' using lasso.hist should be created, see examples below. See glmn::cv.glmnet for further
+#' details on the fitting procedure.
+#'
+#' NOTE: Specifically for the cv.glmnet the predict function needs an input newx instead of the usual
+#' newdata. This means that it is not posible to fit using the oracle estimator where both Y(0) and
+#' Y(1) is emulated, since the newx should be given as an seperate argument in the ... input.
 #'
 #' @param data.hist    Data.frame of the historical data used to build the regression model.
 #' @param method.covs  Character vector with names of the covariates to use as baseline covariates in the prediction model. Make sure that categorical variables are considered as factors.
+#' @param outcome.var  Character with the name of the outcome variable in data.hist.
 #'
 #' @return
 #' An object of class "cv.glmnet" is returned, which is a list with
@@ -17,16 +26,34 @@
 #' @export
 #'
 #' @examples
-#' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
+#'
+#' ###### Direct use of lasso.hist ######
+#' data <- sim.lm(N.sim = 1, N.hist.control = 300, N.hist.treatment = 0,
 #'               N.control = 50, N.treatment = 50)
 #'
 #' lasso.hist(data[[1]]$hist)
 #'
 #'
-lasso.hist <- function(data.hist, method.covs = c("x1", "x2")){
+#' ###### Use of lasso.hist in lm.procova ######
+#'
+#' library(magrittr)
+#'
+#' lasso <- function(data.hist){
+#' lasso.hist(data.hist, method.covs = c("x1", "x2", "x3"), outcome.var = "y")
+#' }
+#'
+#' lm.procova(data.list = data[[1]], method = "PROCOVA", pred.model = lasso,
+#' s = "lambda.min", newx = data[[1]]$rct %>%
+#' dplyr::select(c("x1", "x2", "x3")) %>% as.matrix())
+#'
+#'
+#'
+#'
+lasso.hist <- function(data.hist, method.covs = c("x1", "x2"),
+                       outcome.var = "y"){
 
   glmnet::cv.glmnet(data.hist %>%
                       dplyr::select(method.covs) %>%
                       as.matrix(),
-                    data.hist %>% dplyr::pull("y"))
+                    data.hist %>% dplyr::pull(outcome.var))
 }

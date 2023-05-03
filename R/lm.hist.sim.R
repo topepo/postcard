@@ -8,64 +8,59 @@
 #' Thus, column means can be taken to get averaged results across the different
 #' data sets.
 #'
-#' @param data.list          A list of list elements 1, 2, 3,..., N.sim each with elements $hist and $rct, which are both dataframes being historical and current RCT data sets, respectively. A $hist_test element of the list can be provided for prospective power calculations. Fx. this object could be the output of sim.lm.
+#' @param data.list          A list of list elements 1, 2, 3,..., N.sim each with elements $hist and $rct, which are both data.frames being historical and current RCT data sets, respectively. A $hist_test element of the list can be provided for prospective power calculations. Fx. this object could be the output of sim.lm.
 #' @param method             Method for using historical data. Options: None, PROCOVA, PSM, Oracle0, Oracle. None refers to ANOVA (for adj.covs = NULL) and ANCOVA (for adj.covs specified). For oracle and oracle0 the data.list objects should be generated using sim.lm.
 #' @param margin             Superiority margin (for non-inferiority margin, a negative value can be provided).
 #' @param alpha              Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #' @param outcome.var        Character with the name of the outcome variable in both the $rct and $hist data set.
-#' @param treatment.var      Character with the name of the outcome treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.
+#' @param treatment.var      Character with the name of the treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.
 #' @param adj.covs           Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.
-#' @param interaction        Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "DT", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.
-#' @param est.power          Logical value. If set to TRUE, prospective power calculation is carried out based on theoretical non-centrality parameter as well as Guenther-Schouten approximations, using historical data "hist" and "hist_test" provided in data.list. The entities sigma_2, rho, and R2 are calculated using the historical data, and these can not be specified by the user. Look at NC_power or GS_power if you want a power calculation based on user specified entities. For method="DT", only "hist_test" data is used since "hist" data is used for training the model. In addition, the necessary entities for these calculations are outputted.
+#' @param interaction        Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.
+#' @param est.power          Logical value. If set to TRUE, prospective power calculation is carried out based on theoretical non-centrality parameter as well as Guenther-Schouten approximations, using historical data "hist" and "hist_test" provided in data.list. The entities sigma, rho, and R2 are calculated using the historical data, and these can not be specified by the user. Look at NC_power or GS_power if you want a power calculation based on user specified entities. For method="PROCOVA", only "hist_test" data is used since "hist" data is used for training the model. In addition, the necessary entities for these calculations are outputted.
 #' @param ATE                The average treatment effect. If est.power == TRUE this value is the minimum effect size that we should be able to detect. If data was simulated using the sim.lm function the value is set equal to the ATE attribute from the data set.
-#' @param pred.model         Model object which should be a function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}.
+#' @param pred.model         Model object which should be an R function of the historical data that fits a prediction model based on the baseline covariates. This is only needed for method == "PROCOVA". The model object obtained from the function should be a valid argument for \link[stats]{predict}, where newdata = data.list$rct and with the treatment variable equal to w and outcome variable equal to y. Note that if there is treatment patients in the historical data the prediction model should include treatment.var as a baseline covariate in order to predict \eqn{(E[Y(0)|X], E[Y(1)|X])}.
 #' @param B                  Only relevant for method = PSM. Number of bootstraps for estimating bias between HC and CC groups.
 #' @param L2                 Logical value. Only relevant if method = "PROCOVA" is specified. If set to TRUE, average squared difference between true and estimated prognostic scores are estimated as column "L2". The difference is estimated on elements in the rct data set and can only be used for data.list generated by sim.lm. Irrelevant for Oracle estimators (since these use the true prognostic score).
-#' @param parallel           Logical value. If TRUE the calculations are done using parallelisation using future::plan(future::multicore), which resolves futures asynchronously (in parallel) in separate forked R processes running in the background on the same machine.This is NOT supported on Windows. Reason for not using future::multisession is that this creates and error, probably stemming from a bug in future::multisession.
-#' @param workers            Number of cores to use for parallelisation.
+#' @param parallel           Logical value. If TRUE the calculations are done using parallelisation using future::plan(future::multicore), which resolves futures asynchronously (in parallel) in separate forked R processes running in the background on the same machine. This is NOT supported on Windows. Reason for not using future::multisession is that this creates and error due to the crit.val.t not being saved, probably stemming from a bug in future::multisession.
+#' @param workers            Number of cores to use for parallelisation. Only relevant if parallel = TRUE.
 #'
 #'
 #' @details
 #' The prospective power estimations are determined by the NC_power and GS_power functions. Look at the details of these to see
 #' specifically how the power is determined. If interaction = TRUE and there is historical treatment group participants the interaction
-#' terms are included in  the calculation of R2, otherwise this is not included and hence the power is conservatively estimated.
+#' terms are included in the calculation of R2, otherwise this is not included and hence the power is conservatively estimated.
 #'
 #' The coverage is calculated as the proportion of times the true ATE was inside the confidence intervals
 #'
-#' \deqn{\left[\widehat{\mathrm{ATE}}_i- t_{0.975, n-k}\sqrt{\mathbb{V}\mathrm{ar}\left(\widehat{\mathrm{ATE}}_i\right)},\;\; \widehat{\mathrm{ATE}}_i+t_{0.975, n-k}\sqrt{\mathbb{V}\mathrm{ar}\left(\widehat{\mathrm{ATE}}_i\right)}\right]}
+#' \deqn{\left[\widehat{\mathrm{ATE}}_i- t_{1-\alpha/2, n-k}\sqrt{\mathbb{V}\mathrm{ar}\left(\widehat{\mathrm{ATE}}_i\right)},\;\; \widehat{\mathrm{ATE}}_i+t_{1-\alpha/2, n-k}\sqrt{\mathbb{V}\mathrm{ar}\left(\widehat{\mathrm{ATE}}_i\right)}\right]}
 #'
 #' for i=1,2,3,...,N.sim, where \eqn{\widehat{\mathrm{ATE}}_i} and \eqn{\mathbb{V}\mathrm{ar}\left(\widehat{\mathrm{ATE}}_i\right)} are the ATE and
-#' variance estimates from the ith data set, and \eqn{t_{0.975, n-k}} is the 97.5\%-quantile of the t-distribution with degrees of
-#' freedom equal to the sample size n minus the number of columns in the design matrix. Using the 97.5\%-quantile, we specify a
-#' significance level of 2.5\% for the one-sided superiority test that we want to perform, which corresponds to specification
-#' of a 5\% significance level for a two-sided test, and we would therefore expect an estimated coverage of 95\%.
+#' variance estimates from the ith data set, and \eqn{t_{1-\alpha/2, n-k}} is the \eqn{(1-\alpha/2)\%}-quantile of the t-distribution with degrees of
+#' freedom equal to the sample size n minus the number of columns in the design matrix. Using the \eqn{(1-\alpha/2)\%}-quantile, we specify a
+#' significance level of \eqn{(\alpha/2)\%} for the one-sided superiority test that we want to perform, which corresponds to specification
+#' of a \eqn{\alpha\%} significance level for a two-sided test, and we would therefore expect an estimated coverage of \eqn{(1-\alpha)\%}.
 #'
 #' In order to empirically estimate the probability of correctly rejecting this null hypothesis (the power) we evaluate
-#' if (estimate - sup.margin)/std.err > crit.val.t for each pair of RCT and historical data. This TRUE/FALSE variable is
-#' given in the t.test output. For multiple pairs of RCT and historical data the power is estimated as the proportion of
-#' times t.test == TRUE.
+#' if (estimate - margin)/std.err > crit.val.t for each pair of RCT and historical data. This TRUE/FALSE variable is
+#' given in the t.test output. The power is estimated as the proportion of times t.test == TRUE.
 #'
 #' In order to empirically estimate the probability of mistakenly rejecting the null hypothesis (the type I
-#' error probability), we alter the simulated data by subtracting \eqn{\mathrm{ATE}-\Delta_s} from the outcome variable for
+#' error probability), we alter the simulated data by subtracting \eqn{\mathrm{ATE}-margin} from the outcome variable for
 #' patients in the treatment group, such that the new \eqn{\mathrm{ATE}} was equal to the superiority margin (the case of
-#' correct null hypothesis which has largest probability of rejection). Subtracting \eqn{\mathrm{ATE}-\Delta_s} from the
+#' correct null hypothesis which has largest probability of rejection). Subtracting \eqn{\mathrm{ATE}-margin} from the
 #' outcome variable for patients in the treatment group corresponds to shifting the estimated treatment effect by
-#' \eqn{\mathrm{ATE}-\Delta_s}. For multiple pairs of RCT and historical data the type I error probability is then estimated
-#' by calculating the number of times we (incorrectly) rejected the null hypothesis from the $t$-test statistic.
+#' \eqn{\mathrm{ATE}-margin}. The type I error probability is then estimated by calculating the number of times we
+#' (incorrectly) rejected the null hypothesis from the $t$-test statistic.
 #'
 #' @return
 #' The function returns a data set where each row is the estimated entities on each combination of historical and current RCT data. That means
-#' that there will be N.sim rows if data was simulated using the generate_data function. Thus, column means can be taken to get averaged results across the different datasets.
+#' that there will be N.sim rows if data was simulated using the sim.lm function. Thus, column means can be taken to get averaged results across the different data sets.
 #'
 #' @examples
 #' data <- sim.lm(N.sim = 5, N.hist.control = 100, N.hist.treatment = 100,
 #'               N.control = 50, N.treatment = 50)
 #'
 #' lm.hist.sim(data, workers = 3)
-#'
-#' @return
-#' The function returns a data set where each row is the estimated entities on each combination of historical and current RCT data. That means
-#' that there will be N.sim rows if data was simulated using the generate_data function. Thus, column means can be taken to get averaged results across the different datasets.
 #'
 #' @export
 #'

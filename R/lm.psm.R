@@ -1,4 +1,4 @@
-#' PSM for randomised clinical trials
+#' Propensity score matching for randomised clinical trials
 #'
 #' The function estimates the ATE using a procedure for one-to-one propensity score matching in the
 #' setting of randomised clinical studies where data from multiple external control groups are available.
@@ -9,7 +9,7 @@
 #' unobserved confounders into account. The procedure was described by Lim et al. (Lim J, Walley R, Yuan J, Liu J, Dabral A, Best N, et al. Minimizing Patient Burden
 #' Through the Use of Historical Subject-Level Data in Innovative Confirmatory Clinical Trials:
 #' Review of Methods and Opportunities. Therapeutic Innovation & Regulatory Science. 2018;52(5):546–559.),
-#' ensuring that all control arm patients from the current RCT are used in the treatment effect estimation in equation
+#' and it ensures that all control arm patients from the current RCT are used in the treatment effect estimation in equation
 #' \deqn{\widehat{ATT} = \frac{1}{n_1} \sum_{i:w_i=1} \left( y_i(1) - \widehat y_{i}(0) \right),}
 #' where \eqn{\widehat y_{i}(0)} is the outcome of the matched control group patient to patient i.
 #' The description of the procedure can be found in further details in the article by Lim et al.
@@ -18,11 +18,11 @@
 #' @param margin             Superiority margin (for non-inferiority margin, a negative value can be provided).
 #' @param alpha              Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
 #' @param outcome.var        Character with the name of the outcome variable in both the $rct and $hist data set.
-#' @param treatment.var      Character with the name of the outcome treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.
+#' @param treatment.var      Character with the name of the treatment indicator in both the $rct and $hist data set. Notice that the treatment variable should be an indicator with treatment == 1 and control == 0.
 #' @param adj.covs           Character vector with names of the covariates to adjust for as raw covariates in the ANCOVA model for estimating the ATE. Make sure that categorical variables are considered as factors.
 #' @param interaction        Logical value, that determines whether to model interaction effects between covariates and treatment indicator when estimating the ATE. For method = "PROCOVA", the prognostic score is regarded as an additional covariate and thus the interaction between the prognostic score and the treatment indicator is included.
 #' @param B                  Only relevant for method = PSM. Number of bootstraps for estimating bias between HC and CC groups.
-#' @param ...                Additionall arguments for MatchIt::matchit() which estimates the propensity scores (with a default of using a logistic regression). The default formula for the regression model is "w ~ . - y - HC" which is all the covariates in the data set except from the response y and indicator of being in the historical data HC.
+#' @param ...                Additional arguments for MatchIt::matchit() which estimates the propensity scores (with a default of using a logistic regression). The default formula for the regression model is "w ~ . - y - HC" which is all the covariates in the data set except from the response y and indicator of being in the historical data HC.
 #'
 #'
 #' @return

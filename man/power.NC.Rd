@@ -58,7 +58,7 @@ The ANOVA power is calculated based on the non-centrality parameter given as
 
 where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,n-2,c(n)}\left(F_{t, n-2, 0}^{-1}(1-\alpha/2)\right).}
+\deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha/2)\right).}
 
 The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 
@@ -66,7 +66,7 @@ The power of ANCOVA with univariate covariate adjustment and no interaction is c
 
 such that the power can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,n-3,c(n)}\left(F_{t, n-3, 0}^{-1}(1-\alpha/2)\right).}
+\deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha/2)\right).}
 
 The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 
@@ -78,10 +78,10 @@ between the outcome variable and each covariate. Since we are in the case of ran
 values between the to groups is 0. Furthermore, the elements of \eqn{\Sigma_X^{-1}} will be small, unless the variances are close to 0, or the covariates exhibit strong linear dependencies, so that the correlations are close to 1.
 These scenarios are excluded since they could lead to potentially serious problems regarding inference either way. These arguments are used by Zimmermann et. al
 (Zimmermann G, Kieser M, Bathke AC. Sample Size Calculation and Blinded Recalculation for Analysis of Covariance Models with Multiple Random Covariates. Journal of Biopharmaceutical Statistics. 2020;30(1):143–159.) to approximate
-the non-centrality parameter as in the univariate case where \eqn{\rho} is replaced by \eqn{R^2}.
-Then the power for ANCOVA with k adjustement covariates can be estimated as
+the non-centrality parameter as in the univariate case where \eqn{\rho^2} is replaced by \eqn{R^2}.
+Then the power for ANCOVA with k adjustment covariates can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,n - 2 - n.adj,c(n)}\left(F_{t, n - 2 - n.adj,0), 0}^{-1}(1-\alpha/2)\right).}
+\deqn{1-\beta = 1 - F_{t,n - 2 - n.adj,nc}\left(F_{t, n - 2 - n.adj,0), 0}^{-1}(1-\alpha/2)\right).}
 }
 \examples{
 power.NC(method = "ANCOVA", rho = 0.7)

@@ -5,7 +5,9 @@
 #'
 #' @return
 #' A RF forest model of object "_ranger" and "model_fit". See further details of
-#' parsnip::rand_forest.
+#' parsnip::rand_forest. If the
+#' function should be used as the pred.model input for lm.procova or lm.hist.sim a new function
+#' using RF.hist should be created, see examples below.
 #'
 #' @export
 #'
@@ -16,12 +18,24 @@
 #' @importFrom stats formula
 #'
 #' @examples
+#'
 #' data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
 #'               N.control = 50, N.treatment = 50)
+#'
+#' ###### Direct use of RF.hist ######
 #'
 #' object <- RF.hist(data[[1]]$hist)
 #'
 #' predict(object, new_data = data[[1]]$rct)
+#'
+#'
+#' ###### Use of RF.hist in lm.procova ######
+#'
+#' RF <- function(data.hist) {
+#' RF.hist(data.hist, method.covs = c("x1", "x2", "w"))
+#' }
+#'
+#' lm.procova(data.list = data[[1]], method = "PROCOVA", pred.model = RF)
 #'
 RF.hist <- function(data.hist, method.covs = c("x1", "x2")){
 

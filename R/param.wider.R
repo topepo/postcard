@@ -9,11 +9,11 @@
 #' @param param_name     Name of the column with the parameter names
 #' @param parameters     Vector of parameters that should be pivoted to their own column
 #' @param analysis_value Name of column with the value of the parameter
-#' @param subject_id     Name of the column with subject identifikation
+#' @param subject_id     Name of the column with subject identification
 #' @param analysis_day   Name of column with the relative analysis date
 #'
 #' @return
-#' Data set in wide format with a column for each entrence of the parameters vector.
+#' Data set in wide format with a column for each entrance of the parameters vector.
 #'
 #'
 #' @examples

@@ -27,7 +27,7 @@
 #' where \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 #' we denote by \eqn{\sigma^2} the variance of the outcome, \eqn{\Sigma_X} the covariance matrix of the
 #' covariates, and \eqn{\sigma_{XY}} a \eqn{p}-dimensional column vector consisting of the covariance
-#' between the outcome variable and each covariate. In the univariate case \eqn{R^2} is replaced by \eqn{\rho}.
+#' between the outcome variable and each covariate. In the univariate case \eqn{R^2} is replaced by \eqn{\rho^2}.
 #'
 #' @return
 #' The function returns a power approximation based on the Guenther-Schouten approximation
