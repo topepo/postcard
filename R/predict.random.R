@@ -17,7 +17,7 @@
 #'
 #' object <- random.hist(data[[1]]$hist)
 #'
-#' predict(object, newdata = data[[1]]$rct)
+#' predict(object, new_data = data[[1]]$rct)
 #'
 predict.random <- function(object, ..., new_data) {
   fit <- stats::runif(nrow(new_data), object[1], object[2])

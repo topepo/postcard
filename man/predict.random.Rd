@@ -25,6 +25,6 @@ data <- sim.lm(N.sim = 1, N.hist.control = 100, N.hist.treatment = 100,
 
 object <- random.hist(data[[1]]$hist)
 
-predict(object, newdata = data[[1]]$rct)
+predict(object, new_data = data[[1]]$rct)
 
 }
