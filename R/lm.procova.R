@@ -122,8 +122,6 @@ lm.procova <- function(data.list,
       crit.val.t <- stats::qt(1 - alpha/2, n - 3 - n.adj)
       colname <- colnames(rct.dm)
 
-      browser()
-
       # Model build on non-demeaned baseline values and then the predicted values are determined from the rct and afterwards demeaned
       prediction_model <- pred.model(hist)
       pred <- stats::predict(prediction_model, new_data = rct, ...) %>% stats::setNames(nm = c("pred"))
