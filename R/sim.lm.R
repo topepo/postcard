@@ -38,7 +38,7 @@
 #'
 #' @export
 sim.lm <- function(ATE = 3,
-                   ATE.shift = stats::rnorm(1, 0, 0.1),
+                   ATE.shift = 0,
                    N.covs = 10,
                    N.overspec = 0,
                    coefs = c(0.5, 1, 1),
