@@ -214,7 +214,7 @@ lm.hist.sim <- function(data.list,
                                                          "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"))),
                                    data = rct0)
           rct0$progscore <- X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[1], ncol(X) - (2*N.covs)))
-          prelim <- c(colMeans((rct0$pred - rct0$progscore)^2)) %>% stats::setNames(nm = c("L2"))
+          prelim <- c(mean((rct0$pred - rct0$progscore)^2 %>% dplyr::pull())) %>% stats::setNames(nm = c("L2"))
           res <- c(res, prelim)
         } else {
           # Predict as if they receive treatment
@@ -227,7 +227,7 @@ lm.hist.sim <- function(data.list,
                                                          "+", paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
                                    data = rct)
           rct$progscore1 <- X %*% c(ATE, rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - (3*N.covs + 1)))
-          L2_1 <- mean((rct$pred1 - rct0$progscore1)^2 %>% pull())
+          L2_1 <- mean((rct$pred1 - rct0$progscore1)^2 %>% dplyr::pull())
 
           # Predict as if they receive control
           rct <- rct %>% dplyr::mutate("w" = 0)
@@ -236,7 +236,7 @@ lm.hist.sim <- function(data.list,
                                                          "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"))),
                                    data = rct)
           rct0$progscore0 <- X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[1], ncol(X) - (2*N.covs)))
-          L2_0 <- mean((rct$pred0 - rct0$progscore0)^2 %>% pull())
+          L2_0 <- mean((rct$pred0 - rct0$progscore0)^2 %>% dplyr::pull())
 
           prelim <- c(L2_1, L2_0) %>% stats::setNames(nm = c("L2_1", "L2_0"))
           res <- c(res, prelim)
