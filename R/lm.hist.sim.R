@@ -102,7 +102,6 @@ lm.hist.sim <- function(data.list,
             is.logical(L2), length(L2) == 1L,
             is.numeric(workers), length(workers) == 1L)
 
-
   ####### Preliminary setting of variables and adjustment of data sets ##########
   method <- tolower(method)
   N.sim <- length(data.list)
@@ -193,7 +192,7 @@ lm.hist.sim <- function(data.list,
           stop("Additional list of historical data hist_test should be provided in data.list")
         } else {
           hist <- data.list[[k]]$hist_test
-          hist$pred <- stats::predict(attr(mod, "prediction_model"), hist)
+          hist$pred <- stats::predict(attr(mod, "prediction_model"), new_data = hist)
         }
         prelim <- power.ancova(data.hist = hist, outcome.var = outcome.var, treatment.var = treatment.var,
                                adj.covs = c(adj.covs, "pred"), interaction = interaction, n = n, r = r, ATE = ATE, margin = margin,
@@ -204,22 +203,22 @@ lm.hist.sim <- function(data.list,
       if (L2) {
         N.covs <- attr(data.list, "N.covs")
         coefs <- attr(data.list, "coefs")
-        n1_hist <- data.list$hist[data.list$hist$w == 1, ] %>% nrow()
+        n1_hist <- data.list[[k]]$hist[data.list$hist$w == 1, ] %>% nrow()
 
         if (n1_hist == 0) {
           # Calculating true prognostic score (as for pred.model == "oracle0")
           rct0 <- data.list[[k]]$rct %>% dplyr::mutate(w = 0)
-          rct0$pred <- stats::predict(attr(mod, "prediction_model"), rct0)
+          rct0$pred <- stats::predict(attr(mod, "prediction_model"), new_data = rct0)
           X <- stats::model.matrix(stats::formula(paste0("y ~ -1 +", paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
                                                          "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"))),
                                    data = rct0)
           rct0$progscore <- X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[1], ncol(X) - (2*N.covs)))
-          prelim <- c(mean((rct0$pred - rct0$progscore)^2)) %>% stats::setNames(nm = c("L2"))
+          prelim <- c(mean((rct0$pred - rct0$progscore)^2 %>% dplyr::pull())) %>% stats::setNames(nm = c("L2"))
           res <- c(res, prelim)
         } else {
           # Predict as if they receive treatment
           rct <- data.list[[k]]$rct %>% dplyr::mutate("w" = 1)
-          rct$pred1 <- stats::predict(attr(mod, "prediction_model"), rct)
+          rct$pred1 <- stats::predict(attr(mod, "prediction_model"), new_data = rct)
 
           ## Treatment estimate with procova
           X <- stats::model.matrix(stats::formula(paste0("y ~ 1 +", paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
@@ -227,16 +226,16 @@ lm.hist.sim <- function(data.list,
                                                          "+", paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
                                    data = rct)
           rct$progscore1 <- X %*% c(ATE, rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - (3*N.covs + 1)))
-          L2_1 <- mean((rct$pred1 - rct0$progscore1)^2)
+          L2_1 <- mean((rct$pred1 - rct0$progscore1)^2 %>% pull())
 
           # Predict as if they receive control
           rct <- rct %>% dplyr::mutate("w" = 0)
-          rct$pred0 <- stats::predict(attr(mod, "prediction_model"), rct)
+          rct$pred0 <- stats::predict(attr(mod, "prediction_model"), new_data = rct)
           X <- stats::model.matrix(stats::formula(paste0("y ~ -1 +", paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
                                                          "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"))),
                                    data = rct)
           rct0$progscore0 <- X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[1], ncol(X) - (2*N.covs)))
-          L2_0 <- mean((rct$pred0 - rct0$progscore0)^2)
+          L2_0 <- mean((rct$pred0 - rct0$progscore0)^2 %>% pull())
 
           prelim <- c(L2_1, L2_0) %>% stats::setNames(nm = c("L2_1", "L2_0"))
           res <- c(res, prelim)
@@ -394,7 +393,6 @@ lm.hist.sim <- function(data.list,
       is.null(adj.covs) & interaction ~ paste0("pred", 0:1, "*w", collapse = "+"),
       T ~ paste0(adj.covs, collapse = " + "))))
 
-
     oracle.sim <- function(k) {
       rct <- data.list[[k]]$rct
       rct0 <- rct %>% dplyr::mutate(w = 0)
@@ -429,7 +427,6 @@ lm.hist.sim <- function(data.list,
       res <- c(estimate, std.err, test_stat, power, coverage, MSE, type1.err) %>% stats::setNames(nm = c("estimate", "std.err", "test_stat", "power", "coverage", "MSE", "type1.err"))
 
       if (est.power) {
-
         if (coefs[3] == 0 & is.null(adj.covs)) {
           stop("The parameter c in the data generating process is 0 withour any other adjustment covariates, meaning Sigma_X becomes singular.")
         }
@@ -438,10 +435,10 @@ lm.hist.sim <- function(data.list,
           hist <- rbind(data.list[[k]]$hist, data.list[[k]]$hist_test)
         } else {
           hist <- data.list[[k]]$hist
-          hist1 <- hist %>% dplyr::mutate(w = 1)
-          hist0 <- hist %>% dplyr::mutate(w = 0)
         }
 
+        hist1 <- hist %>% dplyr::mutate(w = 1)
+        hist0 <- hist %>% dplyr::mutate(w = 0)
 
         X <- stats::model.matrix(stats::formula(paste0("y ~ 1 +", paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
                                                        "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
@@ -455,7 +452,7 @@ lm.hist.sim <- function(data.list,
 
 
         prelim <- power.ancova(data.hist = hist, outcome.var = outcome.var, treatment.var = treatment.var,
-                               adj.covs = c(adj.covs, "pred"), interaction = interaction, n = n, r = r, ATE = ATE, margin = margin,
+                               adj.covs = c(adj.covs, "pred1", "pred0"), interaction = interaction, n = n, r = r, ATE = ATE, margin = margin,
                                alpha = alpha)
         res <- c(res, prelim)
 
