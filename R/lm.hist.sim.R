@@ -173,6 +173,7 @@ lm.hist.sim <- function(data.list,
     n0 <- data.list[[1]]$rct[data.list[[1]]$rct$w == 0, ] %>% nrow()
     r <- n1/n0
 
+
     procova.sim <- function(k) {
       mod <- lm.procova(data.list[[k]], method = "PROCOVA", margin = margin, alpha = alpha, outcome.var = outcome.var,
                         treatment.var = treatment.var, adj.covs = adj.covs, interaction = interaction, pred.model = pred.model)
