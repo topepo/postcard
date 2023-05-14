@@ -214,7 +214,7 @@ lm.hist.sim <- function(data.list,
                                                          "+", paste0("I(x", 1:N.covs, "^2)", collapse = "+"))),
                                    data = rct0)
           rct0$progscore <- X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs), rep(coefs[1], ncol(X) - (2*N.covs)))
-          prelim <- c(mean((rct0$pred - rct0$progscore)^2 %>% dplyr::pull())) %>% stats::setNames(nm = c("L2"))
+          prelim <- c(colMeans((rct0$pred - rct0$progscore)^2)) %>% stats::setNames(nm = c("L2"))
           res <- c(res, prelim)
         } else {
           # Predict as if they receive treatment
