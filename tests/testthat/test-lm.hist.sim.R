@@ -24,7 +24,7 @@ test_that("lm.hist.sim", {
   test <- lapply(data_test, select_sim, N.control = (2/5)*30, N.treatment = (3/5)*30, N.hist = 5*30)
   attributes(test) <- attributes(data_test)
 
-  res <- lm.hist.sim(test, method = "PROCOVA", pred.model = random.hist, adj.covs = char_vector, workers = workers, L2 = FALSE, est.power = FALSE)
+  res <- lm.hist.sim(test, method = "PROCOVA", pred.model = random.hist, adj.covs = char_vector, workers = workers, L2 = FALSE, est.power = FALSE, type = "HC3")
 
   expected_cols <- 7
   expected_column_names <- c("estimate", "std.err", "test_stat", "power", "coverage", "MSE", "type1.err")

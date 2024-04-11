@@ -19,7 +19,8 @@ lm.hist.sim(
   ATE = NULL,
   L2 = FALSE,
   parallel = TRUE,
-  workers = future::availableCores()
+  workers = future::availableCores(),
+  ...
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ lm.hist.sim(
 \item{parallel}{Logical value. If TRUE the calculations are done using parallelisation using future::plan(future::multicore), which resolves futures asynchronously (in parallel) in separate forked R processes running in the background on the same machine. This is NOT supported on Windows. Reason for not using future::multisession is that this creates and error due to the crit.val.t not being saved, probably stemming from a bug in future::multisession.}
 
 \item{workers}{Number of cores to use for parallelisation. Only relevant if parallel = TRUE.}
+
+\item{...}{Additional arguments for sandwich::vcovHC for HC estimation of the standard error.}
 }
 \value{
 The function returns a data set where each row is the estimated entities on each combination of historical and current RCT data. That means

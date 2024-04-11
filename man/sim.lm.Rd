@@ -65,7 +65,7 @@ with same distribution of the historical data), $rct (current RCT data)
 and multiple attributes.
 }
 \description{
-Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
+Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
 }
 \examples{
 sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,

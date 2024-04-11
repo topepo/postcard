@@ -1,6 +1,8 @@
 #' Generate pairs of historical and current data
 #'
-#' Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
+#' Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
+#'
+#'
 #'
 #'
 #' @param ATE               The average treatment effect \eqn{ATE = \mathbb{E}[Y(1)] - \mathbb{E}[Y(0)] } data is generated from
