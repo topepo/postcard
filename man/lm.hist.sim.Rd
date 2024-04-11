@@ -54,7 +54,7 @@ lm.hist.sim(
 
 \item{workers}{Number of cores to use for parallelisation. Only relevant if parallel = TRUE.}
 
-\item{...}{Additional arguments for sandwich::vcovHC for HC estimation of the standard error.}
+\item{...}{Additional arguments for sandwich::vcovHC for HC estimation of the standard error. See \link[sandwich]{vcovHC} for more information.}
 }
 \value{
 The function returns a data set where each row is the estimated entities on each combination of historical and current RCT data. That means
