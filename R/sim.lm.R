@@ -5,7 +5,7 @@
 #' @param ATE               The average treatment effect \eqn{ATE = \mathbb{E}[Y(1)] - \mathbb{E}[Y(0)] } data is generated from
 #' @param ATE.shift         ATE shift in the historical data, when historical data contains treatment group patients
 #' @param N.covs            Number of covariates in the data generating process, indexed as x1,...,x_N.covs
-#' @param N.overspec        Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_{N.covs+1},..., x_{N.covs+N.overspec}.
+#' @param N.overspec        Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_\{N.covs+1\},..., x_\{N.covs+N.overspec\}.
 #' @param coefs             Coefficients for a, b and c in \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
 #' @param mu.shift          Mean shift in the historical data "away" from mean 0 in rct data (to simulate skewed historical distribution relative to RCT data).
 #' @param cov               Covariance structure of normally distributed covariates (simultaneous between "true" and overspecified covariates)

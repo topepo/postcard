@@ -31,7 +31,7 @@ sim.lm(
 
 \item{N.covs}{Number of covariates in the data generating process, indexed as x1,...,x_N.covs}
 
-\item{N.overspec}{Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_{N.covs+1},..., x_{N.covs+N.overspec}.}
+\item{N.overspec}{Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_\{N.covs+1\},..., x_\{N.covs+N.overspec\}.}
 
 \item{coefs}{Coefficients for a, b and c in \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}}
 
