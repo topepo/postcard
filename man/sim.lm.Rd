@@ -21,7 +21,7 @@ sim.lm(
   N.treatment = 300,
   N.sim = 10,
   parallel = TRUE,
-  workers = future::availableCores()
+  workers = future::availableCores() - 1
 )
 }
 \arguments{
@@ -60,12 +60,10 @@ sim.lm(
 \item{workers}{Number of cores to use for parallelisation.}
 }
 \value{
-List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
-with same distribution of the historical data), $rct (current RCT data)
-and multiple attributes.
+Same as for \link{simulate_collection}.
 }
 \description{
-Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
+Wrapper of \link{simulate_collection} where covariates and the outcome in both historical and current data is modelled using a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
 }
 \examples{
 sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,
