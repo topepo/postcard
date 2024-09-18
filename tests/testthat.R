@@ -9,4 +9,4 @@
 library(testthat)
 library(PostCard)
 
-test_check("Postcard")
+test_check("PostCard")
