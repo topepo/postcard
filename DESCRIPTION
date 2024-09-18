@@ -1,7 +1,7 @@
 Package: PostCard
 Type: Package
 Title: Prognostic covariate adjustment for estimation of average treatment effect
-Version: 0.2.0
+Version: 0.2.0.9000
 Authors@R: 
     person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = c("aut", "cre"))
 Maintainer: The package maintainer <yourself@somewhere.net>
