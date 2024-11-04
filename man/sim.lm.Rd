@@ -21,7 +21,7 @@ sim.lm(
   N.treatment = 300,
   N.sim = 10,
   parallel = TRUE,
-  workers = future::availableCores()
+  workers = future::availableCores() - 1
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ sim.lm(
 
 \item{N.covs}{Number of covariates in the data generating process, indexed as x1,...,x_N.covs}
 
-\item{N.overspec}{Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_{N.covs+1},..., x_{N.covs+N.overspec}.}
+\item{N.overspec}{Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_\{N.covs+1\},..., x_\{N.covs+N.overspec\}.}
 
 \item{coefs}{Coefficients for a, b and c in \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}}
 
@@ -60,12 +60,10 @@ sim.lm(
 \item{workers}{Number of cores to use for parallelisation.}
 }
 \value{
-List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
-with same distribution of the historical data), $rct (current RCT data)
-and multiple attributes.
+Same as for \link{simulate_collection}.
 }
 \description{
-Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
+Wrapper of \link{simulate_collection} where covariates and the outcome in both historical and current data is modelled using a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
 }
 \examples{
 sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,

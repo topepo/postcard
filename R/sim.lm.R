@@ -1,14 +1,11 @@
 #' Generate pairs of historical and current data
 #'
-#' Current and historical data simulated from a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
-#'
-#'
-#'
+#' Wrapper of [simulate_collection] where covariates and the outcome in both historical and current data is modelled using a normal linear distribution as \eqn{Y(w) \sim N(a^\top X\!\!\!:\!\! \!X + b^\top X + c^{\top} X W + \text{ATE}\cdot W,  \sigma^2)}
 #'
 #' @param ATE               The average treatment effect \eqn{ATE = \mathbb{E}[Y(1)] - \mathbb{E}[Y(0)] } data is generated from
 #' @param ATE.shift         ATE shift in the historical data, when historical data contains treatment group patients
 #' @param N.covs            Number of covariates in the data generating process, indexed as x1,...,x_N.covs
-#' @param N.overspec        Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_{N.covs+1},..., x_{N.covs+N.overspec}.
+#' @param N.overspec        Number of overspecified covariates (generates covariates not used in the data generating process, but can be used in model specifications to simulate overspecification). They are indexed as x_\{N.covs+1\},..., x_\{N.covs+N.overspec\}.
 #' @param coefs             Coefficients for a, b and c in \eqn{Y(w) \sim N(aX^TX+bX+cXW+ATE\cdot W)}
 #' @param mu.shift          Mean shift in the historical data "away" from mean 0 in rct data (to simulate skewed historical distribution relative to RCT data).
 #' @param cov               Covariance structure of normally distributed covariates (simultaneous between "true" and overspecified covariates)
@@ -24,9 +21,7 @@
 #' @param workers           Number of cores to use for parallelisation.
 #'
 #' @return
-#' List object consisting of 1, 2, 3, ..., N.sim list each containing $hist (historical data), $hist_test (test data
-#' with same distribution of the historical data), $rct (current RCT data)
-#' and multiple attributes.
+#' Same as for [simulate_collection].
 #'
 #' @examples
 #' sim.lm(N.sim = 1, N.hist.control = 200, N.hist.treatment = 200,
@@ -55,7 +50,7 @@ sim.lm <- function(ATE = 3,
                    N.treatment = 300,
                    N.sim = 10,
                    parallel = TRUE,
-                   workers = future::availableCores()){
+                   workers = future::availableCores() - 1){
 
   ####### Check if variables are defined correctly ##########
   stopifnot(is.numeric(ATE), length(ATE) == 1L,
@@ -73,92 +68,111 @@ sim.lm <- function(ATE = 3,
             is.numeric(N.treatment), length(N.treatment) == 1L,
             is.numeric(N.sim), length(N.sim) == 1L)
 
-  varnames <- paste0("x", 1:(N.covs + N.overspec))
-  ATE_new <- ATE + ATE.shift
+  out <- simulate_collection(
+    covariate_model =
+      function(n_treatment, n_control) {
+        covariate_model_multinorm(
+          n_treatment = n_treatment,
+          n_control = n_control,
+          n_covars = N.covs + N.overspec,
+          mean_covars = 0,
+          covariance_covars = cov
+        )},
+    outcome_model =
+      function(data) {
+        outcome_model_linear(
+          data = data,
+          ATE = ATE,
+          coef_covars = coefs[2],
+          coef_covars_interactions = coefs[1],
+          coef_treat_interaction = coefs[3],
+          noise = noise
+        )
+      },
+    hist_covariate_model =
+      function(n_treatment, n_control) {
+        covariate_model_multinorm(
+          n_treatment = n_treatment,
+          n_control = n_control,
+          n_covars = N.covs + N.overspec,
+          mean_covars = mu.shift,
+          covariance_covars = cov
+        )},
+    hist_outcome_model =
+      function(data) {
+        outcome_model_linear(
+          data = data,
+          ATE = ATE + ATE.shift,
+          coef_covars = coefs[2],
+          coef_covars_interactions = coefs[1],
+          coef_treat_interaction = coefs[3],
+          noise = noise
+        )
+      },
+    n_sim = N.sim,
+    n_control = N.control,
+    n_treatment = N.treatment,
+    n_hist_control = N.hist.control,
+    n_hist_treatment = N.hist.treatment,
+    n_test_control = N.test.control,
+    n_test_treatment = N.test.treatment,
+    parallel = parallel,
+    workers = workers)
 
-  sim <- function(k){
-
-    res <- list()
-
-    if (!is.null(N.hist.control) & !is.null(N.hist.treatment)) {
-
-      data.hist <- MASS::mvrnorm(n = N.hist.control + N.hist.treatment + N.test.control + N.test.treatment,
-                                 mu = rep(mu.shift, N.covs + N.overspec),
-                                 Sigma = cov) %>% as.data.frame()
-
-      colnames(data.hist) <- varnames
-      rownames(data.hist) <- 1:nrow(data.hist)
-
-      data.hist$w <- c(rep(0, N.hist.control), rep(1, N.hist.treatment), rep(0, N.test.control), rep(1, N.test.treatment))
-      data.hist$y <- ATE_new*data.hist$w + stats::rnorm(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment, 0, noise)
-
-      X <- stats::model.matrix(stats::formula(paste0("y ~ ",
-                                                     paste0("(", paste0("x", 1:N.covs, collapse = "+"),")^2"),
-                                                     "+",
-                                                     paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
-                                                     "+",
-                                                     paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
-                               data = data.hist)[,-1]
-
-      data.hist$y <- data.hist$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
-                                           rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
-      res$hist <- data.hist
-    }
-
-    if (N.test.control + N.test.treatment > 0) {
-      res$hist_test <- res$hist[(N.hist.control + N.hist.treatment + 1):(N.hist.control + N.hist.treatment + N.test.control + N.test.treatment), ]
-      res$hist <- res$hist[1:(N.hist.control + N.hist.treatment), ]
-    }
-
-
-    if (!is.null(N.control) & !is.null(N.treatment)) {
-
-      data.rct <- MASS::mvrnorm(n = N.control + N.treatment, mu = rep(0, N.covs + N.overspec), Sigma = cov) %>% as.data.frame()
-
-      colnames(data.rct) <- varnames
-      data.rct$w <- c(rep(0, N.control), rep(1, N.treatment))
-
-      data.rct$y <- ATE*data.rct$w + stats::rnorm(N.control + N.treatment, 0, noise)
-
-      X <- stats::model.matrix(stats::formula(paste0("y ~ ",
-                                                     paste0("(", paste0("x", 1:N.covs, collapse = "+"), ")^2"),
-                                                     "+",
-                                                     paste0("I(x", 1:N.covs, "^2)", collapse = "+"),
-                                                     "+",
-                                                     paste0("I(x", 1:N.covs, "*w)", collapse = "+"))),
-                               data = data.rct)[,-1]
-
-      data.rct$y <- data.rct$y + X %*% c(rep(coefs[2], N.covs), rep(coefs[1], N.covs),
-                                         rep(coefs[3], N.covs), rep(coefs[1], ncol(X) - 3*N.covs))
-
-      res$rct <- data.rct
-    }
-
-    res
-  }
-
-
-  if (parallel) {
-    oplan <-  future::plan(future::multicore, workers = workers)
-    on.exit(plan(oplan))
-    out <- future.apply::future_lapply(X = 1:N.sim, future.seed = TRUE, FUN = sim)
-  } else {
-    out <- lapply(1:N.sim, FUN = sim)
-  }
-
-  out <- as.list(out)
   attr(out, "ATE") <- ATE
   attr(out, "ATE.shift") <- ATE.shift
   attr(out, "N.covs") <- N.covs
   attr(out, "coefs") <- coefs
-  attr(out, "N.hist.control") <- N.hist.control
-  attr(out, "N.hist.treatment") <- N.hist.treatment
-  attr(out, "N.control") <- N.control
-  attr(out, "N.treatment") <- N.treatment
-  attr(out, "N.test.control") <- N.test.control
-  attr(out, "N.test.treatment") <- N.test.treatment
 
-  out
+  return(out)
 }
 
+covariate_model_multinorm <- function(n_treatment, n_control, n_covars,
+                                      mean_covars = 0,
+                                      covariance_covars = diag(nrow = n_covars)) {
 
+  data_covars <- MASS::mvrnorm(n = sum(n_treatment, n_control),
+                               mu = rep(mean_covars, n_covars),
+                               Sigma = covariance_covars) %>%
+    as.data.frame()
+  colnames(data_covars) <- paste0("x", 1:n_covars)
+
+  final <- data_covars |>
+    mutate(w = c(rep(0, n_control), rep(1, n_treatment)))
+
+  return(final)
+}
+
+outcome_model_linear <- function(data,
+                                 ATE,
+                                 coef_covars,
+                                 coef_covars_interactions,
+                                 coef_treat_interaction,
+                                 noise = 1) {
+
+  w_with_noise <- ATE*data$w + stats::rnorm(nrow(data), 0, noise)
+
+  # Taking number of columns of data minus 1 to exclude the treatment variable
+  n_covars <- ncol(data) - 1
+  X <- stats::model.matrix(stats::formula(paste0("~ -1 + (", paste0("x", 1:n_covars, collapse = "+"),")^2+",
+                                                 paste0("I(x", 1:n_covars, "^2)", collapse = "+"),
+                                                 "+",
+                                                 paste0("I(x", 1:n_covars, "*w)", collapse = "+"))),
+                           data = data)
+
+  # Find indices of columns of X
+  covars <- grep("^x\\d+$", colnames(X))
+  covars_squared <- grep("\\^2", colnames(X))
+  treat_interaction <- grep("\\*\\s?w", colnames(X))
+  covars_interactions <- grep("x\\d+\\:x\\d+", colnames(X))
+
+  # Create vector from given coefficients to multiply by correct columns of X
+  coef_vector <- vector("numeric")
+  coef_vector[covars] <- coef_covars
+  coef_vector[treat_interaction] <- coef_treat_interaction
+  coef_vector[c(covars_squared, covars_interactions)] <- coef_covars_interactions
+
+  final <- data.frame(y = w_with_noise + X %*% coef_vector)
+
+  return(final)
+}
