@@ -1,5 +1,5 @@
 #' @export
-print.rctglm = function(x, ...) {
+print.rctglm <- function(x, ...) {
   cat("Object of class 'rctglm'\n\n")
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
@@ -23,4 +23,24 @@ print.rctglm = function(x, ...) {
       sep = "")
 
   return(invisible())
+}
+
+#' @export
+coef.rctglm <- function(object, ...) {
+  coef(object$glm)
+}
+
+#' @export
+summary.rctglm <- function(object, ...) {
+  summary(object$glm)
+}
+
+#' @export
+estimand <- function(x, ...) {
+  UseMethod("estimand")
+}
+
+#' @export
+estimand.rctglm <- function(x, ...) {
+  x$estimand
 }
