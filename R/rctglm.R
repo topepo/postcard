@@ -119,15 +119,16 @@ rctglm <- function(formula,
   se_estimand <- sqrt(var_estimand/nrow(data))
 
   out <- list(
-    counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1,
-    counterfactual_mean0 = counterfactual_mean0,
-    counterfactual_mean1 = counterfactual_mean1,
-    estimand_fun = estimand_fun,
     estimand = estimand,
     se_estimand = se_estimand,
+    estimand_fun = estimand_fun,
     glm = model,
-    call = call)
+    call = call,
+    counterfactual_mean0 = counterfactual_mean0,
+    counterfactual_mean1 = counterfactual_mean1,
+    counterfactual_pred0 = counterfactual_pred0,
+    counterfactual_pred1 = counterfactual_pred1
+  )
 
   return(structure(out, class = c("rctglm", class(out))))
 }
