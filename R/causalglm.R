@@ -52,7 +52,7 @@ causalglm <- function(formula,
 
   estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
 
-  IF_estimand <- IF_marginaleffect(
+  IF_marginaleffect_val <- IF_marginaleffect(
     response_variable = response_var,
     group_indicator = group_indicator_var,
     group_allocation_prob = group_allocation_prob,
@@ -63,15 +63,17 @@ causalglm <- function(formula,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1)
 
-  var_IF_estimand <- as.numeric(var(IF_estimand))
-  se_IF_estimand <- sqrt(var_IF_estimand/nrow(data))
+  var_estimand <- as.numeric(var(IF_marginaleffect_val))
+  se_estimand <- sqrt(var_estimand/nrow(data))
 
   out <- list(
+    counterfactual_pred0 = counterfactual_pred0,
+    counterfactual_pred1 = counterfactual_pred1,
     counterfactual_mean0 = counterfactual_mean0,
     counterfactual_mean1 = counterfactual_mean1,
     estimand_fun = estimand_fun,
     estimand = estimand,
-    se_IF_estimand = se_IF_estimand,
+    se_estimand = se_estimand,
     glm = model,
     call = call)
 
