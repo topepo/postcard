@@ -28,13 +28,13 @@
 #' b1 <- 1.5
 #' b2 <- 2
 #'
-#' lin_pred <- b0+b1*x1+b2*a
-#' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
-#' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
+#' truemean_treat <- b0+b1*x1+b2*a
+#' y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
+#' dat_treat <- data.frame(Y = y_norm, W = w1, A = a)
 #'
-#' lin_pred_notreat <- b0+b1*x1
-#' y_hist <- rnorm(n, mean = lin_pred_notreat, sd = 1)
-#' dat_hist <- data.frame(Y = y_hist, X = x1)
+#' truemean_notreat <- b0+b1*x1
+#' y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
+#' dat_hist <- data.frame(Y = y_notreat, W = w1)
 #'
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
@@ -81,9 +81,12 @@ rctglm_with_prognosticscore <- function(
     )
   )
 
-  lrnr_fit <- fit_best_learner(formula = prog_formula, data = data_hist, n_folds = n_folds, learners = learners)
+  lrnr_fit <- fit_best_learner(formula = prog_formula,
+                               data = data_hist,
+                               n_folds = n_folds,
+                               learners = learners)
 
-  lrnr_pred <- predict(lrnr_fit, data_hist) %>%
+  lrnr_pred <- predict(lrnr_fit, data) %>%
     dplyr::pull(.pred)
   data %<>%
     dplyr::mutate(prog = lrnr_pred)
