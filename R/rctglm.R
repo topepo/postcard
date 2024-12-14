@@ -39,13 +39,13 @@
 #'               family = gaussian(),
 #'               estimand_fun = "ate")
 rctglm <- function(formula,
-                      family,
-                      data,
-                      group_indicator,
-                      group_allocation_prob = 1/2,
-                      estimand_fun = "ate",
-                      estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
-                      ...
+                   family,
+                   data,
+                   group_indicator,
+                   group_allocation_prob = 1/2,
+                   estimand_fun = "ate",
+                   estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+                   ...
 ) {
 
   # TODO: Right now, estimand_fun needs to have arguments with 0 and 1 in them, and the group_indicator
@@ -78,9 +78,10 @@ rctglm <- function(formula,
   model <- do.call(glm, args = args_glm)
 
   response_var <- model$y
+  group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
   group_indicator_var <- data %>%
-    dplyr::pull(!!group_indicator)
-  group_indicator_name <- as.character(rlang::quo_get_expr(group_indicator))
+    dplyr::pull(group_indicator_name)
+
 
   counterfactual_pred0 <- predict_counterfactual_means(group_val = 0,
                                                        model = model,
