@@ -1,6 +1,10 @@
 #' Fit GLM and find any estimand (marginal effect) using plug-in estimation with variance estimation using
 #' influence functions
 #'
+#' The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
+#' estimand in the setting of a randomised clinical trial, even in the case of heterogeneous effect of
+#' covariates in randomisation groups.
+#'
 #' @inheritParams stats::glm
 #'
 #' @param group_indicator (name of) the variable in data that identifies randomisation groups
@@ -12,7 +16,23 @@
 #' @param ... Additional arguments passed to [stats::glm()]
 #'
 #' @details
-#' Default estimand functions can be specified via `"ate"` and `"rate_ratio"`.
+#' The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
+#' `group_indicator` variable, allocated randomly with probability `group_allocation_prob`. A GLM is
+#' fit and then used to predict the response of all observations in the event that the `group_indicator`
+#' is 0 and 1, respectively. Taking means of these predictions prodeuce the *counterfactual means*
+#' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
+#'
+#' The variance of the estimand is found by taking the variance of the influence function of the estimand.
+#'
+#' This method of inference using plug-in estimation and influence functions for the variance produces a
+#' causal estimate of the estimand, as stated by articles XXXX.
+#'
+#' @section Estimands:
+#' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using
+#' a fitted GLM in the binary groups defined by `group_indicator`.
+#'
+#' Default estimand functions can be specified via `"ate"` (taking the difference `psi1 - psi0`) and
+#' `"rate_ratio"` (taking the ratio `psi1 / psi0`)
 #'
 #' As a default, the `Deriv` package to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
@@ -39,9 +59,9 @@
 #'               family = gaussian(),
 #'               estimand_fun = "ate")
 rctglm <- function(formula,
+                   group_indicator,
                    family,
                    data,
-                   group_indicator,
                    group_allocation_prob = 1/2,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
