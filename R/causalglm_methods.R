@@ -1,6 +1,8 @@
 #' @export
 print.causalglm = function(x, ...) {
-  cat("<glmCausal>:\n")
+  cat("Object of class 'causalglm'\n\n")
+  cat("Call:  ",
+      paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   cat("  - Counterfactual control mean (Psi_0=E[Y|W, A=0]) estimate: ",
       x$counterfactual_mean0,
       "\n",

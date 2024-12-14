@@ -1,39 +1,38 @@
-validate_formulas = function() {
-  if (get_response_from_formula(self$model$formula) !=
-      get_response_from_formula(self$formula_causal)) {
-    cli::cli_abort("Reponse variable is different in the 2 provided formulas")
+get_fun_args <- function(fun) {
+  names(formals(fun))
+}
+
+deparse_fun_body <- function(fun) {
+  deparse(body(fun))
+}
+
+get01args = function(fun) {
+
+  arg0 <- grep("0", get_fun_args(fun), value = TRUE)
+  arg1 <- grep("1", get_fun_args(fun), value = TRUE)
+
+  if (length(arg0) == 0 | length(arg1) == 0) {
+    cli::cli_abort("Arguments of the {.var fun} need {.code 0} and {.code 1} in their names to be able to perform automatic symbolic differentiation. Alternatively, specify the partial derivatives, {.var estimand_fun_deriv0} and {.var estimand_fun_deriv1}, manually.")
   }
+
+  return(list(arg0 = arg0, arg1 = arg1))
 }
 
-#################
-# Estimand stuff
-get_estimand_fun_args = function(estimand_fun) {
+print_symbolic_differentiation <- function(arg, fun, add_string = "") {
+  derivative <- Deriv::Deriv(fun, arg)
 
-  arg_with0 <- grep("0", get_fun_args(estimand_fun), value = TRUE)
-  arg_with1 <- grep("1", get_fun_args(estimand_fun), value = TRUE)
+  body_of_fun <- deparse_fun_body(fun)
+  body_of_derivative <- deparse_fun_body(derivative)
 
-  if (length(arg_with0) == 0 | length(arg_with1) == 0) {
-    cli::cli_abort("Arguments of the {.var estimand_fun} need {.code 0} and {.code 1} in their names to be able to perform automatic symbolic differentiation. Alternatively, specify the partial derivatives, {.var estimand_fun_deriv0} and {.var estimand_fun_deriv1}, manually.")
-  }
+  cli::cli_alert_info("Symbolically deriving partial derivative of the function '{body_of_fun}' with respect to '{arg}' as: '{body_of_derivative}'.\n")
+  if (stringr::str_length(add_string) > 0) cli::cli_ul(add_string, .envir = sys.frame(-1))
 
-  return(list(arg_with0 = arg_with0, arg_with1 = arg_with1))
+  return(derivative)
 }
 
-estimand_fun_derivative = function(fun, arg) {
-  print_symbolic_differentiation(
-    arg = arg,
-    fun = fun,
-    add_string = "Alternatively, specify the derivative through the argument {.var {fun_name}}\n")
-}
-
-
-# IFs
-IF_counterfactual_mean_glm <- function(response_variable,
-                                       treatment_indicator,
-                                       group_allocation_prob,
-                                       counterfactual_mean,
-                                       counterfactual_pred) {
-  (treatment_indicator/group_allocation_prob *
-     (response_variable - counterfactual_mean) +
-     (counterfactual_mean - counterfactual_pred))
+predict_counterfactual_means <- function(model, data, group_indicator_name, group_val) {
+  predict(model,
+          type = "response",
+          newdata = data |>
+            dplyr::mutate("{group_indicator_name}" := group_val))
 }
