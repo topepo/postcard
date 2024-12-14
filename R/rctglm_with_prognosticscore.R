@@ -21,13 +21,14 @@
 #' @examples
 #' # Generate some data
 #' n <- 100
-#' x1 <- rnorm (n)
+#' w1 <- runif(n, min = -2, max = 2)
+#' x1 <- abs(sin(w1))
 #' a <- rbinom (n, 1, .5)
 #' b0 <- 1
 #' b1 <- 1.5
 #' b2 <- 2
-#' lin_pred <- b0+b1*x1+b2*a
 #'
+#' lin_pred <- b0+b1*x1+b2*a
 #' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
 #' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
 #'
@@ -65,24 +66,24 @@ rctglm_with_prognosticscore <- function(
   if (is.null(prog_formula)) {
     response_var_name <- get_response_from_formula(formula)
     prog_formula <- formula(paste0(response_var_name, " ~ ."))
+  } else if (is.character(prog_formula)) {
+    prog_formula <- formula(prog_formula)
   }
 
-  if (is.character(prog_formula)) prog_formula <- formula(prog_formula)
-
-  data_from_formula <- do.call(
+  data_hist <- do.call(
     model.frame,
-    c(list(formula = prog_formula, data = data),
+    c(
+      list(
+        formula = prog_formula,
+        data = data_hist
+      ),
       extra_glm_args
     )
   )
 
-  cv_folds <- rsample::vfold_cv(data_hist, v = n_folds)
-  lrnr <- cv_folds %>%
-    get_best_learner(learners = learners,
-                     formula = prog_formula)
-  lrnr_fit <- fit(lrnr, data_hist)
+  lrnr_fit <- fit_best_learner(formula = prog_formula, data = data_hist, n_folds = n_folds, learners = learners)
 
-  lrnr_pred <- predict(lrnr_fit, data_from_formula) %>%
+  lrnr_pred <- predict(lrnr_fit, data_hist) %>%
     dplyr::pull(.pred)
   data %<>%
     dplyr::mutate(prog = lrnr_pred)

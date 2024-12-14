@@ -92,4 +92,13 @@ get_best_learner <- function(
     tune::finalize_workflow(best_params)
 }
 
+fit_best_learner <- function(formula, data, n_folds = 5, learners = default_learners()) {
+  cv_folds <- rsample::vfold_cv(data, v = n_folds)
+  lrnr <- cv_folds %>%
+    get_best_learner(learners = learners,
+                     formula = formula)
+  lrnr_fit <- fit(lrnr, data)
+
+  return(lrnr_fit)
+}
 
