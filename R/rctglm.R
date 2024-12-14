@@ -1,4 +1,4 @@
-causalglm <- function(formula,
+rctglm <- function(formula,
                       family,
                       data,
                       group_indicator,
@@ -77,5 +77,5 @@ causalglm <- function(formula,
     glm = model,
     call = call)
 
-  return(structure(out, class = c("causalglm", class(out))))
+  return(structure(out, class = c("rctglm", class(out))))
 }
