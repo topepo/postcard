@@ -78,7 +78,14 @@ rctglm <- function(formula,
   model <- do.call(glm, args = args_glm)
 
   response_var <- model$y
-  group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
+
+  enquo_expr <- rlang::quo_get_expr(group_indicator)
+  called_within_prognosticscore <- enquo_expr == "group_indicator"
+  if (called_within_prognosticscore) {
+    group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
+  } else {
+    group_indicator_name <- enquo_expr
+  }
   group_indicator_var <- data %>%
     dplyr::pull(group_indicator_name)
 

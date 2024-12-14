@@ -21,25 +21,34 @@
 #' rctglm_with_prognosticscore(formula = Y ~ ., group_indicator = A,
 #' data = dat_norm, family = gaussian(), estimand_fun = "ate",
 #' data_hist = dat_norm)
-rctglm_with_prognosticscore <- function(formula,
-                                     family,
-                                     data,
-                                     group_indicator,
-                                     group_allocation_prob = 1/2,
-                                     estimand_fun = "ate",
-                                     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
-                                     ...,
-                                     data_hist,
-                                     n_folds = 5,
-                                     learners = default_learners(),
-                                     prog_formula = formula) {
-
-  if (is.character(formula)) formula <- formula(formula)
-  if (is.character(prog_formula)) prog_formula <- formula(prog_formula)
+rctglm_with_prognosticscore <- function(
+    formula,
+    family,
+    data,
+    group_indicator,
+    group_allocation_prob = 1/2,
+    estimand_fun = "ate",
+    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+    ...,
+    data_hist,
+    n_folds = 5,
+    learners = default_learners(),
+    prog_formula = NULL) {
 
   group_indicator <- rlang::enquo(group_indicator)
   named_args <- as.list(environment())
   extra_glm_args <- list(...)
+
+  if (is.character(formula)) formula <- formula(formula)
+  if (is.null(prog_formula)) {
+    group_indicator_name <- rlang::quo_get_expr(group_indicator)
+    prog_formula <- remove_groupindicator_from_formula(formula = formula,
+                                                        group_indicator_name = group_indicator_name)
+  }
+
+  if (is.character(prog_formula)) prog_formula <- formula(prog_formula)
+
+
 
   data_from_formula <- do.call(
     model.frame,
