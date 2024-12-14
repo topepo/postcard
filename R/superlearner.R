@@ -43,7 +43,7 @@ add_learners <- function(preproc, learners) {
   wf <- workflowsets::workflow_set(
     preproc = preproc,
     models = learners %>%
-      map(~.$model)
+      purrr::map(~.$model)
   )
   for (learner_name in names(learners)){
     for (preproc_name in get_preproc_names(wf)) {
@@ -77,7 +77,7 @@ get_best_learner <- function(
   best_learner_name <- fit_learners %>%
     workflowsets::rank_results(rank_metric = 'rmse') %>%
     dplyr::select(wflow_id, model, .config, rmse=mean, rank) %>%
-    dplyr::filter(row_number() == 1) %>%
+    dplyr::filter(dplyr::row_number() == 1) %>%
     dplyr::pull(wflow_id)
   if (verbose){
     print(best_learner_name)
