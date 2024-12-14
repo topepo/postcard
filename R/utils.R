@@ -43,3 +43,11 @@ default_estimand_funs <- function(defaults = c("ate", "rate_ratio")) {
     rate_ratio = function(psi1, psi0) psi/psi0
   )
 }
+
+remove_groupindicator_from_formula <- function(formula, group_indicator_name) {
+  formula_as_str <- deparse(formula)
+  formula_without_groupindicator <- gsub(paste0("[\\+\\*]?\\s*", group_indicator_name, "\\s*[\\+\\*]?", sep = "", collapse = ""),
+       "",
+       formula_as_str)
+  return(formula(formula_without_groupindicator))
+}
