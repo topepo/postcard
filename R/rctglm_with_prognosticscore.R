@@ -1,26 +1,48 @@
 #' Title
 #'
-#' @param formula
-#' @param family
-#' @param data
-#' @param group_indicator
-#' @param group_allocation_prob
-#' @param estimand_fun
-#' @param estimand_fun_deriv0
-#' @param estimand_fun_deriv1
-#' @param ...
-#' @param data_hist
-#' @param n_folds
-#' @param learners
-#' @param prog_formula
+#' @inheritParams rctglm
 #'
-#' @return
+#' @param data_hist a `data.frame` with historical data on which to fit a prognostic model
+#' @param n_folds a `numeric` with the number of cross-validation folds for fitting the
+#' super learner prognostic model
+#' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
+#' regression and boosted trees
+#' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
+#' model on the historical data `data_hist`. Default models the response (assumed same as in
+#' `formula`) using all columns in the `data_hist` data
+#'
+#' @details
+#' More details on prognostic models and scores being predictions of counterfactual means
+#' in control group.
+#'
+#' @return an `rctglm` object, fitted with a prognostic score as a covariate in the model
 #' @export
 #'
 #' @examples
-#' rctglm_with_prognosticscore(formula = Y ~ ., group_indicator = A,
-#' data = dat_norm, family = gaussian(), estimand_fun = "ate",
-#' data_hist = dat_norm)
+#' # Generate some data
+#' n <- 100
+#' x1 <- rnorm (n)
+#' a <- rbinom (n, 1, .5)
+#' b0 <- 1
+#' b1 <- 1.5
+#' b2 <- 2
+#' lin_pred <- b0+b1*x1+b2*a
+#'
+#' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
+#' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
+#'
+#' lin_pred_notreat <- b0+b1*x1
+#' y_hist <- rnorm(n, mean = lin_pred_notreat, sd = 1)
+#' dat_hist <- data.frame(Y = y_hist, X = x1)
+#'
+#' ate <- rctglm_with_prognosticscore(
+#'   formula = Y ~ .,
+#'   group_indicator = A,
+#'   data = dat_norm,
+#'   family = gaussian(),
+#'   estimand_fun = "ate",
+#'   data_hist = dat_hist)
+#'
 rctglm_with_prognosticscore <- function(
     formula,
     family,
@@ -41,14 +63,11 @@ rctglm_with_prognosticscore <- function(
 
   if (is.character(formula)) formula <- formula(formula)
   if (is.null(prog_formula)) {
-    group_indicator_name <- rlang::quo_get_expr(group_indicator)
-    prog_formula <- remove_groupindicator_from_formula(formula = formula,
-                                                        group_indicator_name = group_indicator_name)
+    response_var_name <- get_response_from_formula(formula)
+    prog_formula <- formula(paste0(response_var_name, " ~ ."))
   }
 
   if (is.character(prog_formula)) prog_formula <- formula(prog_formula)
-
-
 
   data_from_formula <- do.call(
     model.frame,
@@ -60,12 +79,13 @@ rctglm_with_prognosticscore <- function(
   cv_folds <- rsample::vfold_cv(data_hist, v = n_folds)
   lrnr <- cv_folds %>%
     get_best_learner(learners = learners,
-                     formula = prog_formula) %>%
-    fit(data_hist)
+                     formula = prog_formula)
+  lrnr_fit <- fit(lrnr, data_hist)
 
-  lrnr_pred <- predict(lrnr, data_from_formula) %>%
+  lrnr_pred <- predict(lrnr_fit, data_from_formula) %>%
     dplyr::pull(.pred)
-  data %<>% mutate(prog = lrnr_pred)
+  data %<>%
+    dplyr::mutate(prog = lrnr_pred)
 
   formula_with_prognosticscore <- paste0(deparse(formula), " + prog")
 
