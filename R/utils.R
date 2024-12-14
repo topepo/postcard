@@ -6,6 +6,13 @@ deparse_fun_body <- function(fun) {
   deparse(body(fun))
 }
 
+get_response_from_formula <- function(formula) {
+  if (inherits(formula, "formula")) {
+    formula <- deparse(formula)
+  }
+  gsub("\\s*~.*", "", formula)
+}
+
 get01args = function(fun) {
 
   arg0 <- grep("0", get_fun_args(fun), value = TRUE)
