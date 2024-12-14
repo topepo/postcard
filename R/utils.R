@@ -36,3 +36,10 @@ predict_counterfactual_means <- function(model, data, group_indicator_name, grou
           newdata = data |>
             dplyr::mutate("{group_indicator_name}" := group_val))
 }
+
+default_estimand_funs <- function(defaults = c("ate", "rate_ratio")) {
+  switch(defaults,
+    ate = function(psi1, psi0) psi1-psi0,
+    rate_ratio = function(psi1, psi0) psi/psi0
+  )
+}

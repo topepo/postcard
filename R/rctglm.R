@@ -1,17 +1,61 @@
+#' Fit GLM and find any estimand (marginal effect) using plug-in estimation with variance estimation using
+#' influence functions
+#'
+#' @inheritParams stats::glm
+#'
+#' @param group_indicator (name of) the variable in data that identifies randomisation groups
+#' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0)
+#' @param estimand_fun a `character` specifying a default estimand function, or `function` with
+#' arguments `psi0` and `psi1` specifying the estimand.
+#' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`
+#' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`
+#' @param ... Additional arguments passed to [stats::glm()]
+#'
+#' @details
+#' Default estimand functions can be specified via `"ate"` and `"rate_ratio"`.
+#'
+#' As a default, the `Deriv` package to perform symbolic differentiation to find the derivatives of
+#' the `estimand_fun`.
+#'
+#' @return an `rctglm` object
+#' @export
+#'
+#' @examples
+#' # Generate some data
+#' n <- 100
+#' x1 <- rnorm (n)
+#' a <- rbinom (n, 1, .5)
+#' b0 <- 1
+#' b1 <- 1.5
+#' b2 <- 2
+#' lin_pred <- b0+b1*x1+b2*a
+#'
+#' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
+#' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
+#'
+#' ate <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_norm,
+#'               family = gaussian(),
+#'               estimand_fun = "ate")
 rctglm <- function(formula,
                       family,
                       data,
                       group_indicator,
                       group_allocation_prob = 1/2,
-                      estimand_fun = function(psi1, psi0) psi1/psi0,
+                      estimand_fun = "ate",
                       estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
-                      predict_counterfactual_means = NULL,
                       ...
 ) {
+
+  # TODO: Right now, estimand_fun needs to have arguments with 0 and 1 in them, and the group_indicator
+  # needs to take values 0 and 1. Generalise this to work for factors and be able to set reference level
 
   group_indicator <- rlang::enquo(group_indicator)
   args <- as.list(environment())
   call <- match.call()
+
+  if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
 
   if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
     args01 <- get01args(fun = estimand_fun)
