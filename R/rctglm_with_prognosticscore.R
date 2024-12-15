@@ -1,12 +1,9 @@
 #' Title
 #'
 #' @inheritParams rctglm
+#' @inheritParams fit_best_learner
 #'
 #' @param data_hist a `data.frame` with historical data on which to fit a prognostic model
-#' @param n_folds a `numeric` with the number of cross-validation folds for fitting the
-#' super learner prognostic model
-#' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
-#' regression and boosted trees
 #' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
 #' model on the historical data `data_hist`. Default models the response (assumed same as in
 #' `formula`) using all columns in the `data_hist` data

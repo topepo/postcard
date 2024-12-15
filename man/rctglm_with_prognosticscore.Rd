@@ -54,8 +54,8 @@ arguments \code{psi0} and \code{psi1} specifying the estimand.}
 
 \item{data_hist}{a \code{data.frame} with historical data on which to fit a prognostic model}
 
-\item{n_folds}{a \code{numeric} with the number of cross-validation folds for fitting the
-super learner prognostic model}
+\item{n_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
+evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
 regression and boosted trees}
