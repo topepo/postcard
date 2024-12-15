@@ -4,7 +4,8 @@
 #'
 #' @param response_variable a `numeric vector` with the response variable in the model
 #' @param counterfactual_pred a `numeric vector` with predictions of the response variable for all
-#' observations in the scenario that the `group_indicator` is equal for all observations.
+#' observations a hypothetic scenario of all observations being in the same group defined by
+#' `group_indicator`. See more in details.
 #'
 #' @details
 #' Assuming we have a response variable \eqn{Y}, design matrix \eqn{X} and link function \eqn{g}, a GLM
@@ -67,16 +68,19 @@ if_counterfactual_mean_glm <- function(response_variable,
 #'
 #' @inheritParams if_counterfactual_mean_glm
 #'
-#' @param counterfactual_pred0
-#' @param counterfactual_pred1
-#' @param estimand_fun_deriv0
-#' @param estimand_fun_deriv1
+#' @param counterfactual_pred0 a `numeric vector` with predictions of \eqn{E[Y|X_{-A}, A=0]}.
+#' See more in details.
+#' @param counterfactual_pred1 a `numeric vector` with predictions of \eqn{E[Y|X_{-A}, A=1]}.
+#' See more in details.
+#' @param estimand_fun_deriv0 a `function` with arguments `psi0` and `psi1` being the derivative
+#' of the estimand function wrt. `psi0`
+#' @param estimand_fun_deriv1 a `function` with arguments `psi0` and `psi1` being the derivative
+#' of the estimand function wrt. `psi1`
 #'
 #' @inherit if_counterfactual_mean_glm details
 #'
-#' @return
-#'
-#' @examples
+#' @return a `numeric vector` with the value of the influence function of the marginal effect for
+#' all observations
 #'
 #' @noRd
 if_marginaleffect <- function(response_variable,
