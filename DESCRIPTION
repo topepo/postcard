@@ -3,35 +3,26 @@ Package: PostCard
 Title: Prognostic covariate adjustment for estimation of estimands
 Version: 1.0.0.9000
 Authors@R: c(
-      person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
-      person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut")
-    )
+    person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
+    person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut")
+  )
 Description: Convenient functions for conducting analysis using prognostic
     covariate adjustment for GLMs. The package uses plug-in estimation for
     robust estimation of the estimand and influence functions for robust
     estimation of the variance of the estimand.
 License: MIT + file LICENSE
 Imports: 
+    cli,
+    Deriv,
     dplyr,
-    extraDistr,
-    future,
-    future.apply,
-    glmnet,
-    lmtest,
+    generics,
     magrittr,
-    MASS,
-    Matching,
-    MatchIt,
     parsnip,
     purrr,
-    randomForest,
-    ranger,
     rlang,
     rsample,
-    sandwich,
     stats,
     stringr,
-    tidyr,
     tune,
     workflowsets,
     yardstick

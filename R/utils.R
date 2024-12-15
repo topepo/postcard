@@ -48,9 +48,11 @@ predict_counterfactual_means <- function(model, data, group_indicator_name, grou
 }
 
 # Default estimand functions
-default_estimand_funs <- function(defaults = c("ate", "rate_ratio")) {
-  switch(defaults,
+default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
+  default <- match.arg(default)
+
+  switch(default,
     ate = function(psi1, psi0) psi1-psi0,
-    rate_ratio = function(psi1, psi0) psi/psi0
+    rate_ratio = function(psi1, psi0) psi1/psi0
   )
 }

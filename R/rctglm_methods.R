@@ -38,8 +38,12 @@ summary.rctglm <- function(object, ...) {
   summary(object$glm)
 }
 
+#' Generic for extracting estimand
+#'
+#' @param x an object of some class to dispatch on
+#' @param ... additional arguments passed to methods
+#'
 #' @export
-#' @noRd
 estimand <- function(x, ...) {
   UseMethod("estimand")
 }

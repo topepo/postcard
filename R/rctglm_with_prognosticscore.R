@@ -88,7 +88,7 @@ rctglm_with_prognosticscore <- function(
                                learners = learners)
 
   lrnr_pred <- predict(lrnr_fit, data) %>%
-    dplyr::pull(.pred)
+    dplyr::pull(.data$.pred)
   data %<>%
     dplyr::mutate(prog = lrnr_pred)
 

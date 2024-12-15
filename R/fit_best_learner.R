@@ -31,7 +31,7 @@ fit_best_learner <- function(data, formula, n_folds = 5, learners = default_lear
   lrnr <- cv_folds %>%
     get_best_learner(learners = learners,
                      formula = formula)
-  lrnr_fit <- fit(lrnr, data)
+  lrnr_fit <- generics::fit(lrnr, data)
 
   return(lrnr_fit)
 }
@@ -69,7 +69,7 @@ default_learners <- function() {
 # set up the pre-processing of the work flow
 get_preproc_names <- function(wf) {
   wf %>%
-    dplyr::pull(wflow_id) %>%
+    dplyr::pull(.data$wflow_id) %>%
     stringr::str_split("_") %>%
     purrr::map_chr(~.[1]) %>%
     unique()
@@ -115,9 +115,9 @@ get_best_learner <- function(
 
   best_learner_name <- fit_learners %>%
     workflowsets::rank_results(rank_metric = 'rmse') %>%
-    dplyr::select(wflow_id, model, .config, rmse=mean, rank) %>%
+    dplyr::select(.data$wflow_id, .data$model, .data$.config, rmse=mean, rank) %>%
     dplyr::filter(dplyr::row_number() == 1) %>%
-    dplyr::pull(wflow_id)
+    dplyr::pull(.data$wflow_id)
   if (verbose){
     print(best_learner_name)
   }
