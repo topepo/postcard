@@ -1,0 +1,23 @@
+---
+title: "Extension of stats::glm"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extension of stats::glm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(PostCard)
+```
+
+## Control, contrast, offset, etc. passed to `glm::stats`
+
+## Specify any family
