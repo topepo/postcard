@@ -1,0 +1,24 @@
+url: https://nnpackages.github.io/PostCard/
+template:
+  bootstrap: 5
+
+reference:
+- title: Estimation of marginal effects in GLMs for two-armed randomised trials
+  desc: >
+    In cases where observations are randomly allocated into binary groups, any group effect estimand is
+    most robustly estimated using plug-in estimation and estimating the variance using influence functions
+  contents:
+  - rctglm
+- subtitle: Estimation using prognostic scores
+  desc: >
+    When historical data is available from one group, a (prognostic) model can be fit to the historical
+    data, which is then used to predict outcomes for all observations and used as a covariate in the model
+    to improve efficiency
+  contents:
+  - rctglm_with_prognosticscore
+- title: Fitting a discrete super learner to data using cross validation
+  desc: >
+    The function fits and tunes a list of models specified by the user and selects the best model based
+    on RMSE in training data
+  contents:
+  - fit_best_learner

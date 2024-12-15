@@ -8,6 +8,13 @@
 \description{
 Convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. The package uses plug-in estimation for robust estimation of the estimand and influence functions for robust estimation of the variance of the estimand.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://nnpackages.github.io/PostCard/}
+}
+
+}
 \author{
 \strong{Maintainer}: Mathias Lerbech Jeppesen \email{mathiasljeppesen@outlook.com}
 
