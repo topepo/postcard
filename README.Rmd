@@ -15,11 +15,13 @@ knitr::opts_chunk$set(
 
 ```{r setup, include = FALSE}
 library(PostCard)
+withr::local_seed(42)
 ```
 
 # PostCard
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised clinical trials. At the time of writing, the package features convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. The package uses plug-in estimation for robust estimation of a marginal effect estimand and influence functions for robust estimation of the variance of the estimand.
@@ -38,7 +40,7 @@ The `rctglm` function estimates any specified estimand using plug-in estimation 
 
 To showcase the use of the function, we need to simulate some data:
 ```{r}
-n <- 100
+n <- 1000
 x1 <- rnorm(n)
 a <- rbinom(n, 1, .5)
 b0 <- 1

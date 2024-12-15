@@ -4,6 +4,8 @@
 # PostCard
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised
@@ -31,7 +33,7 @@ using the influence function of the marginal effect estimand.
 To showcase the use of the function, we need to simulate some data:
 
 ``` r
-n <- 100
+n <- 1000
 x1 <- rnorm(n)
 a <- rbinom(n, 1, .5)
 b0 <- 1
@@ -81,10 +83,10 @@ ate
 #> Call:  rctglm(formula = Y ~ A * X, group_indicator = A, family = gaussian(), 
 #>     data = dat_heterogeneous)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.035887
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 2.667376
+#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 0.9658657
+#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 2.975619
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.631489 (0.430937)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.009753 (0.1412466)
 ```
 
 ## Showcasing the `rctglm_with_prognosticscore` function
@@ -168,10 +170,10 @@ ate_prog
 #>     estimand_fun = estimand_fun, estimand_fun_deriv0 = estimand_fun_deriv0, 
 #>     estimand_fun_deriv1 = estimand_fun_deriv1)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.480057
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 3.845126
+#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.471268
+#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 3.522278
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.365069 (0.5521173)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.051011 (0.5157132)
 ```
 
 <!-- For comparison's sake, we also fit a model in this scenario of non-linear effects of covariates not using a prognostic score and investigate the results: -->
