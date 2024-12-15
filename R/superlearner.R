@@ -1,3 +1,41 @@
+#' Find the best learner in terms of RMSE among specified learners using cross validation
+#'
+#' @inheritParams rctglm
+#'
+#' @param n_folds a `numeric` with the number of cross-validation folds used when fitting and
+#' evaluating models
+#' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
+#' regression and boosted trees
+#'
+#' @return a trained `workflow`
+#' @export
+#'
+#' @examples
+#' # Generate some "historical" data of a control treatment
+#' n <- 100
+#' w1 <- runif(n, min = -2, max = 2)
+#' x1 <- abs(sin(w1))
+#' a <- rbinom (n, 1, .5)
+#' b0 <- 1
+#' b1 <- 1.5
+#' b2 <- 2
+#'
+#' truemean_notreat <- b0+b1*x1
+#' y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
+#' dat_hist <- data.frame(Y = y_notreat, W = w1)
+#'
+#' # Fit a learner to the data with default learners
+#' fit <- fit_best_learner(Y ~ ., data = dat_hist)
+fit_best_learner <- function(formula, data, n_folds = 5, learners = default_learners()) {
+  cv_folds <- rsample::vfold_cv(data, v = n_folds)
+  lrnr <- cv_folds %>%
+    get_best_learner(learners = learners,
+                     formula = formula)
+  lrnr_fit <- fit(lrnr, data)
+
+  return(lrnr_fit)
+}
+
 # Default learners used for searching among
 default_learners <- function() {
   list(
@@ -92,42 +130,3 @@ get_best_learner <- function(
     tune::extract_workflow(best_learner_name) %>%
     tune::finalize_workflow(best_params)
 }
-
-#' Find the best learner in terms of RMSE among specified learners using cross validation
-#'
-#' @inheritParams rctglm
-#'
-#' @param n_folds a `numeric` with the number of cross-validation folds used when fitting and
-#' evaluating models
-#' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
-#' regression and boosted trees
-#'
-#' @return a trained `workflow`
-#' @export
-#'
-#' @examples
-#' # Generate some "historical" data of a control treatment
-#' n <- 100
-#' w1 <- runif(n, min = -2, max = 2)
-#' x1 <- abs(sin(w1))
-#' a <- rbinom (n, 1, .5)
-#' b0 <- 1
-#' b1 <- 1.5
-#' b2 <- 2
-#'
-#' truemean_notreat <- b0+b1*x1
-#' y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-#' dat_hist <- data.frame(Y = y_notreat, W = w1)
-#'
-#' # Fit a learner to the data with default learners
-#' fit <- fit_best_learner(Y ~ ., data = dat_hist)
-fit_best_learner <- function(formula, data, n_folds = 5, learners = default_learners()) {
-  cv_folds <- rsample::vfold_cv(data, v = n_folds)
-  lrnr <- cv_folds %>%
-    get_best_learner(learners = learners,
-                     formula = formula)
-  lrnr_fit <- fit(lrnr, data)
-
-  return(lrnr_fit)
-}
-
