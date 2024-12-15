@@ -9,6 +9,9 @@ reference:
     most robustly estimated using plug-in estimation and estimating the variance using influence functions
   contents:
   - rctglm
+- subtitle: Methods for `rctglm` objects
+  contents:
+  - estimand
 - subtitle: Estimation using prognostic scores
   desc: >
     When historical data is available from one group, a (prognostic) model can be fit to the historical
