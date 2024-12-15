@@ -1,4 +1,5 @@
 #' @export
+#' @noRd
 print.rctglm <- function(x, ...) {
   cat("Object of class 'rctglm'\n\n")
   cat("Call:  ",
@@ -26,21 +27,25 @@ print.rctglm <- function(x, ...) {
 }
 
 #' @export
+#' @noRd
 coef.rctglm <- function(object, ...) {
   coef(object$glm)
 }
 
 #' @export
+#' @noRd
 summary.rctglm <- function(object, ...) {
   summary(object$glm)
 }
 
 #' @export
+#' @noRd
 estimand <- function(x, ...) {
   UseMethod("estimand")
 }
 
 #' @export
+#' @noRd
 estimand.rctglm <- function(x, ...) {
   x$estimand
 }
