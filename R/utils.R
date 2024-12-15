@@ -13,6 +13,7 @@ get_response_from_formula <- function(formula) {
   gsub("\\s*~.*", "", formula)
 }
 
+# Get names of arguments containing 0 and 1 from function
 get01args = function(fun) {
 
   arg0 <- grep("0", get_fun_args(fun), value = TRUE)
@@ -25,6 +26,7 @@ get01args = function(fun) {
   return(list(arg0 = arg0, arg1 = arg1))
 }
 
+# Perform symbolic differentiation of function and print message
 print_symbolic_differentiation <- function(arg, fun, add_string = "") {
   derivative <- Deriv::Deriv(fun, arg)
 
@@ -37,6 +39,7 @@ print_symbolic_differentiation <- function(arg, fun, add_string = "") {
   return(derivative)
 }
 
+# Modify data to have the same value of a group identifier and then predict
 predict_counterfactual_means <- function(model, data, group_indicator_name, group_val) {
   predict(model,
           type = "response",
@@ -44,17 +47,10 @@ predict_counterfactual_means <- function(model, data, group_indicator_name, grou
             dplyr::mutate("{group_indicator_name}" := group_val))
 }
 
+# Default estimand functions
 default_estimand_funs <- function(defaults = c("ate", "rate_ratio")) {
   switch(defaults,
     ate = function(psi1, psi0) psi1-psi0,
     rate_ratio = function(psi1, psi0) psi/psi0
   )
-}
-
-remove_groupindicator_from_formula <- function(formula, group_indicator_name) {
-  formula_as_str <- deparse(formula)
-  formula_without_groupindicator <- gsub(paste0("[\\+\\*]?\\s*", group_indicator_name, "\\s*[\\+\\*]?", sep = "", collapse = ""),
-       "",
-       formula_as_str)
-  return(formula(formula_without_groupindicator))
 }
