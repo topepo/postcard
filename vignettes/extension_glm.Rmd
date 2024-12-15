@@ -20,4 +20,10 @@ library(PostCard)
 
 ## Control, contrast, offset, etc. passed to `glm::stats`
 
+You can pass any argument from `glm` to `rctglm`. See
+```{r}
+Sys.sleep(0.5)
+```
+
+
 ## Specify any family
