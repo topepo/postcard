@@ -31,7 +31,7 @@
 #'
 #' truemean_treat <- b0+b1*x1+b2*a
 #' y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
-#' dat_treat <- data.frame(Y = y_norm, W = w1, A = a)
+#' dat_treat <- data.frame(Y = y_treat, W = w1, A = a)
 #'
 #' truemean_notreat <- b0+b1*x1
 #' y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
@@ -40,7 +40,7 @@
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
 #'   group_indicator = A,
-#'   data = dat_norm,
+#'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
 #'   data_hist = dat_hist)
