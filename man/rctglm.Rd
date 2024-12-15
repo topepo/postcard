@@ -89,11 +89,12 @@ a <- rbinom (n, 1, .5)
 b0 <- 1
 b1 <- 1.5
 b2 <- 2
-lin_pred <- b0+b1*x1+b2*a
 
+lin_pred <- b0+b1*x1+b2*a
 y_norm <- rnorm(n, mean = lin_pred, sd = 1)
 dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
 
+# Fit the model
 ate <- rctglm(formula = Y ~ .,
               group_indicator = A,
               data = dat_norm,

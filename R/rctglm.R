@@ -48,11 +48,12 @@
 #' b0 <- 1
 #' b1 <- 1.5
 #' b2 <- 2
-#' lin_pred <- b0+b1*x1+b2*a
 #'
+#' lin_pred <- b0+b1*x1+b2*a
 #' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
 #' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
 #'
+#' # Fit the model
 #' ate <- rctglm(formula = Y ~ .,
 #'               group_indicator = A,
 #'               data = dat_norm,
@@ -124,18 +125,16 @@ rctglm <- function(formula,
 
   estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
 
-  IF_marginaleffect_val <- IF_marginaleffect(
+  if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
     group_indicator = group_indicator_var,
     group_allocation_prob = group_allocation_prob,
     counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_mean0 = counterfactual_mean0,
     counterfactual_pred1 = counterfactual_pred1,
-    counterfactual_mean1 = counterfactual_mean1,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1)
 
-  var_estimand <- as.numeric(var(IF_marginaleffect_val))
+  var_estimand <- as.numeric(var(if_marginaleffect_val))
   se_estimand <- sqrt(var_estimand/nrow(data))
 
   out <- list(
