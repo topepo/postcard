@@ -26,7 +26,7 @@
 #'
 #' # Fit a learner to the data with default learners
 #' fit <- fit_best_learner(Y ~ ., data = dat_hist)
-fit_best_learner <- function(formula, data, n_folds = 5, learners = default_learners()) {
+fit_best_learner <- function(data, formula, n_folds = 5, learners = default_learners()) {
   cv_folds <- rsample::vfold_cv(data, v = n_folds)
   lrnr <- cv_folds %>%
     get_best_learner(learners = learners,

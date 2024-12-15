@@ -15,9 +15,9 @@ rctglm_with_prognosticscore(
   estimand_fun_deriv1 = NULL,
   ...,
   data_hist,
+  prog_formula = NULL,
   n_folds = 5,
-  learners = default_learners(),
-  prog_formula = NULL
+  learners = default_learners()
 )
 }
 \arguments{
@@ -54,15 +54,15 @@ arguments \code{psi0} and \code{psi1} specifying the estimand.}
 
 \item{data_hist}{a \code{data.frame} with historical data on which to fit a prognostic model}
 
+\item{prog_formula}{a \code{character} or \code{numeric} with the formula for fitting the prognostic
+model on the historical data \code{data_hist}. Default models the response (assumed same as in
+\code{formula}) using all columns in the \code{data_hist} data}
+
 \item{n_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
 regression and boosted trees}
-
-\item{prog_formula}{a \code{character} or \code{numeric} with the formula for fitting the prognostic
-model on the historical data \code{data_hist}. Default models the response (assumed same as in
-\code{formula}) using all columns in the \code{data_hist} data}
 }
 \value{
 an \code{rctglm} object, fitted with a prognostic score as a covariate in the model

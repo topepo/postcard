@@ -51,9 +51,9 @@ rctglm_with_prognosticscore <- function(
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     ...,
     data_hist,
+    prog_formula = NULL,
     n_folds = 5,
-    learners = default_learners(),
-    prog_formula = NULL) {
+    learners = default_learners()) {
 
   group_indicator <- rlang::enquo(group_indicator)
   named_args <- as.list(environment())
