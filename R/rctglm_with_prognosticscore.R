@@ -1,4 +1,8 @@
-#' Title
+#' Use prognostic covariate adjustment when fitting an [rctglm]
+#'
+#' The procedure uses [fit_best_learner] to fit a prognostic model to historical data and uses
+#' the model to produce counterfactual predictions as a prognostic score that is then adjusted
+#' for as a covariate in the [rctglm] procedure.
 #'
 #' @inheritParams rctglm
 #' @inheritParams fit_best_learner
@@ -12,7 +16,7 @@
 #' More details on prognostic models and scores being predictions of counterfactual means
 #' in control group.
 #'
-#' @return an `rctglm` object, fitted with a prognostic score as a covariate in the model
+#' @return an [rctglm] object, fitted with a prognostic score as a covariate in the model
 #' @export
 #'
 #' @examples

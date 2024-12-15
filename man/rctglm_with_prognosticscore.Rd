@@ -2,7 +2,7 @@
 % Please edit documentation in R/rctglm_with_prognosticscore.R
 \name{rctglm_with_prognosticscore}
 \alias{rctglm_with_prognosticscore}
-\title{Title}
+\title{Use prognostic covariate adjustment when fitting an \link{rctglm}}
 \usage{
 rctglm_with_prognosticscore(
   formula,
@@ -65,10 +65,12 @@ evaluating models}
 regression and boosted trees}
 }
 \value{
-an \code{rctglm} object, fitted with a prognostic score as a covariate in the model
+an \link{rctglm} object, fitted with a prognostic score as a covariate in the model
 }
 \description{
-Title
+The procedure uses \link{fit_best_learner} to fit a prognostic model to historical data and uses
+the model to produce counterfactual predictions as a prognostic score that is then adjusted
+for as a covariate in the \link{rctglm} procedure.
 }
 \details{
 More details on prognostic models and scores being predictions of counterfactual means
