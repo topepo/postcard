@@ -59,15 +59,3 @@ default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
          rate_ratio = function(psi1, psi0) psi1/psi0
   )
 }
-
-cli_with_verbose <- function(string,
-                             cli_fun = cli::cli_alert_info,
-                             verbose = options::opt("verbose"),
-                             verbose_level_allow = 1,
-                             .envir = sys.frame(2),
-                             ...) {
-
-  if (verbose >= verbose_level_allow) {
-    cli_fun(string, .envir = .envir, ...)
-  }
-}
