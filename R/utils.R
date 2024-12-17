@@ -33,9 +33,10 @@ print_symbolic_differentiation <- function(arg, fun, add_string = "", verbose = 
   body_of_fun <- deparse_fun_body(fun)
   body_of_derivative <- deparse_fun_body(derivative)
 
-  if (verbose > 0) {
+  if (verbose >= 1) {
     cli::cli_alert_info("Symbolically deriving partial derivative of the function '{body_of_fun}' with respect to '{arg}' as: '{body_of_derivative}'.\n")
-    if (stringr::str_length(add_string) > 0) cli::cli_ul(add_string, .envir = sys.frame(-1))
+    if (stringr::str_length(add_string) > 0)
+      cli::cli_ul(add_string)
   }
 
   return(derivative)
@@ -54,7 +55,19 @@ default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
   default <- match.arg(default)
 
   switch(default,
-    ate = function(psi1, psi0) psi1-psi0,
-    rate_ratio = function(psi1, psi0) psi1/psi0
+         ate = function(psi1, psi0) psi1-psi0,
+         rate_ratio = function(psi1, psi0) psi1/psi0
   )
+}
+
+cli_with_verbose <- function(string,
+                             cli_fun = cli::cli_alert_info,
+                             verbose = options::opt("verbose"),
+                             verbose_level_allow = 1,
+                             .envir = sys.frame(2),
+                             ...) {
+
+  if (verbose >= verbose_level_allow) {
+    cli_fun(string, .envir = .envir, ...)
+  }
 }

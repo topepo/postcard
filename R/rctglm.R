@@ -83,6 +83,7 @@ rctglm <- function(formula,
   if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
     args01 <- get01args(fun = estimand_fun)
 
+    if (verbose >= 1) cli::cli_h2("Symbolic differentiation")
     if (is.null(estimand_fun_deriv0)) {
       estimand_fun_deriv0 <- print_symbolic_differentiation(
         arg = args01[["arg0"]],
@@ -145,12 +146,12 @@ rctglm <- function(formula,
     estimand = estimand,
     se_estimand = se_estimand,
     estimand_fun = estimand_fun,
-    glm = model,
-    call = call,
     counterfactual_mean0 = counterfactual_mean0,
     counterfactual_mean1 = counterfactual_mean1,
     counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1
+    counterfactual_pred1 = counterfactual_pred1,
+    call = call,
+    glm_fit = model
   )
 
   return(structure(out, class = c("rctglm", class(out))))

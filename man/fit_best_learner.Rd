@@ -4,7 +4,13 @@
 \alias{fit_best_learner}
 \title{Find the best learner in terms of RMSE among specified learners using cross validation}
 \usage{
-fit_best_learner(data, formula, n_folds = 5, learners = default_learners())
+fit_best_learner(
+  data,
+  formula,
+  cv_folds = 5,
+  learners = default_learners(),
+  verbose = options::opt("verbose")
+)
 }
 \arguments{
 \item{data}{an optional data frame, list or environment (or object
@@ -18,11 +24,13 @@ fit_best_learner(data, formula, n_folds = 5, learners = default_learners())
     model to be fitted.  The details of model specification are given
     under \sQuote{Details}.}
 
-\item{n_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
+\item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
 regression and boosted trees}
+
+\item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
 a trained \code{workflow}

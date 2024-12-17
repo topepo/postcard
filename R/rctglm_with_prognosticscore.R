@@ -56,8 +56,11 @@ rctglm_with_prognosticscore <- function(
     ...,
     data_hist,
     prog_formula = NULL,
-    n_folds = 5,
-    learners = default_learners()) {
+    cv_folds = 5,
+    learners = default_learners(),
+    verbose = options::opt("verbose")) {
+
+  call <- match.call()
 
   group_indicator <- rlang::enquo(group_indicator)
   named_args <- as.list(environment())
@@ -82,15 +85,20 @@ rctglm_with_prognosticscore <- function(
     )
   )
 
+  if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   lrnr_fit <- fit_best_learner(formula = prog_formula,
                                data = data_hist,
-                               n_folds = n_folds,
-                               learners = learners)
+                               cv_folds = cv_folds,
+                               learners = learners,
+                               verbose = verbose)
 
   lrnr_pred <- predict(lrnr_fit, data) %>%
     dplyr::pull(.data$.pred)
   data %<>%
     dplyr::mutate(prog = lrnr_pred)
+
+  if (verbose >= 2)
+    cli::cli_alert_info("Investigate trained learners and fitted model in {.var prognostic_info} list element")
 
   formula_with_prognosticscore <- paste0(deparse(formula), " + prog")
 
@@ -103,8 +111,22 @@ rctglm_with_prognosticscore <- function(
     estimand_fun = estimand_fun,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1,
+    verbose = verbose,
     ...
   )
 
-  return(rctglm_with_prognosticscore)
+  prog_info <- list(
+    prognostic_info = list(
+      model_fit = lrnr_fit,
+      learners = learners,
+      cv_folds = cv_folds
+  ))
+
+  list_with_prognostic_info <- c(rctglm_with_prognosticscore, prog_info)
+  list_with_prognostic_info$call <- call
+
+  out <- structure(list_with_prognostic_info,
+                   class = class(rctglm_with_prognosticscore))
+
+  return(out)
 }

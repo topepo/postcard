@@ -2,7 +2,7 @@
 #'
 #' @inheritParams rctglm
 #'
-#' @param n_folds a `numeric` with the number of cross-validation folds used when fitting and
+#' @param cv_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
 #' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
 #' regression and boosted trees
@@ -26,11 +26,13 @@
 #'
 #' # Fit a learner to the data with default learners
 #' fit <- fit_best_learner(Y ~ ., data = dat_hist)
-fit_best_learner <- function(data, formula, n_folds = 5, learners = default_learners()) {
-  cv_folds <- rsample::vfold_cv(data, v = n_folds)
+fit_best_learner <- function(data, formula, cv_folds = 5, learners = default_learners(),
+                             verbose = options::opt("verbose")) {
+  cv_folds <- rsample::vfold_cv(data, v = cv_folds)
   lrnr <- cv_folds %>%
     get_best_learner(learners = learners,
-                     formula = formula)
+                     formula = formula,
+                     verbose = verbose)
   lrnr_fit <- generics::fit(lrnr, data)
 
   return(lrnr_fit)
@@ -98,7 +100,7 @@ get_best_learner <- function(
     resamples,
     learners = default_learners(),
     formula,
-    verbose = T
+    verbose = options::opt("verbose")
 ) {
 
   if (is.character(formula)) formula <- formula(formula)
@@ -106,10 +108,17 @@ get_best_learner <- function(
   wfs <- add_learners(preproc = list(mod = formula),
                       learners = learners)
 
+  if (verbose >= 1) {
+    cli::cli_alert_info("Fitting learners")
+    cli::cli_ul(wfs$wflow_id)
+  }
+
+  print_model_tuning <- ifelse(verbose >= 2, TRUE, FALSE)
   fit_learners <- wfs %>%
     workflowsets::workflow_map(
       resamples = resamples,
-      metrics = yardstick::metric_set(yardstick::rmse)
+      metrics = yardstick::metric_set(yardstick::rmse),
+      verbose = print_model_tuning
     )
 
   best_learner_name <- fit_learners %>%
@@ -117,8 +126,9 @@ get_best_learner <- function(
     dplyr::select(.data$wflow_id, .data$model, .data$.config, rmse=mean, rank) %>%
     dplyr::filter(dplyr::row_number() == 1) %>%
     dplyr::pull(.data$wflow_id)
-  if (verbose){
-    print(best_learner_name)
+
+  if (verbose >= 1) {
+    cli::cli_alert_info("Model with lowest RMSE: {best_learner_name}")
   }
 
   best_params <- fit_learners %>%

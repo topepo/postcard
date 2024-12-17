@@ -16,8 +16,9 @@ rctglm_with_prognosticscore(
   ...,
   data_hist,
   prog_formula = NULL,
-  n_folds = 5,
-  learners = default_learners()
+  cv_folds = 5,
+  learners = default_learners(),
+  verbose = options::opt("verbose")
 )
 }
 \arguments{
@@ -58,11 +59,13 @@ arguments \code{psi0} and \code{psi1} specifying the estimand.}
 model on the historical data \code{data_hist}. Default models the response (assumed same as in
 \code{formula}) using all columns in the \code{data_hist} data}
 
-\item{n_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
+\item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
 regression and boosted trees}
+
+\item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
 an \link{rctglm} object, fitted with a prognostic score as a covariate in the model
