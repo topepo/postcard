@@ -34,7 +34,7 @@ You can install the development version of PostCard from [GitHub](https://github
 pak::pak("NNpackages/PostCard")
 ```
 
-## Showcasing the `rctglm` function
+## Fitting `rctglm` without prognostic covariate adjustment
 
 The `rctglm` function estimates any specified estimand using plug-in estimation for randomised clinical trials and estimates the variance using the influence function of the marginal effect estimand. 
 
@@ -74,7 +74,7 @@ This creates an `rctglm` object which prints as
 ate
 ```
 
-## Showcasing the `rctglm_with_prognosticscore` function
+## Using prognostic covariate adjustment
 
 The `rctglm_with_prognosticscore` function uses the `fit_best_learner` function to fit a prognostic model to historical data and then uses the prognostic model to predict
 $$
