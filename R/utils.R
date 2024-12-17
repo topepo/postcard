@@ -27,14 +27,16 @@ get01args = function(fun) {
 }
 
 # Perform symbolic differentiation of function and print message
-print_symbolic_differentiation <- function(arg, fun, add_string = "") {
+print_symbolic_differentiation <- function(arg, fun, add_string = "", verbose = options::opt("verbose")) {
   derivative <- Deriv::Deriv(fun, arg)
 
   body_of_fun <- deparse_fun_body(fun)
   body_of_derivative <- deparse_fun_body(derivative)
 
-  cli::cli_alert_info("Symbolically deriving partial derivative of the function '{body_of_fun}' with respect to '{arg}' as: '{body_of_derivative}'.\n")
-  if (stringr::str_length(add_string) > 0) cli::cli_ul(add_string, .envir = sys.frame(-1))
+  if (verbose > 0) {
+    cli::cli_alert_info("Symbolically deriving partial derivative of the function '{body_of_fun}' with respect to '{arg}' as: '{body_of_derivative}'.\n")
+    if (stringr::str_length(add_string) > 0) cli::cli_ul(add_string, .envir = sys.frame(-1))
+  }
 
   return(derivative)
 }

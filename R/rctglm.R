@@ -6,6 +6,7 @@
 #' covariates in randomisation groups.
 #'
 #' @inheritParams stats::glm
+#' @inheritParams options
 #'
 #' @param group_indicator (name of) the variable in data that identifies randomisation groups
 #' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0)
@@ -66,6 +67,7 @@ rctglm <- function(formula,
                    group_allocation_prob = 1/2,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+                   verbose = options::opt("verbose"),
                    ...
 ) {
 
@@ -85,13 +87,15 @@ rctglm <- function(formula,
       estimand_fun_deriv0 <- print_symbolic_differentiation(
         arg = args01[["arg0"]],
         fun = estimand_fun,
-        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv0}\n")
+        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv0}\n",
+        verbose = verbose)
     }
     if (is.null(estimand_fun_deriv1)) {
       estimand_fun_deriv1 <- print_symbolic_differentiation(
         arg = args01[["arg1"]],
         fun = estimand_fun,
-        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv1}\n")
+        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv1}\n",
+        verbose = verbose)
     }
   }
 

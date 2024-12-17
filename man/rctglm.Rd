@@ -14,6 +14,7 @@ rctglm(
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
+  verbose = options::opt("verbose"),
   ...
 )
 }
@@ -46,6 +47,8 @@ arguments \code{psi0} and \code{psi1} specifying the estimand.}
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}}
 
 \item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}}
+
+\item{verbose}{Verbosity level specifying how much information should be printed to the user. Allowed values are 1 and 0 (Defaults to \code{1}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 }
