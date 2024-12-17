@@ -25,3 +25,6 @@ reference:
     on RMSE in training data
   contents:
   - fit_best_learner
+- title: Package level options
+  contents:
+  - options
