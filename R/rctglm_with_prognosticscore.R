@@ -69,6 +69,8 @@ rctglm_with_prognosticscore <- function(
   if (is.character(formula)) formula <- formula(formula)
   if (is.null(prog_formula)) {
     response_var_name <- get_response_from_formula(formula)
+    if (!response_var_name %in% data_hist)
+      cli::cli_abort("Tried to create formula to fit prognostic model but did not find the response variable {.var {response_var_name}} specified in the primary formula.\nProvide a formula manually through the argument {.arg prog_formula}.")
     prog_formula <- formula(paste0(response_var_name, " ~ ."))
   } else if (is.character(prog_formula)) {
     prog_formula <- formula(prog_formula)
