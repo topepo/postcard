@@ -86,7 +86,7 @@ Allowing the use of complex non-linear models to create such a prognostic score 
 
 We simulate some data to showcase the use of this function as well:
 ```{r}
-n <- 100
+n <- 1000
 x1 <- rnorm(n)
 w2 <- runif(n, min = -2, max = 2)
 x2 <- abs(sin(w2))

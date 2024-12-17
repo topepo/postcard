@@ -106,7 +106,7 @@ information in the GLM model using a single covariate adjustment.
 We simulate some data to showcase the use of this function as well:
 
 ``` r
-n <- 100
+n <- 1000
 x1 <- rnorm(n)
 w2 <- runif(n, min = -2, max = 2)
 x2 <- abs(sin(w2))
@@ -146,17 +146,13 @@ ate_prog <- rctglm_with_prognosticscore(
   family = gaussian(),
   estimand_fun = "ate",
   data_hist = dat_notreat)
-#> [1] "mod_lm"
+#> [1] "mod_mars"
 #> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi0' as: '-1'.
 #> • Alternatively, specify the derivative through the argument
 #> `estimand_fun_deriv0`
 #> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi1' as: '1'.
 #> • Alternatively, specify the derivative through the argument
 #> `estimand_fun_deriv1`
-#> Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
-#> prediction from rank-deficient fit; attr(*, "non-estim") has doubtful cases
-#> Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
-#> prediction from rank-deficient fit; attr(*, "non-estim") has doubtful cases
 ```
 
 Quick results of the fit can be seen by printing the object:
@@ -170,10 +166,10 @@ ate_prog
 #>     estimand_fun = estimand_fun, estimand_fun_deriv0 = estimand_fun_deriv0, 
 #>     estimand_fun_deriv1 = estimand_fun_deriv1)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.471268
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 3.522278
+#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.288951
+#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 3.310139
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.051011 (0.5157132)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.021189 (0.1441516)
 ```
 
 <!-- For comparison's sake, we also fit a model in this scenario of non-linear effects of covariates not using a prognostic score and investigate the results: -->
