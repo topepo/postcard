@@ -58,10 +58,10 @@ default_learners <- function() {
         learn_rate = 0.1
       ) %>%
         parsnip::set_engine("xgboost"),
-      grid = purrr::cross_df(list(
-        trees = seq.int(25, 500, by=25),
-        tree_depth = c(3)
-      ))
+      grid = data.frame(
+        trees = seq(from = 25, to = 500, by = 25),
+        tree_depth = 3
+      )
     )
   )
 }
@@ -70,8 +70,7 @@ default_learners <- function() {
 get_preproc_names <- function(wf) {
   wf %>%
     dplyr::pull(.data$wflow_id) %>%
-    stringr::str_split("_") %>%
-    purrr::map_chr(~.[1]) %>%
+    sapply(function(x) gsub("\\_.*$", "", x)) %>%
     unique()
 }
 
@@ -80,7 +79,7 @@ add_learners <- function(preproc, learners) {
   wf <- workflowsets::workflow_set(
     preproc = preproc,
     models = learners %>%
-      purrr::map(~.$model)
+      lapply(function(x) x$model)
   )
   for (learner_name in names(learners)){
     for (preproc_name in get_preproc_names(wf)) {
