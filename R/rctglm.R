@@ -8,12 +8,15 @@
 #' @inheritParams stats::glm
 #' @inheritParams options
 #'
-#' @param group_indicator (name of) the variable in data that identifies randomisation groups
-#' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0)
+#' @param group_indicator (name of) the variable in `data` that identifies randomisation groups
+#' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0).
+#' As a default, the ratio of 1's in data is used.
 #' @param estimand_fun a `character` specifying a default estimand function, or `function` with
 #' arguments `psi0` and `psi1` specifying the estimand.
-#' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`
-#' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`
+#' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`. As a default
+#' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
+#' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default
+#' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param ... Additional arguments passed to [stats::glm()]
 #'
 #' @details
@@ -35,7 +38,7 @@
 #' Default estimand functions can be specified via `"ate"` (taking the difference `psi1 - psi0`) and
 #' `"rate_ratio"` (taking the ratio `psi1 / psi0`)
 #'
-#' As a default, the `Deriv` package to perform symbolic differentiation to find the derivatives of
+#' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
 #' @return an `rctglm` object
@@ -64,7 +67,7 @@ rctglm <- function(formula,
                    group_indicator,
                    family,
                    data,
-                   group_allocation_prob = 1/2,
+                   group_allocation_prob = NULL,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
                    verbose = options::opt("verbose"),
@@ -78,12 +81,30 @@ rctglm <- function(formula,
   args <- as.list(environment())
   call <- match.call()
 
+  ind_expr <- rlang::quo_get_expr(group_indicator)
+  called_within_prognosticscore <- ind_expr == "group_indicator"
+  if (called_within_prognosticscore) {
+    group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
+  } else {
+    group_indicator_name <- as.character(ind_expr)
+  }
+
+  group_vals <- data[, group_indicator_name]
+  group_vals_unique <- unique(group_vals)
+  if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var group_indicator} column can only have 1's and 0's")
+
+  if (is.null(group_allocation_prob)) {
+    group_allocation_prob <- mean(group_vals)
+    if (verbose >= 1)
+      cli::cli_alert_info("Setting the group allocation probability {.var group_allocation_prob} as the mean of column {.var {group_indicator_name}} in data: {group_allocation_prob}")
+  }
+
   if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
 
   if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
     args01 <- get01args(fun = estimand_fun)
 
-    if (verbose >= 1) cli::cli_h2("Symbolic differentiation")
+    if (verbose >= 1) cli::cli_h2("Symbolic differentiation of estimand function")
     if (is.null(estimand_fun_deriv0)) {
       estimand_fun_deriv0 <- print_symbolic_differentiation(
         arg = args01[["arg0"]],
@@ -104,14 +125,6 @@ rctglm <- function(formula,
   model <- do.call(glm, args = args_glm)
 
   response_var <- model$y
-
-  enquo_expr <- rlang::quo_get_expr(group_indicator)
-  called_within_prognosticscore <- enquo_expr == "group_indicator"
-  if (called_within_prognosticscore) {
-    group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
-  } else {
-    group_indicator_name <- enquo_expr
-  }
   group_indicator_var <- data %>%
     dplyr::pull(group_indicator_name)
 

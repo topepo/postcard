@@ -9,7 +9,7 @@ rctglm_with_prognosticscore(
   family,
   data,
   group_indicator,
-  group_allocation_prob = 1/2,
+  group_allocation_prob = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -42,14 +42,17 @@ rctglm_with_prognosticscore(
 
 \item{group_indicator}{(name of) the variable in data that identifies randomisation groups}
 
-\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0)}
+\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
+As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{character} specifying a default estimand function, or \code{function} with
 arguments \code{psi0} and \code{psi1} specifying the estimand.}
 
-\item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}}
+\item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
+the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
-\item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}}
+\item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
+the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 

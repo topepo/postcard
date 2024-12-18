@@ -10,7 +10,7 @@ rctglm(
   group_indicator,
   family,
   data,
-  group_allocation_prob = 1/2,
+  group_allocation_prob = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -39,14 +39,17 @@ rctglm(
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0)}
+\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
+As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{character} specifying a default estimand function, or \code{function} with
 arguments \code{psi0} and \code{psi1} specifying the estimand.}
 
-\item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}}
+\item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
+the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
-\item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}}
+\item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
+the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
 \item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 
@@ -80,7 +83,7 @@ a fitted GLM in the binary groups defined by \code{group_indicator}.
 Default estimand functions can be specified via \code{"ate"} (taking the difference \code{psi1 - psi0}) and
 \code{"rate_ratio"} (taking the ratio \code{psi1 / psi0})
 
-As a default, the \code{Deriv} package to perform symbolic differentiation to find the derivatives of
+As a default, the \code{Deriv} package is used to perform symbolic differentiation to find the derivatives of
 the \code{estimand_fun}.
 }
 

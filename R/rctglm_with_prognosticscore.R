@@ -50,7 +50,7 @@ rctglm_with_prognosticscore <- function(
     family,
     data,
     group_indicator,
-    group_allocation_prob = 1/2,
+    group_allocation_prob = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     ...,
