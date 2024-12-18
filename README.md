@@ -24,29 +24,37 @@ You can install the development version of PostCard from
 pak::pak("NNpackages/PostCard")
 ```
 
-## Fitting `rctglm` without prognostic covariate adjustment
+``` r
+library(PostCard)
+withr::local_seed(1395878)
+withr::local_options(list(PostCard.verbose = 0))
+```
 
-The `rctglm` function estimates any specified estimand using plug-in
-estimation for randomised clinical trials and estimates the variance
-using the influence function of the marginal effect estimand.
+## Plug-in estimation of marginal effects and variance estimation using influence functions
 
-To showcase the use of the function, we need to simulate some data:
+First, we simulate some data to be able to showcase the functionalities
 
 ``` r
 n <- 1000
-x1 <- rnorm(n)
+w <- runif(n, min = -2, max = 2)
+x <- sin(w)^2
 a <- rbinom(n, 1, .5)
 b0 <- 1
-b1 <- 1.5
+b1 <- 3
 b2 <- 2
-b3 <- 1
 
-lin_pred <- b0+b1*x1+b2*a+b3*x1*a
-y_heterogeneous <- rnorm(n, mean = lin_pred, sd = 1)
-dat_heterogeneous <- data.frame(Y = y_heterogeneous, X = x1, A = a)
+truemean_treat <- b0+b1*x+b2*a
+y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
+dat_treat <- data.frame(Y = y_treat, W = w, A = a)
 ```
 
-The interface of `rctglm` is similar to that of the `stats::glm`
+### Fitting `rctglm()` without prognostic covariate adjustment
+
+The `rctglm()` function estimates any specified estimand using plug-in
+estimation for randomised clinical trials and estimates the variance
+using the influence function of the marginal effect estimand.
+
+The interface of `rctglm()` is similar to that of the `stats::glm()`
 function but with an added mandatory specification of
 
 - The randomisation variable in data, usually being the (name of) the
@@ -62,74 +70,55 @@ function but with an added mandatory specification of
 Thus, we can estimate the ATE by simply writing
 
 ``` r
-ate <- rctglm(formula = Y ~ A * X,
+ate <- rctglm(formula = Y ~ A * W,
               group_indicator = A,
-              data = dat_heterogeneous,
+              data = dat_treat,
               family = gaussian())
-#> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi0' as: '-1'.
-#> • Alternatively, specify the derivative through the argument
-#> `estimand_fun_deriv0`
-#> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi1' as: '1'.
-#> • Alternatively, specify the derivative through the argument
-#> `estimand_fun_deriv1`
 ```
 
-This creates an `rctglm` object which prints as
+This creates an `rctglm()` object which prints as
 
 ``` r
 ate
 #> Object of class 'rctglm'
 #> 
-#> Call:  rctglm(formula = Y ~ A * X, group_indicator = A, family = gaussian(), 
-#>     data = dat_heterogeneous)
+#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = gaussian(), 
+#>     data = dat_treat)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 0.9658657
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 2.975619
+#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.775793
+#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.866888
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.009753 (0.1412466)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09209306)
 ```
 
-## Using prognostic covariate adjustment
+### Using prognostic covariate adjustment
 
-The `rctglm_with_prognosticscore` function uses the `fit_best_learner`
-function to fit a prognostic model to historical data and then uses the
-prognostic model to predict $$
-\mathbb{E}[Y|X,A=0]
-$$ for all observations in the current data set. These *prognostic
-scores* are then used as a covariate in the GLM when running `rctglm`.
+The `rctglm_with_prognosticscore()` function uses the
+`fit_best_learner()` function to fit a prognostic model to historical
+data and then uses the prognostic model to predict
+
+for all observations in the current data set. These *prognostic scores*
+are then used as a covariate in the GLM when running `rctglm()`.
 
 Allowing the use of complex non-linear models to create such a
 prognostic score allows utilising information from potentially many
 variables, “catching” non-linear relationships and then using all this
 information in the GLM model using a single covariate adjustment.
 
-We simulate some data to showcase the use of this function as well:
+We simulate some historical data to showcase the use of this function as
+well:
 
 ``` r
-n <- 1000
-x1 <- rnorm(n)
-w2 <- runif(n, min = -2, max = 2)
-x2 <- abs(sin(w2))
-a <- rbinom(n, 1, .5)
-b0 <- 1
-b1 <- 1.5
-b2 <- 2
-b3 <- 1
-b4 <- 0.5
-
-truemean_treat <- b0+b1*x1+b2*a+b3*x1*a+b4*x2
-y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
-dat_treat <- data.frame(Y = y_treat, X = x1, W = w2, A = a)
-
-truemean_notreat <- b0+b1*x1+b4*x2
+truemean_notreat <- b0+b1*x
 y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-dat_notreat <- data.frame(Y = y_notreat, X = x1, W = w2, A = a)
+dat_notreat <- data.frame(Y = y_notreat, W = w)
 ```
 
-The call to `rctglm_with_prognosticscore` is the same as to `rctglm` but
-with an added specification of
+The call to `rctglm_with_prognosticscore()` is the same as to `rctglm()`
+but with an added specification of
 
-- (Historical) data to fit the prognostic model using `fit_best_learner`
+- (Historical) data to fit the prognostic model using
+  `fit_best_learner()`
 - A formula used when fitting the prognostic model
   - Default uses all covariates in the data.
 - (Optionally) number folds in cross validation and a list of learners
@@ -140,19 +129,13 @@ adjusting for a prognostic score, is seen below:
 
 ``` r
 ate_prog <- rctglm_with_prognosticscore(
-  formula = Y ~ .,
+  formula = Y ~ A * W,
   group_indicator = A,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",
-  data_hist = dat_notreat)
-#> [1] "mod_mars"
-#> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi0' as: '-1'.
-#> • Alternatively, specify the derivative through the argument
-#> `estimand_fun_deriv0`
-#> ℹ Symbolically deriving partial derivative of the function 'psi1 - psi0' with respect to 'psi1' as: '1'.
-#> • Alternatively, specify the derivative through the argument
-#> `estimand_fun_deriv1`
+  data_hist = dat_notreat,
+  prog_formula = Y ~ W)
 ```
 
 Quick results of the fit can be seen by printing the object:
@@ -161,24 +144,17 @@ Quick results of the fit can be seen by printing the object:
 ate_prog
 #> Object of class 'rctglm'
 #> 
-#> Call:  rctglm(formula = formula_with_prognosticscore, group_indicator = group_indicator, 
-#>     family = family, data = data, group_allocation_prob = group_allocation_prob, 
-#>     estimand_fun = estimand_fun, estimand_fun_deriv0 = estimand_fun_deriv0, 
-#>     estimand_fun_deriv1 = estimand_fun_deriv1)
+#> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(), 
+#>     data = dat_treat, group_indicator = A, estimand_fun = "ate", 
+#>     data_hist = dat_notreat, prog_formula = Y ~ W)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 1.288951
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 3.310139
+#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.828515
+#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.819363
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.021189 (0.1441516)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.06411652)
 ```
 
-<!-- For comparison's sake, we also fit a model in this scenario of non-linear effects of covariates not using a prognostic score and investigate the results: -->
-<!-- ```{r} -->
-<!-- ate_noprog <- rctglm( -->
-<!--   formula = Y ~ ., -->
-<!--   group_indicator = A, -->
-<!--   data = dat_treat, -->
-<!--   family = gaussian(), -->
-<!--   estimand_fun = "ate") -->
-<!-- ate_noprog -->
-<!-- ``` -->
+It’s evident that in this case where there is a non-linear relationship
+between the covariate we observe and the response, adjusting for the
+prognostic score reduces the standard error of our estimand
+approximation by quite a bit.
