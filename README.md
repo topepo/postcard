@@ -66,7 +66,11 @@ function but with an added mandatory specification of
   - As a default, the function takes the average treatment effect (ATE)
     as the estimand
 
-Thus, we can estimate the ATE by simply writing
+Thus, we can estimate the ATE by simply writing the below:
+
+> Note that as a default, information about the algorithm is printed in
+> the console, but here we suppress this behavior. See more in
+> `vignette("non-default")`.
 
 ``` r
 ate <- rctglm(formula = Y ~ A * W,
@@ -84,10 +88,10 @@ ate
 #> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = gaussian(), 
 #>     data = dat_treat)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.775793
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.866888
-#>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09208528)
+#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.775793
+#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.866888
+#> - Estimand function r: psi1 - psi0
+#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09208528)
 ```
 
 ### Using prognostic covariate adjustment
@@ -132,9 +136,7 @@ ate_prog <- rctglm_with_prognosticscore(
   group_indicator = A,
   data = dat_treat,
   family = gaussian(),
-  estimand_fun = "ate",
-  data_hist = dat_notreat,
-  prog_formula = Y ~ W)
+  data_hist = dat_notreat)
 ```
 
 Quick results of the fit can be seen by printing the object:
@@ -144,13 +146,12 @@ ate_prog
 #> Object of class 'rctglm'
 #> 
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(), 
-#>     data = dat_treat, group_indicator = A, estimand_fun = "ate", 
-#>     data_hist = dat_notreat, prog_formula = Y ~ W)
+#>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
 #> 
-#>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.828515
-#>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.819363
-#>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.0641213)
+#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.828515
+#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.819363
+#> - Estimand function r: psi1 - psi0
+#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.0641213)
 ```
 
 It’s evident that in this case where there is a non-linear relationship

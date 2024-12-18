@@ -64,7 +64,10 @@ The interface of `rctglm()` is similar to that of the `stats::glm()` function bu
 -   An estimand function
     -   As a default, the function takes the average treatment effect (ATE) as the estimand
 
-Thus, we can estimate the ATE by simply writing
+Thus, we can estimate the ATE by simply writing the below:
+
+> Note that as a default, information about the algorithm is printed in the console, but here we suppress this behavior. See more in `vignette("non-default")`.
+
 ```{r noprog-run}
 ate <- rctglm(formula = Y ~ A * W,
               group_indicator = A,
@@ -109,9 +112,7 @@ ate_prog <- rctglm_with_prognosticscore(
   group_indicator = A,
   data = dat_treat,
   family = gaussian(),
-  estimand_fun = "ate",
-  data_hist = dat_notreat,
-  prog_formula = Y ~ W)
+  data_hist = dat_notreat)
 ```
 
 Quick results of the fit can be seen by printing the object:
