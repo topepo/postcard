@@ -61,8 +61,7 @@ function but with an added mandatory specification of
   treatment variable
 - The randomisation ratio - the probability of being allocated to group
   1 (rather than 0)
-  - As a default, a 1:1 randomisation ratio is assumed, meaning a
-    probability of 1/2.
+  - As a default, a ratio of 1’s in data is used
 - An estimand function
   - As a default, the function takes the average treatment effect (ATE)
     as the estimand
@@ -88,7 +87,7 @@ ate
 #>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.775793
 #>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.866888
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09209306)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09208528)
 ```
 
 ### Using prognostic covariate adjustment
@@ -151,7 +150,7 @@ ate_prog
 #>   - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.828515
 #>   - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.819363
 #>   - Estimand function r: psi1 - psi0
-#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.06411652)
+#>   - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.0641213)
 ```
 
 It’s evident that in this case where there is a non-linear relationship

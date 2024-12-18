@@ -60,7 +60,7 @@ The interface of `rctglm()` is similar to that of the `stats::glm()` function bu
 
 -   The randomisation variable in data, usually being the (name of) the treatment variable
 -   The randomisation ratio - the probability of being allocated to group 1 (rather than 0)
-    -   As a default, a 1:1 randomisation ratio is assumed, meaning a probability of 1/2.
+    -   As a default, a ratio of 1's in data is used
 -   An estimand function
     -   As a default, the function takes the average treatment effect (ATE) as the estimand
 
