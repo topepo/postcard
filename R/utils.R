@@ -3,7 +3,13 @@ get_fun_args <- function(fun) {
 }
 
 deparse_fun_body <- function(fun) {
-  deparse(body(fun))
+  deparsed_body <- deparse(body(fun))
+  len_dep <- length(deparsed_body)
+  if (len_dep > 1) {
+    deparsed_body <- gsub("\\s*", "", deparsed_body[-c(1, len_dep)])
+  }
+
+  return(deparsed_body)
 }
 
 get_response_from_formula <- function(formula) {
