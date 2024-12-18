@@ -67,11 +67,10 @@ rctglm_with_prognosticscore <- function(
   extra_glm_args <- list(...)
 
   if (is.character(formula)) formula <- formula(formula)
+
+  if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   if (is.null(prog_formula)) {
-    response_var_name <- get_response_from_formula(formula)
-    if (!response_var_name %in% data_hist)
-      cli::cli_abort("Tried to create formula to fit prognostic model but did not find the response variable {.var {response_var_name}} specified in the primary formula.\nProvide a formula manually through the argument {.arg prog_formula}.")
-    prog_formula <- formula(paste0(response_var_name, " ~ ."))
+    prog_formula <- formula_everything(orig_formula = formula, data = data_hist, verbose = verbose)
   } else if (is.character(prog_formula)) {
     prog_formula <- formula(prog_formula)
   }
@@ -87,7 +86,6 @@ rctglm_with_prognosticscore <- function(
     )
   )
 
-  if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   lrnr_fit <- fit_best_learner(formula = prog_formula,
                                data = data_hist,
                                cv_folds = cv_folds,

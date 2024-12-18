@@ -59,3 +59,16 @@ default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
          rate_ratio = function(psi1, psi0) psi1/psi0
   )
 }
+
+# Create formula that is function of
+formula_everything <- function(orig_formula, data, verbose = options::opt("verbose")) {
+  response_var_name <- get_response_from_formula(orig_formula)
+  if (!response_var_name %in% colnames(data))
+    cli::cli_abort("Tried to create formula to fit prognostic model but did not find the response variable {.var {response_var_name}} specified in the primary formula.\nProvide a formula manually through the argument {.arg prog_formula}.")
+
+  prog_formula_str <- paste0(response_var_name, " ~ .")
+  if (verbose >= 1)
+    cli::cli_alert_info("Created formula for fitting prognostic model as: {prog_formula_str}")
+
+  return(formula(prog_formula_str))
+}
