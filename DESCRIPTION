@@ -30,6 +30,7 @@ Imports:
     yardstick
 Suggests: 
     knitr,
+    LiblineaR,
     rmarkdown,
     testthat (>= 3.0.0),
     withr
