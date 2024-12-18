@@ -7,6 +7,7 @@
 #' @importFrom rlang .data
 #' @importFrom rlang :=
 #' @importFrom stats coef
+#' @importFrom stats formula
 #' @importFrom stats glm
 #' @importFrom stats model.frame
 #' @importFrom stats predict
