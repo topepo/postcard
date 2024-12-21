@@ -30,7 +30,7 @@
 #' # Generate a gaussian response from a single covariate with
 #' # non-linear effects
 #' create_glm_data(1+2*abs(sin(x1)),
-#'                 x1 = runif(min = -2, max = 2))
+#'                 x1 = runif(10, min = -2, max = 2))
 #'
 #' # Generate a negative binomial response
 #' create_glm_data(1+2*x1-x2,
@@ -77,7 +77,8 @@ create_glm_data <- function(formula_eta,
   y <- do.call(generate_from_family, args_to_rfun)
 
   out <- data %>%
-    dplyr::mutate("{response_name}" := y, .before = everything())
+    dplyr::mutate("{response_name}" := y,
+                  .before = dplyr::everything())
 
   return(out)
 }

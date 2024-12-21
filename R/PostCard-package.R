@@ -8,9 +8,14 @@
 #' @importFrom rlang :=
 #' @importFrom stats coef
 #' @importFrom stats formula
+#' @importFrom stats gaussian
 #' @importFrom stats glm
 #' @importFrom stats model.frame
 #' @importFrom stats predict
+#' @importFrom stats rbinom
+#' @importFrom stats rnbinom
+#' @importFrom stats rnorm
+#' @importFrom stats rpois
 #' @importFrom stats var
 ## usethis namespace: end
 NULL

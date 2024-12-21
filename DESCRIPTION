@@ -31,6 +31,7 @@ Imports:
 Suggests: 
     knitr,
     LiblineaR,
+    MASS,
     ranger,
     rmarkdown,
     testthat (>= 3.0.0),
