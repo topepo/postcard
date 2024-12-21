@@ -69,12 +69,6 @@ test_that("family can be given as character, function and call", {
   expect_snapshot(nbinom_data)
 })
 
-test_that("Error occurs when no variables are given", {
-  expect_error(
-    create_glm_data(1+x1)
-  )
-})
-
 test_that("Changing `response_name` changes column name in resulting data", {
   data <- create_glm_data(
     1+2*x1,
@@ -82,4 +76,16 @@ test_that("Changing `response_name` changes column name in resulting data", {
     response_name = "test"
   )
   expect_true(!is.null(data$test))
+})
+
+test_that("Error occurs when no variables are given", {
+  expect_error(
+    create_glm_data(1+x1)
+  )
+})
+
+test_that("Error occurs when trying to use variable in formula that's not defined", {
+  expect_error(
+    create_glm_data(1+x1+x2, x1 = rnorm(10))
+  )
 })
