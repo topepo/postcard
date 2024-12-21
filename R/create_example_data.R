@@ -17,6 +17,7 @@
 #' a `call` to a family function
 #' @param family_args a named `list` with values of arguments passed to
 #' family relevant r<family_name> function for simulating the data
+#' @param response_name a `character` giving the name of the simulated response
 #'
 #' @returns a `data.frame`
 #' @export
@@ -47,7 +48,8 @@
 create_glm_data <- function(formula_eta,
                             ...,
                             family = gaussian(),
-                            family_args = list(sd = 1)) {
+                            family_args = list(sd = 1),
+                            response_name = "Y") {
   family = check_family(family)
 
   data_list <- list(...)
@@ -75,7 +77,7 @@ create_glm_data <- function(formula_eta,
   y <- do.call(generate_from_family, args_to_rfun)
 
   out <- data %>%
-    dplyr::mutate(y = y, .before = everything())
+    dplyr::mutate("{response_name}" := y, .before = everything())
 
   return(out)
 }

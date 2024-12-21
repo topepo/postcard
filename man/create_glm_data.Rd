@@ -8,7 +8,8 @@ create_glm_data(
   formula_eta,
   ...,
   family = gaussian(),
-  family_args = list(sd = 1)
+  family_args = list(sd = 1),
+  response_name = "Y"
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ a \code{call} to a family function}
 
 \item{family_args}{a named \code{list} with values of arguments passed to
 family relevant r<family_name> function for simulating the data}
+
+\item{response_name}{a \code{character} giving the name of the simulated response}
 }
 \value{
 a \code{data.frame}
