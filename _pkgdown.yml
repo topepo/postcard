@@ -31,7 +31,7 @@ reference:
     exploratory analyses across different scenarios of simulated data with and without prognostic
     covariate adjustment
   contents:
-  - create_glm_data
+  - glm_data
 - title: Package level options
   contents:
   - options
