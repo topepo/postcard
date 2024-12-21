@@ -1,5 +1,14 @@
 # Modify data to have the same value of a group identifier and then predict
-predict_counterfactual_means <- function(model, data, group_indicator_name, group_val) {
+predict_counterfactual_means <- function(model,
+                                         group_indicator_name,
+                                         group_val,
+                                         data = NULL) {
+  if (is.null(data)) data <- model$data
+
+  group_indicator_in_model <- group_indicator_name %in% names(coef(model))
+  group_indicator_in_data <- group_indicator_name %in% colnames(data)
+  if (!group_indicator_in_model && !group_indicator_in_data)
+    cli::cli_abort("{.arg {group_indicator_name}} is not in {.arg {model}} or {.arg {data}}. Specify name of a binary predictor in the {.arg {model}} and {.arg {data}}")
   predict(model,
           type = "response",
           newdata = data |>

@@ -128,11 +128,9 @@ rctglm <- function(formula,
 
   counterfactual_pred0 <- predict_counterfactual_means(group_val = 0,
                                                        model = model,
-                                                       data = data,
                                                        group_indicator_name = group_indicator_name)
   counterfactual_pred1 <- predict_counterfactual_means(group_val = 1,
                                                        model = model,
-                                                       data = data,
                                                        group_indicator_name = group_indicator_name)
 
   counterfactual_mean0 <- mean(counterfactual_pred0)
