@@ -25,6 +25,13 @@ reference:
     on RMSE in training data
   contents:
   - fit_best_learner
+- title: Generate data from GLM model with known mean
+  desc: >
+    Used in development for examples, vignettes and tests, but exported to enable users to perform
+    exploratory analyses across different scenarios of simulated data with and without prognostic
+    covariate adjustment
+  contents:
+  - create_glm_data
 - title: Package level options
   contents:
   - options
