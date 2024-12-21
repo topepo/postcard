@@ -20,26 +20,6 @@ library(magrittr)
 withr::local_seed(1395878)
 ```
 
-```{r dat-sim, include = FALSE}
-n <- 1000
-w <- runif(n, min = -2, max = 2)
-x <- sin(w)^2
-a <- rbinom(n, 1, .5)
-b0 <- 1
-b1 <- 3
-b2 <- 2
-
-truemean_treat <- b0+b1*x+b2*a
-y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
-dat_treat <- data.frame(Y = y_treat, W = w, X = x, A = a)
-
-truemean_notreat <- b0+b1*x
-y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-dat_notreat <- data.frame(Y = y_notreat, W = w, X = x)
-```
-
-> Note! We use the same data as was generated in the [README](https://github.com/NNpackages/PostCard#README) examples. Here we will also generate new data sets to show results for other families than the Gaussian using definitions from those examples.
-
 ## Controlling verbosity
 
 See package level options documentation in `options()`, giving information on how to change package behavior through options and environmental variables. Only option is `verbose`, which controls the amount of information printed to the console.
@@ -50,6 +30,23 @@ As a default, `verbose = 2`, meaning various information printed throughout the 
 
 ## Plug-in estimation of marginal effects and variance estimation using influence functions
 
+As in the [README](https://github.com/NNpackages/PostCard#README) examples, we simulate data using the `glm_data()` function from the package.
+
+```{r dat-sim}
+n <- 1000
+b0 <- 1
+b1 <- 3
+b2 <- 2
+
+# Simulate data with a non-linear effect
+dat_pois <- glm_data(
+  b0+b1*sin(W)^2+b2*A,
+  W = runif(n, min = -2, max = 2),
+  A = rbinom(n, 1, .5),
+  family = poisson(link = "log") # Default value
+)
+```
+
 ### Changing the estimand
 
 The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is the average treatment effect (ATE). However, it's possible to specify any estimand.
@@ -59,14 +56,11 @@ The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is 
 Built in is the ATE and rate ratio, which can be specified with character strings. As is apparent from the documentation of `rctglm()` and `rctglm_with_prognosticscore()`, the default of `estimand_fun` is `"ate"`, and similarly the user can specify `estimand_fun = "ratio_ratio"` to use the estimand function `psi1 / psi0` as seen below:
 
 ```{r rate-ratio-run-show}
-dat_pois <- dat_treat %>% 
-  dplyr::mutate(Y = rpois(n, lambda = exp(truemean_treat)))
-
 rate_ratio <- rctglm(
-  formula = Y ~ A + X,
+  formula = Y ~ A + W,
   group_indicator = A,
   data = dat_pois,
-  family = poisson(link = "log"),
+  family = "poisson",
   estimand_fun = "rate_ratio")
 rate_ratio
 ```
@@ -85,8 +79,8 @@ nonsense_estimand_fun <- function(psi1, psi0) {
 nonsense_estimand <- rctglm(
   formula = Y ~ A * W,
   group_indicator = A,
-  data = dat_treat,
-  family = gaussian(),
+  data = dat_pois,
+  family = poisson(),
   estimand_fun = nonsense_estimand_fun,
   verbose = 0)
 nonsense_estimand
@@ -111,7 +105,29 @@ To illustrate, below is the code of the unexported function `default_learners` w
 PostCard:::default_learners
 ```
 
-##### Example of creating own list of learners
+##### Creating own list of learners
+
+> We first simulate some data to run the example
+
+```{r dat-hist-sim}
+# Generate some data
+n <- 1000
+b0 <- 1
+b1 <- 1.5
+b2 <- 2
+W_sim <- runif(n, min = -2, max = 2)
+
+dat_treat <- glm_data(
+  b0+b1*abs(sin(W))+b2*A,
+  W = W_sim,
+  A = rbinom (n, 1, .5)
+)
+
+dat_notreat <- glm_data(
+  b0+b1*abs(sin(W)),
+  W = W_sim
+)
+```
 
 A listing of models is available at [the tidymodels website](https://www.tidymodels.org/find/parsnip/), and the user can specify a list of any of those models along with specified values of parameters to the `learners` argument.
 
