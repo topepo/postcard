@@ -30,23 +30,30 @@ withr::local_seed(1395878)
 withr::local_options(list(PostCard.verbose = 0))
 ```
 
-## Plug-in estimation of marginal effects and variance estimation using influence functions
+## Simulating data for exploratory analyses
 
-First, we simulate some data to be able to showcase the functionalities
+First, we simulate some data to be able to enable showcasing of the
+functionalities. For this we use the `glm_data()` function from the
+package, where the user can specify an expression alongside variables
+and a family of the response to then simulate a response from a GLM with
+linear predictor given by the expression provided.
 
 ``` r
 n <- 1000
-w <- runif(n, min = -2, max = 2)
-x <- sin(w)^2
-a <- rbinom(n, 1, .5)
 b0 <- 1
 b1 <- 3
 b2 <- 2
 
-truemean_treat <- b0+b1*x+b2*a
-y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
-dat_treat <- data.frame(Y = y_treat, W = w, A = a)
+# Simulate data with a non-linear effect
+dat_treat <- glm_data(
+  b0+b1*sin(W)^2+b2*A,
+  W = runif(n, min = -2, max = 2),
+  A = rbinom(n, 1, .5),
+  family = gaussian() # Default value
+)
 ```
+
+## Plug-in estimation of marginal effects and variance estimation using influence functions
 
 ### Fitting `rctglm()` without prognostic covariate adjustment
 
@@ -76,7 +83,7 @@ Thus, we can estimate the ATE by simply writing the below:
 ate <- rctglm(formula = Y ~ A * W,
               group_indicator = A,
               data = dat_treat,
-              family = gaussian())
+              family = "gaussian") # Default value
 ```
 
 This creates an `rctglm()` object which prints as
@@ -85,13 +92,13 @@ This creates an `rctglm()` object which prints as
 ate
 #> Object of class 'rctglm'
 #> 
-#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = gaussian(), 
+#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
 #>     data = dat_treat)
 #> 
-#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.775793
-#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.866888
+#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.78
+#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.87
 #> - Estimand function r: psi1 - psi0
-#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.091095 (0.09208528)
+#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.09 (0.0921)
 ```
 
 ### Using prognostic covariate adjustment
@@ -112,9 +119,11 @@ We simulate some historical data to showcase the use of this function as
 well:
 
 ``` r
-truemean_notreat <- b0+b1*x
-y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-dat_notreat <- data.frame(Y = y_notreat, W = w)
+dat_notreat <- glm_data(
+  b0+b1*sin(W)^2,
+  W = runif(n, min = -2, max = 2),
+  family = gaussian # Default value
+)
 ```
 
 The call to `rctglm_with_prognosticscore()` is the same as to `rctglm()`
@@ -135,7 +144,7 @@ ate_prog <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
   group_indicator = A,
   data = dat_treat,
-  family = gaussian(),
+  family = gaussian(link = "identity"), # Default value
   data_hist = dat_notreat)
 ```
 
@@ -145,13 +154,13 @@ Quick results of the fit can be seen by printing the object:
 ate_prog
 #> Object of class 'rctglm'
 #> 
-#> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(), 
+#> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
 #>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
 #> 
-#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.828515
-#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.819363
+#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.83
+#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.82
 #> - Estimand function r: psi1 - psi0
-#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.990849 (0.0641213)
+#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.99 (0.0641)
 ```
 
 It’s evident that in this case where there is a non-linear relationship
