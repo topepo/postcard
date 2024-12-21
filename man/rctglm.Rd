@@ -24,7 +24,7 @@ rctglm(
     model to be fitted.  The details of model specification are given
     under \sQuote{Details}.}
 
-\item{group_indicator}{(name of) the variable in data that identifies randomisation groups}
+\item{group_indicator}{(name of) the variable in \code{data} that identifies randomisation groups}
 
 \item{family}{a description of the error distribution and link
     function to be used in the model.  For \code{glm} this can be a
@@ -90,20 +90,16 @@ the \code{estimand_fun}.
 \examples{
 # Generate some data
 n <- 100
-x1 <- rnorm (n)
-a <- rbinom (n, 1, .5)
-b0 <- 1
-b1 <- 1.5
-b2 <- 2
-
-lin_pred <- b0+b1*x1+b2*a
-y_norm <- rnorm(n, mean = lin_pred, sd = 1)
-dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
+dat_gaussian <- create_glm_data(
+  1+1.5*X1+2*A,
+  X1 = rnorm(n),
+  A = rbinom(n, 1, .5)
+)
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
               group_indicator = A,
-              data = dat_norm,
+              data = dat_gaussian,
               family = gaussian(),
               estimand_fun = "ate")
 }

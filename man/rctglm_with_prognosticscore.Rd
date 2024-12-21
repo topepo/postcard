@@ -40,7 +40,7 @@ rctglm_with_prognosticscore(
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_indicator}{(name of) the variable in data that identifies randomisation groups}
+\item{group_indicator}{(name of) the variable in \code{data} that identifies randomisation groups}
 
 \item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
 As a default, the ratio of 1's in data is used.}
@@ -85,20 +85,21 @@ in control group.
 \examples{
 # Generate some data
 n <- 100
-w1 <- runif(n, min = -2, max = 2)
-x1 <- abs(sin(w1))
-a <- rbinom (n, 1, .5)
 b0 <- 1
 b1 <- 1.5
 b2 <- 2
+W1 <- runif(n, min = -2, max = 2)
 
-truemean_treat <- b0+b1*x1+b2*a
-y_treat <- rnorm(n, mean = truemean_treat, sd = 1)
-dat_treat <- data.frame(Y = y_treat, W = w1, A = a)
+dat_treat <- create_glm_data(
+  b0+b1*abs(sin(W1))+b2*A,
+  W1 = W1,
+  A = rbinom (n, 1, .5)
+)
 
-truemean_notreat <- b0+b1*x1
-y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-dat_hist <- data.frame(Y = y_notreat, W = w1)
+dat_notreat <- create_glm_data(
+  b0+b1*abs(sin(W1)),
+  W1 = W1
+)
 
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
@@ -106,6 +107,6 @@ ate <- rctglm_with_prognosticscore(
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",
-  data_hist = dat_hist)
+  data_hist = dat_notreat)
 
 }

@@ -47,20 +47,16 @@
 #' @examples
 #' # Generate some data
 #' n <- 100
-#' x1 <- rnorm (n)
-#' a <- rbinom (n, 1, .5)
-#' b0 <- 1
-#' b1 <- 1.5
-#' b2 <- 2
-#'
-#' lin_pred <- b0+b1*x1+b2*a
-#' y_norm <- rnorm(n, mean = lin_pred, sd = 1)
-#' dat_norm <- data.frame(Y = y_norm, X = x1, A = a)
+#' dat_gaussian <- create_glm_data(
+#'   1+1.5*X1+2*A,
+#'   X1 = rnorm(n),
+#'   A = rbinom(n, 1, .5)
+#' )
 #'
 #' # Fit the model
 #' ate <- rctglm(formula = Y ~ .,
 #'               group_indicator = A,
-#'               data = dat_norm,
+#'               data = dat_gaussian,
 #'               family = gaussian(),
 #'               estimand_fun = "ate")
 rctglm <- function(formula,

@@ -48,7 +48,7 @@ create_glm_data(1+2*x1,
 # Generate a gaussian response from a single covariate with
 # non-linear effects
 create_glm_data(1+2*abs(sin(x1)),
-                x1 = runif(min = -2, max = 2))
+                x1 = runif(10, min = -2, max = 2))
 
 # Generate a negative binomial response
 create_glm_data(1+2*x1-x2,
