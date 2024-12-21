@@ -88,18 +88,19 @@ the \code{estimand_fun}.
 }
 
 \examples{
-# Generate some data
+# Generate some data to showcase example
 n <- 100
-dat_gaussian <- glm_data(
+dat_binom <- glm_data(
   1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5)
+  A = rbinom(n, 1, .5),
+  family = binomial()
 )
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
               group_indicator = A,
-              data = dat_gaussian,
-              family = gaussian(),
+              data = dat_binom,
+              family = binomial,
               estimand_fun = "ate")
 }
