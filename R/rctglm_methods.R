@@ -1,15 +1,15 @@
 #' @export
 #' @noRd
-print.rctglm <- function(x, ...) {
+print.rctglm <- function(x, digits = 3, ...) {
   cat("Object of class 'rctglm'\n\n")
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   cat("- Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: ",
-      x$counterfactual_mean0,
+      format(x$counterfactual_mean0, digits = digits),
       "\n",
       sep = "")
   cat("- Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: ",
-      x$counterfactual_mean1,
+      format(x$counterfactual_mean1, digits = digits),
       "\n",
       sep = "")
   cat("- Estimand function r: ",
@@ -17,9 +17,9 @@ print.rctglm <- function(x, ...) {
       "\n",
       sep = "")
   cat("- Estimand (r(Psi_1, Psi_0)) estimate (SE): ",
-      x$estimand,
+      format(x$estimand, digits = digits),
       " (",
-      x$se_estimand,
+      format(x$se_estimand, digits = digits),
       ")\n",
       sep = "")
 
