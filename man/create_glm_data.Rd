@@ -13,8 +13,8 @@ create_glm_data(
 )
 }
 \arguments{
-\item{formula_eta}{a \link{formula} or a \code{character} specifying how
-to generate the linear predictor, eta}
+\item{formula_eta}{an object of class \link{formula} specifying how
+to generate the mean of the response (together with the inverse link from \code{family})}
 
 \item{...}{a \code{data.frame} with columns corresponding to variables used
 in \code{formula_eta}, a named \code{list} of those variables, or individually provided

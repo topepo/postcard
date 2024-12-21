@@ -6,8 +6,8 @@
 #' simulate the response with this mean from the generating function according
 #' to the chosen family.
 #'
-#' @param formula_eta a [formula] or a `character` specifying how
-#' to generate the linear predictor, eta
+#' @param formula_eta an object of class [formula] specifying how
+#' to generate the mean of the response (together with the inverse link from `family`)
 #' @param ... a `data.frame` with columns corresponding to variables used
 #' in `formula_eta`, a named `list` of those variables, or individually provided
 #' named arguments of variables
@@ -56,19 +56,15 @@ create_glm_data <- function(formula_eta,
   if (length(data_list) == 0) cli::cli_abort("You need to specify columns to generate data from")
   # if (!(length(data) == 1 && inherits(data[[1]], "data.frame")))
   data <- as.data.frame(data_list)
-
   n <- nrow(data)
 
   cols_env <- rlang::new_environment(data)
   linear_predictor <- withr::with_environment(
     env = cols_env,
-    code = {
-      ifelse(is.character(formula_eta),
-             eval(parse(text = formula_eta)),
-             formula_eta)
-    }
+    code = formula_eta
   )
   mu <- family$linkinv(linear_predictor)
+
 
   args_to_rfun <- c(list(n = n,
                          mu = mu,
