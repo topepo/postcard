@@ -13,7 +13,7 @@ create_glm_data(
 )
 }
 \arguments{
-\item{formula_eta}{an object of class \link{formula} specifying how
+\item{formula_eta}{an \code{expression} specifying how
 to generate the mean of the response (together with the inverse link from \code{family})}
 
 \item{...}{a \code{data.frame} with columns corresponding to variables used
