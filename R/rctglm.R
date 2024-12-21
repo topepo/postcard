@@ -47,7 +47,7 @@
 #' @examples
 #' # Generate some data
 #' n <- 100
-#' dat_gaussian <- create_glm_data(
+#' dat_gaussian <- glm_data(
 #'   1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
 #'   A = rbinom(n, 1, .5)

@@ -90,13 +90,13 @@ b1 <- 1.5
 b2 <- 2
 W1 <- runif(n, min = -2, max = 2)
 
-dat_treat <- create_glm_data(
+dat_treat <- glm_data(
   b0+b1*abs(sin(W1))+b2*A,
   W1 = W1,
   A = rbinom (n, 1, .5)
 )
 
-dat_notreat <- create_glm_data(
+dat_notreat <- glm_data(
   b0+b1*abs(sin(W1)),
   W1 = W1
 )

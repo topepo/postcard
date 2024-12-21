@@ -1,5 +1,5 @@
 test_that("`family_args` correctly passes arguments", {
-  data <- create_glm_data(
+  data <- glm_data(
     1+2*x1,
     x1 = rep(1, 10),
     family_args = list(sd = 0)
@@ -8,7 +8,7 @@ test_that("`family_args` correctly passes arguments", {
 })
 
 test_that("Response is created as intended", {
-  data <- create_glm_data(
+  data <- glm_data(
     1+2*x1,
     x1 = 1:2,
     family_args = list(sd = 0))
@@ -17,7 +17,7 @@ test_that("Response is created as intended", {
 
 test_that("Variables can be given as data.frame, list and individual variables", {
   ind_args <- withr::with_seed(42, {
-    create_glm_data(
+    glm_data(
       1+x1+2*x2,
       x1 = 1:2,
       x2 = 4:5
@@ -25,7 +25,7 @@ test_that("Variables can be given as data.frame, list and individual variables",
   })
 
   list_args <- withr::with_seed(42, {
-    create_glm_data(
+    glm_data(
       1+x1+2*x2,
       list(
         x1 = 1:2,
@@ -35,7 +35,7 @@ test_that("Variables can be given as data.frame, list and individual variables",
   })
 
   df_args <- withr::with_seed(42, {
-    create_glm_data(
+    glm_data(
       1+x1+2*x2,
       data.frame(
         x1 = 1:2,
@@ -50,19 +50,19 @@ test_that("Variables can be given as data.frame, list and individual variables",
 
 test_that("family can be given as character, function and call", {
   withr::local_seed(42)
-  pois_data <- create_glm_data(
+  pois_data <- glm_data(
     1+2*x1,
     x1 = 1:2,
     family = "poisson")
   expect_snapshot(pois_data)
 
-  binom_data <- create_glm_data(
+  binom_data <- glm_data(
     1+2*x1,
     x1 = 1:2,
     family = binomial)
   expect_snapshot(binom_data)
 
-  nbinom_data <- create_glm_data(
+  nbinom_data <- glm_data(
     1+2*x1,
     x1 = 1:2,
     family = MASS::negative.binomial(2))
@@ -70,7 +70,7 @@ test_that("family can be given as character, function and call", {
 })
 
 test_that("Changing `response_name` changes column name in resulting data", {
-  data <- create_glm_data(
+  data <- glm_data(
     1+2*x1,
     x1 = 1:2,
     response_name = "test"
@@ -80,12 +80,12 @@ test_that("Changing `response_name` changes column name in resulting data", {
 
 test_that("Error occurs when no variables are given", {
   expect_error(
-    create_glm_data(1+x1)
+    glm_data(1+x1)
   )
 })
 
 test_that("Error occurs when trying to use variable in formula that's not defined", {
   expect_error(
-    create_glm_data(1+x1+x2, x1 = rnorm(10))
+    glm_data(1+x1+x2, x1 = rnorm(10))
   )
 })
