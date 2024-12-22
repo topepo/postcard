@@ -6,9 +6,8 @@ predict_counterfactual_means <- function(model,
   if (is.null(data)) data <- model$data
 
   group_indicator_in_model <- group_indicator_name %in% names(coef(model))
-  group_indicator_in_data <- group_indicator_name %in% colnames(data)
-  if (!group_indicator_in_model && !group_indicator_in_data)
-    cli::cli_abort("{.arg {group_indicator_name}} is not in {.arg {model}} or {.arg {data}}. Specify name of a binary predictor in the {.arg {model}} and {.arg {data}}")
+  if (!group_indicator_in_model)
+    cli::cli_abort("{.arg {group_indicator_name}} is not in {.arg {model}}. Specify name of a binary predictor in the {.arg {model}}")
   predict(model,
           type = "response",
           newdata = data |>
