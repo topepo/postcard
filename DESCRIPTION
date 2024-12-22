@@ -25,6 +25,7 @@ Imports:
     stats,
     stringr,
     tune,
+    utils,
     workflowsets,
     xgboost,
     yardstick

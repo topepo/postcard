@@ -17,5 +17,6 @@
 #' @importFrom stats rnorm
 #' @importFrom stats rpois
 #' @importFrom stats var
+#' @importFrom utils capture.output
 ## usethis namespace: end
 NULL
