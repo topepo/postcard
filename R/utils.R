@@ -5,21 +5,19 @@ get_fun_args <- function(fun) {
 
 # To enable nice character priting of a function definition
 deparse_fun_body <- function(fun) {
-  deparsed_body <- deparse(body(fun))
-  len_dep <- length(deparsed_body)
-  if (len_dep > 1) {
-    deparsed_body <- gsub("\\s*", "", deparsed_body[-c(1, len_dep)])
-  }
-
-  return(deparsed_body)
+  body_as_char <- capture.output(body(fun))
+  out <- paste(body_as_char, collapse = "\n")
+  return(out)
 }
 
 # Extract response from formula to
 get_response_from_formula <- function(formula) {
-  if (inherits(formula, "formula")) {
-    formula <- deparse(formula)
-  }
-  gsub("\\s*~.*", "", formula)
+  if (!inherits(formula, "formula"))
+    cli::cli_abort("{.arg formula} needs to have class `formula`")
+
+  formula_char <- deparse(formula)
+  lhs_oftilde <- gsub("\\s*~.*", "", formula_char)
+  return(lhs_oftilde)
 }
 
 # Create formula that is function of
