@@ -53,3 +53,10 @@ test_that("`get_response_from_formula` works for different formula specifiations
                "testing")
 })
 
+# is_response_in_data
+
+
+# formula_everything
+test_that("`formula_everything`", {
+  formula_everything(Y ~ A)
+})

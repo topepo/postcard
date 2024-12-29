@@ -71,7 +71,10 @@ rctglm_with_prognosticscore <- function(
 
   if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   if (is.null(prog_formula)) {
-    prog_formula <- formula_everything(orig_formula = formula, data = data_hist, verbose = verbose)
+    is_response_in_data(formula, data = data_hist)
+    prog_formula <- formula_everything(formula)
+    if (verbose >= 1)
+      cli::cli_alert_info("Created formula for fitting prognostic model as: {prog_formula}")
   } else if (is.character(prog_formula)) {
     prog_formula <- formula(prog_formula)
   }
