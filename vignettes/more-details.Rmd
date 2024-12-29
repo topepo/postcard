@@ -1,0 +1,176 @@
+---
+title: "More details on usage of package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{More details on usage of package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(PostCard)
+library(magrittr)
+withr::local_seed(1395878)
+```
+
+## Controlling verbosity
+
+See package level options documentation in `options()`, giving information on how to change package behavior through options and environmental variables. Only option is `verbose`, which controls the amount of information printed to the console.
+
+As a default, `verbose = 2`, meaning various information printed throughout the algorithm. Change to `verbose = 1` for a little less information or `verbose = 0` for no information
+
+> Throughout the examples in this vignette, it will be visible what kind of information is printed to the user.
+
+## Plug-in estimation of marginal effects and variance estimation using influence functions
+
+As in the [README](https://github.com/NNpackages/PostCard#README) examples, we simulate data using the `glm_data()` function from the package.
+
+```{r dat-sim}
+n <- 1000
+b0 <- 1
+b1 <- 3
+b2 <- 2
+
+# Simulate data with a non-linear effect
+dat_pois <- glm_data(
+  b0+b1*sin(W)^2+b2*A,
+  W = runif(n, min = -2, max = 2),
+  A = rbinom(n, 1, .5),
+  family = poisson(link = "log") # Default value
+)
+```
+
+### Changing the estimand
+
+The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is the average treatment effect (ATE). However, it's possible to specify any estimand.
+
+#### Built-in estimands - average treatment effect and rate ratio
+
+Built in is the ATE and rate ratio, which can be specified with character strings. As is apparent from the documentation of `rctglm()` and `rctglm_with_prognosticscore()`, the default of `estimand_fun` is `"ate"`, and similarly the user can specify `estimand_fun = "ratio_ratio"` to use the estimand function `psi1 / psi0` as seen below:
+
+```{r rate-ratio-run-show}
+rate_ratio <- rctglm(
+  formula = Y ~ A + W,
+  group_indicator = A,
+  data = dat_pois,
+  family = "poisson",
+  estimand_fun = "rate_ratio")
+rate_ratio
+```
+
+#### Specifying any estimand
+
+It's possible to specify any function with 2 named arguments, `psi0` and `psi1`, as your estimand function `estimand_fun`. Below is an example showing that any estimand function can be specified.
+
+> Note that information is printed to the console about the automatic differentiation being performed on the `estimand_fun`, which are used for the calculation of the influence function of the marginal effect.
+
+```{r nonsense-run-show}
+nonsense_estimand_fun <- function(psi1, psi0) {
+  psi1 / sqrt(psi0) * 2 - 1
+}
+
+nonsense_estimand <- rctglm(
+  formula = Y ~ A * W,
+  group_indicator = A,
+  data = dat_pois,
+  family = poisson(),
+  estimand_fun = nonsense_estimand_fun,
+  verbose = 0)
+nonsense_estimand
+```
+
+### Prognostic covariate adjustment
+
+The `rctglm_with_prognosticscore()` uses the function `fit_best_learner()` to fit a prognostic model to the historical data, `data_hist`. Thereafter, the model is used to predict prognostic scores for all observations in `data` before using these scores as a covariate when performing plug-in etimation in a GLM using `rctglm`.
+
+The default behavior of `fit_best_learner()` and subsequently `rctglm_with_prognosticscore()` is to fit a discrete super learner (discrete to avoid overfitting) by finding the model with the lowest RMSE among a linear regression, Multivariate adaptive regression spline (MARS) and boosted trees.
+
+The algorithm uses a default of 5 folds for cross validation and tries to construct the formula used for the prognostic model as modelling the response with a design matrix containing an intercept and main effect from all variables in the historical data, `data_hist`.
+
+#### Specifying learners
+
+It's easy for the user to specify other learners to train in order to fit the discrete super learner. The package utilises the framework of [tidymodels](https://www.tidymodels.org/). All the user needs to do is specify a list of models.
+
+##### Code used for default learners
+
+To illustrate, below is the code of the unexported function `default_learners` which creates a list of the default learners:
+```{r default-learners-show}
+PostCard:::default_learners
+```
+
+##### Creating own list of learners
+
+> We first simulate some data to run the example
+
+```{r dat-hist-sim}
+# Generate some data
+n <- 1000
+b0 <- 1
+b1 <- 1.5
+b2 <- 2
+W_sim <- runif(n, min = -2, max = 2)
+
+dat_treat <- glm_data(
+  b0+b1*abs(sin(W))+b2*A,
+  W = W_sim,
+  A = rbinom (n, 1, .5)
+)
+
+dat_notreat <- glm_data(
+  b0+b1*abs(sin(W)),
+  W = W_sim
+)
+```
+
+A listing of models is available at [the tidymodels website](https://www.tidymodels.org/find/parsnip/), and the user can specify a list of any of those models along with specified values of parameters to the `learners` argument.
+
+```{r fit-own-learners}
+learners <- list(
+  rf = list(
+    model = parsnip::rand_forest(
+      mode = "regression",
+      trees = 500,
+      min_n = 5
+    ) %>% 
+      parsnip::set_engine("ranger")
+  ),
+  svm.linear = list(
+    model = parsnip::svm_linear(
+      mode = "regression",
+      cost = 1,
+      margin = 0.1) %>% 
+    parsnip::set_engine("LiblineaR")
+  )
+)
+
+model_own_learners <- rctglm_with_prognosticscore(
+  formula = Y ~ A * W,
+  group_indicator = A,
+  data = dat_treat,
+  family = gaussian(),
+  data_hist = dat_notreat,
+  learners = learners)
+```
+
+#### Investigating the prognostic model
+
+It's possible to view information regarding the fit of the prognostic model in the `rctglm` class object that `rctglm_with_prognosticscore()` returns by looking at the list element `prognostic_info`.
+
+Inside this list element are elements
+
+- `model_fit`: The result of `fit_best_learner()`
+- `leaners`: The list of learners used
+- `cv_folds`: The number of folds used for cross validation
+
+```{r prognostic-info-show}
+model_own_learners$prognostic_info
+```
+
+

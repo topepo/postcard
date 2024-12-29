@@ -1,38 +1,46 @@
-Package: PostCard
 Type: Package
-Title: Prognostic covariate adjustment for estimation of average treatment effect
-Version: 0.2.0.9000
-Authors@R: 
-    person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = c("aut", "cre"))
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: Convenient functions for conducting analysis using prognostic covariate adjustment for linear models. The package contain a
-    function that can generate normally distributed data in different data generating scenarios in order to
-    determine the finite sample properties of prognostic covariate for linear models. This generated data can then be used as an
-    input for the lm.hist.sim function, that estimates ATE, SD, power, type I error, etc. This function can also 
-    be used for a single pair of RCT and historical data. 
+Package: PostCard
+Title: Prognostic covariate adjustment for estimation of estimands
+Version: 1.0.0.9000
+Authors@R: c(
+    person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
+    person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut")
+  )
+Description: Convenient functions for conducting analysis using prognostic
+    covariate adjustment for GLMs. The package uses plug-in estimation for
+    robust estimation of the estimand and influence functions for robust
+    estimation of the variance of the estimand.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-LazyData: true
-RoxygenNote: 7.3.2
 Imports: 
+    cli,
+    Deriv,
     dplyr,
+    earth,
+    generics,
     magrittr,
+    options,
     parsnip,
-    ranger, 
-    MatchIt,
-    glmnet,
-    MASS, 
-    randomForest,
-    Matching,
-    extraDistr,
-    future.apply, 
-    future, 
-    rlang, 
-    tidyr, 
+    rlang,
+    rsample,
     stats,
-    sandwich, 
-    lmtest
+    stringr,
+    tune,
+    utils,
+    workflowsets,
+    xgboost,
+    yardstick
 Suggests: 
-    testthat (>= 3.0.0)
+    knitr,
+    LiblineaR,
+    MASS,
+    ranger,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+VignetteBuilder: knitr
+URL: https://nnpackages.github.io/PostCard/
