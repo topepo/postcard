@@ -1,5 +1,9 @@
-#' Methods for objects of class `rctglm`
+#' @name rctglm_methods
+#' @rdname rctglm_methods
 #'
+#' @title Methods for objects of class `rctglm`
+#'
+#' @description
 #' Methods mostly to extract information from model fit and inference. See
 #' details for more information on each method.
 #'
@@ -19,9 +23,6 @@
 #' estimand function on the predicted counterfactual means of each group.
 #' These functions are a shortcut to extract the list elements `estimand`
 #' and `se_estimand`of an `rctglm` class object.
-#'
-#' @rdname rctglm_methods
-#' @export
 #'
 #' @examples
 #' # Generate some data to showcase example
@@ -45,6 +46,10 @@
 #' se_estimand(ate)
 #' coef(ate)
 #' summary(ate)
+NULL
+
+#' @rdname rctglm_methods
+#' @export
 print.rctglm <- function(x, digits = 3, ...) {
   cat("Object of class 'rctglm'\n\n")
   cat("Call:  ",
