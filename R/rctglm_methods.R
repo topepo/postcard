@@ -1,5 +1,55 @@
+#' @name rctglm_methods
+#' @rdname rctglm_methods
+#'
+#' @title Methods for objects of class `rctglm`
+#'
+#' @description
+#' Methods mostly to extract information from model fit and inference. See
+#' details for more information on each method.
+#'
+#' @param x an object of class `rctglm`
+#' @param object an object of class `rctglm`
+#' @param digits a `numeric` with the number of digits to display when printing
+#' @param ... additional arguments passed to methods
+#'
+#' @details
+#' `coef` and `summary` just use the corresponding `glm` methods on the `glm`
+#' fit contained within the `rctglm` object. Thus, these functions are shortcuts
+#' of running `coef(x$glm)` and `summary(x$glm)`.
+#'
+#' `estimand` and `se_estimand` are methods for extracting the estimated
+#' estimand value as well as the standard error (SE) of the estimand.
+#' Extract the plug-in estimation of the estimand, found by using the
+#' estimand function on the predicted counterfactual means of each group.
+#' These functions are a shortcut to extract the list elements `estimand`
+#' and `se_estimand`of an `rctglm` class object.
+#'
+#' @examples
+#' # Generate some data to showcase example
+#' n <- 100
+#' dat_binom <- glm_data(
+#'   1+1.5*X1+2*A,
+#'   X1 = rnorm(n),
+#'   A = rbinom(n, 1, .5),
+#'   family = binomial()
+#' )
+#'
+#' # Fit the model
+#' ate <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_binom,
+#'               family = binomial,
+#'               estimand_fun = "ate")
+#'
+#' print(ate)
+#' estimand(ate)
+#' se_estimand(ate)
+#' coef(ate)
+#' summary(ate)
+NULL
+
+#' @rdname rctglm_methods
 #' @export
-#' @noRd
 print.rctglm <- function(x, digits = 3, ...) {
   cat("Object of class 'rctglm'\n\n")
   cat("Call:  ",
@@ -27,29 +77,37 @@ print.rctglm <- function(x, digits = 3, ...) {
 }
 
 #' @export
-#' @noRd
+#' @rdname rctglm_methods
 coef.rctglm <- function(object, ...) {
   coef(object$glm)
 }
 
 #' @export
-#' @noRd
+#' @rdname rctglm_methods
 summary.rctglm <- function(object, ...) {
   summary(object$glm)
 }
 
-#' Generic for extracting estimand
-#'
-#' @param x an object of some class to dispatch on
-#' @param ... additional arguments passed to methods
-#'
 #' @export
-estimand <- function(x, ...) {
+#' @rdname rctglm_methods
+estimand <- function(x) {
   UseMethod("estimand")
 }
 
 #' @export
-#' @noRd
-estimand.rctglm <- function(x, ...) {
+#' @rdname rctglm_methods
+estimand.rctglm <- function(x) {
   x$estimand
+}
+
+#' @export
+#' @rdname rctglm_methods
+se_estimand <- function(x) {
+  UseMethod("se_estimand")
+}
+
+#' @export
+#' @rdname rctglm_methods
+se_estimand.rctglm <- function(x) {
+  x$se_estimand
 }

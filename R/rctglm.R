@@ -153,13 +153,14 @@ rctglm <- function(formula,
   out <- list(
     estimand = estimand,
     se_estimand = se_estimand,
+    var_estimand = var_estimand,
     estimand_fun = estimand_fun,
     counterfactual_mean0 = counterfactual_mean0,
     counterfactual_mean1 = counterfactual_mean1,
     counterfactual_pred0 = counterfactual_pred0,
     counterfactual_pred1 = counterfactual_pred1,
     call = call,
-    glm_fit = model
+    glm = model
   )
 
   return(structure(out, class = c("rctglm", class(out))))

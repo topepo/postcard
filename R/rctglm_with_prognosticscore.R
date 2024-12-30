@@ -16,7 +16,8 @@
 #' More details on prognostic models and scores being predictions of counterfactual means
 #' in control group.
 #'
-#' @return an [rctglm] object, fitted with a prognostic score as a covariate in the model
+#' @return an `rctglm_prog` and `rctglm` object. Corresponds to an [rctglm] fitted with a
+#' prognostic score as a covariate in the model
 #' @export
 #'
 #' @examples
@@ -123,14 +124,18 @@ rctglm_with_prognosticscore <- function(
     prognostic_info = list(
       model_fit = lrnr_fit,
       learners = learners,
-      cv_folds = cv_folds
-  ))
+      cv_folds = cv_folds,
+      data = data_hist
+    ))
 
   list_with_prognostic_info <- c(rctglm_with_prognosticscore, prog_info)
   list_with_prognostic_info$call <- call
 
   out <- structure(list_with_prognostic_info,
-                   class = class(rctglm_with_prognosticscore))
+                   class = c("rctglm_prog",
+                             class(rctglm_with_prognosticscore)
+                   )
+  )
 
   return(out)
 }
