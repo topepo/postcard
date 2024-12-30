@@ -101,6 +101,41 @@ ate
 #> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.09 (0.0921)
 ```
 
+### Structure of `rctglm` and methods for extracting entities
+
+The `print` method for the `rctglm` class specifies the way to print
+such an object as seen above. Behind the S3 class of `rctglm` it is a
+list with
+
+- Estimand related information
+  - Value of plug-in estimation of estimand
+    - Accessible through `ate$estimand` or using method `estimand(ate)`
+  - Variance and standard error (SE) of estimand
+  - Accessible through `ate$var_estimand` and `ate$se_estimand` as well
+    as the SE with method `se_estimand(ate)`
+  - Counterfactual predictions (for each observation) and counterfactual
+    means for both groups
+    - Accessible through `ate$counterfactual_mean<0/1>` and
+      `ate$counterfactual_pred<0/1>`
+- Information on the underlying `glm` fit
+  - Entire `glm` object available through `ate$glm`
+  - Methods `coef` and `summary` exist for the `rctglm` class, which
+    uses the corresponding methods on the `glm` object contained within
+    `rctglm`
+
+Thus, methods available are:
+
+``` r
+estimand(ate)
+#> [1] 2.091095
+se_estimand(ate)
+#> [1] 0.09208528
+coef(ate)
+#> (Intercept)           A           W         A:W 
+#>  2.77585401  2.09122279  0.02364106  0.04961895
+# summary(ate) # Not printing to avoid long output in formatted output
+```
+
 ### Using prognostic covariate adjustment
 
 The `rctglm_with_prognosticscore()` function uses the
@@ -167,3 +202,17 @@ It’s evident that in this case where there is a non-linear relationship
 between the covariate we observe and the response, adjusting for the
 prognostic score reduces the standard error of our estimand
 approximation by quite a bit.
+
+#### Investigating the prognostic model
+
+Information on the prognostic model is available in the list element
+`prognostic_info` of the resulting object. This contains
+
+- The fitted prognostic model as a `workflow`
+  - Accessible through `ate$prognostic_info$model_fit` or with method
+    `prog_model(ate)`
+- A list of the learners used for fitting the model using
+  \[fit_best_learner()\]
+  - Accessible through `ate$prognostic_info$learners`
+- The number of folds used for cross validation (`cv_folds`) and the
+  historical data used for fitting the model

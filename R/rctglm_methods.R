@@ -38,18 +38,80 @@ summary.rctglm <- function(object, ...) {
   summary(object$glm)
 }
 
-#' Generic for extracting estimand
+#' Generic for extracting estimand value
+#'
+#' Extract the plug-in estimation of the estimand, found by using the
+#' estimand function on the predicted counterfactual means of each group.
+#' This function is a shortcut to extract the list element `estimand` of
+#' an `rctglm` class object.
 #'
 #' @param x an object of some class to dispatch on
 #' @param ... additional arguments passed to methods
 #'
 #' @export
+#'
+#' @examples
+#' # Generate some data to showcase example
+#' n <- 100
+#' dat_binom <- glm_data(
+#'   1+1.5*X1+2*A,
+#'   X1 = rnorm(n),
+#'   A = rbinom(n, 1, .5),
+#'   family = binomial()
+#' )
+#'
+#' # Fit the model
+#' ate <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_binom,
+#'               family = binomial,
+#'               estimand_fun = "ate")
+#'
+#' estimand(ate)
 estimand <- function(x, ...) {
   UseMethod("estimand")
 }
 
 #' @export
-#' @noRd
-estimand.rctglm <- function(x, ...) {
+#' @rdname estimand
+estimand.rctglm <- function(x) {
   x$estimand
+}
+
+#' Generic for extracting standard error (SE) of estimand
+#'
+#' Extract the standard error (SE) of the estimand. See more details in
+#' [rctglm] and [estimand].
+#' This function is a shortcut to extract the list element `se_estimand` of
+#' an `rctglm` class object.
+#'
+#' @inheritParams estimand
+#'
+#' @export
+#' @examples
+#' # Generate some data to showcase example
+#' n <- 100
+#' dat_binom <- glm_data(
+#'   1+1.5*X1+2*A,
+#'   X1 = rnorm(n),
+#'   A = rbinom(n, 1, .5),
+#'   family = binomial()
+#' )
+#'
+#' # Fit the model
+#' ate <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_binom,
+#'               family = binomial,
+#'               estimand_fun = "ate")
+#'
+#' se_estimand(ate)
+se_estimand <- function(x, ...) {
+  UseMethod("se_estimand")
+}
+
+#' @export
+#' @rdname se_estimand
+se_estimand.rctglm <- function(x) {
+  x$se_estimand
 }

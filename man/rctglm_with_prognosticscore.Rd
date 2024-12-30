@@ -71,7 +71,8 @@ regression and boosted trees}
 \item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
-an \link{rctglm} object, fitted with a prognostic score as a covariate in the model
+an \code{rctglm_prog} and \code{rctglm} object. Corresponds to an \link{rctglm} fitted with a
+prognostic score as a covariate in the model
 }
 \description{
 The procedure uses \link{fit_best_learner} to fit a prognostic model to historical data and uses
