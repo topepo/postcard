@@ -2,7 +2,8 @@
 #'
 #' Extract the fitted prognostic model.
 #'
-#' @inheritParams estimand
+#' @param x an object of class `rctglm_prog` (returned by
+#' [rctglm_with_prognosticscore])
 #'
 #' @export
 #' @examples
@@ -33,7 +34,7 @@
 #'   data_hist = dat_notreat)
 #'
 #' prog_model(ate)
-prog_model <- function(x, ...) {
+prog_model <- function(x) {
   UseMethod("prog_model")
 }
 

@@ -136,6 +136,8 @@ coef(ate)
 # summary(ate) # Not printing to avoid long output in formatted output
 ```
 
+See more info in the documentation page `rctglm_methods()`.
+
 ### Using prognostic covariate adjustment
 
 The `rctglm_with_prognosticscore()` function uses the

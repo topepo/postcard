@@ -5,14 +5,13 @@
 \alias{prog_model.rctglm_prog}
 \title{Generic for extracting the fitted prognostic model}
 \usage{
-prog_model(x, ...)
+prog_model(x)
 
 \method{prog_model}{rctglm_prog}(x)
 }
 \arguments{
-\item{x}{an object of some class to dispatch on}
-
-\item{...}{additional arguments passed to methods}
+\item{x}{an object of class \code{rctglm_prog} (returned by
+\link{rctglm_with_prognosticscore})}
 }
 \description{
 Extract the fitted prognostic model.
