@@ -13,9 +13,12 @@
 #' @param ... additional arguments passed to methods
 #'
 #' @details
-#' `coef` and `summary` just use the corresponding `glm` methods on the `glm`
-#' fit contained within the `rctglm` object. Thus, these functions are shortcuts
-#' of running `coef(x$glm)` and `summary(x$glm)`.
+#' `coef` just use the corresponding `glm` methods on the `glm`
+#' fit contained within the `rctglm` object. Thus, this function is a
+#' shortcuts to running `coef(x$glm)`.
+#'
+#' `summary` summarises information related to the estimand as well as
+#' the underlying GLM fit.
 #'
 #' `estimand` and `se_estimand` are methods for extracting the estimated
 #' estimand value as well as the standard error (SE) of the estimand.
@@ -50,28 +53,23 @@ NULL
 
 #' @rdname rctglm_methods
 #' @export
-print.rctglm <- function(x, digits = 3, ...) {
-  cat("Object of class 'rctglm'\n\n")
+print.rctglm <- function(x,
+                         digits = max(3L, getOption("digits") - 3L),
+                         ...) {
+  cat("\nObject of class 'rctglm'\n\n")
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
-  cat("- Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: ",
+  cat("Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: ",
       format(x$counterfactual_mean0, digits = digits),
       "\n",
       sep = "")
-  cat("- Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: ",
+  cat("Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: ",
       format(x$counterfactual_mean1, digits = digits),
       "\n",
       sep = "")
-  cat("- Estimand function r: ",
-      deparse_fun_body(x$estimand_fun),
-      "\n",
-      sep = "")
-  cat("- Estimand (r(Psi_1, Psi_0)) estimate (SE): ",
-      format(x$estimand, digits = digits),
-      " (",
-      format(x$se_estimand, digits = digits),
-      ")\n",
-      sep = "")
+  print_estimand_info(x,
+                      digits = max(3L, getOption("digits") - 3L),
+                      ...)
 
   return(invisible())
 }
@@ -85,7 +83,43 @@ coef.rctglm <- function(object, ...) {
 #' @export
 #' @rdname rctglm_methods
 summary.rctglm <- function(object, ...) {
-  summary(object$glm)
+  sum <- list(estimand = object$estimand,
+              se_estimand = object$se_estimand,
+              var_estimand = object$var_estimand,
+              estimand_fun = object$estimand_fun,
+              group_indicator = object$group_indicator,
+              call = object$call,
+              glm_summary = summary(object$glm))
+
+  out <- structure(sum, class = "summary.rctglm")
+
+  return(out)
+}
+
+#' @export
+#' @rdname rctglm_methods
+print.summary.rctglm <- function(
+    x,
+    digits = max(3L, getOption("digits") - 3L),
+    ...) {
+
+  cat("\nCall:  ",
+      paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
+
+  cli::cli_h2("Summary of estimand related statistics:")
+  cat("Counterfactual means, psi0 and psi1, based on groups in column ",
+      x$group_indicator,
+      "\n",
+      sep = "")
+  print_estimand_info(x,
+                      digits = max(3L, getOption("digits") - 3L),
+                      ...)
+  cat("\n")
+
+  cli::cli_h2("Summary of glm fit:")
+  glm_summary_without_call(x$glm_summary)
+
+  return(invisible())
 }
 
 #' @export
@@ -110,4 +144,32 @@ se_estimand <- function(x) {
 #' @rdname rctglm_methods
 se_estimand.rctglm <- function(x) {
   x$se_estimand
+}
+
+print_estimand_info <- function(x,
+                                digits = max(3L, getOption("digits") - 3L),
+                                ...) {
+  cat("Estimand function r: ",
+      deparse_fun_body(x$estimand_fun),
+      "\n",
+      sep = "")
+  cat("Estimand (r(psi_1, psi_0)) estimate (SE): ",
+      format(x$estimand, digits = digits),
+      " (",
+      format(x$se_estimand, digits = digits),
+      ")\n",
+      sep = "")
+  return(invisible())
+}
+
+# Utility functions for methods
+glm_summary_without_call <- function(glm_summary) {
+  glm_summary$call <- NULL
+  glm_summary_as_str <- paste(
+    utils::capture.output(
+      print(glm_summary)
+    ),
+    collapse = "\n")
+  cat(gsub("\nCall:\nNULL\n\n", "", glm_summary_as_str))
+  return(invisible())
 }

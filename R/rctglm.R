@@ -159,6 +159,7 @@ rctglm <- function(formula,
     counterfactual_mean1 = counterfactual_mean1,
     counterfactual_pred0 = counterfactual_pred0,
     counterfactual_pred1 = counterfactual_pred1,
+    group_indicator = group_indicator_name,
     call = call,
     glm = model
   )
