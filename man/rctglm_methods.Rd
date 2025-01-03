@@ -5,17 +5,20 @@
 \alias{print.rctglm}
 \alias{coef.rctglm}
 \alias{summary.rctglm}
+\alias{print.summary.rctglm}
 \alias{estimand}
 \alias{estimand.rctglm}
 \alias{se_estimand}
 \alias{se_estimand.rctglm}
 \title{Methods for objects of class \code{rctglm}}
 \usage{
-\method{print}{rctglm}(x, digits = 3, ...)
+\method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 \method{coef}{rctglm}(object, ...)
 
 \method{summary}{rctglm}(object, ...)
+
+\method{print}{summary.rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 estimand(x)
 
@@ -39,9 +42,12 @@ Methods mostly to extract information from model fit and inference. See
 details for more information on each method.
 }
 \details{
-\code{coef} and \code{summary} just use the corresponding \code{glm} methods on the \code{glm}
-fit contained within the \code{rctglm} object. Thus, these functions are shortcuts
-of running \code{coef(x$glm)} and \code{summary(x$glm)}.
+\code{coef} just use the corresponding \code{glm} methods on the \code{glm}
+fit contained within the \code{rctglm} object. Thus, this function is a
+shortcuts to running \code{coef(x$glm)}.
+
+\code{summary} summarises information related to the estimand as well as
+the underlying GLM fit.
 
 \code{estimand} and \code{se_estimand} are methods for extracting the estimated
 estimand value as well as the standard error (SE) of the estimand.

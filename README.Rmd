@@ -104,7 +104,7 @@ Thus, methods available are:
 estimand(ate)
 se_estimand(ate)
 coef(ate)
-# summary(ate) # Not printing to avoid long output in formatted output
+summary(ate)
 ```
 
 See more info in the documentation page `rctglm_methods()`.

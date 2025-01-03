@@ -90,15 +90,16 @@ This creates an `rctglm()` object which prints as
 
 ``` r
 ate
+#> 
 #> Object of class 'rctglm'
 #> 
 #> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
 #>     data = dat_treat)
 #> 
-#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.78
-#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.87
-#> - Estimand function r: psi1 - psi0
-#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 2.09 (0.0921)
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.776
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.867
+#> Estimand function r: psi1 - psi0
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
 ```
 
 ### Structure of `rctglm` and methods for extracting entities
@@ -133,7 +134,33 @@ se_estimand(ate)
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
-# summary(ate) # Not printing to avoid long output in formatted output
+summary(ate)
+#> 
+#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
+#>     data = dat_treat)
+#> 
+#> ── Summary of estimand related statistics: ──
+#> 
+#> Counterfactual means, psi0 and psi1, based on groups in column A
+#> Estimand function r: psi1 - psi0
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
+#> ── Summary of glm fit: ──
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)  2.77585    0.06543  42.425   <2e-16 ***
+#> A            2.09122    0.09242  22.628   <2e-16 ***
+#> W            0.02364    0.05687   0.416    0.678    
+#> A:W          0.04962    0.07908   0.627    0.530    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for gaussian family taken to be 2.125824)
+#> 
+#>     Null deviance: 3222.5  on 999  degrees of freedom
+#> Residual deviance: 2117.3  on 996  degrees of freedom
+#> AIC: 3598
+#> 
+#> Number of Fisher Scoring iterations: 2
 ```
 
 See more info in the documentation page `rctglm_methods()`.
@@ -189,15 +216,16 @@ Quick results of the fit can be seen by printing the object:
 
 ``` r
 ate_prog
+#> 
 #> Object of class 'rctglm'
 #> 
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
 #>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
 #> 
-#> - Counterfactual control mean (Psi_0=E[Y|X, A=0]) estimate: 2.83
-#> - Counterfactual control mean (Psi_1=E[Y|X, A=1]) estimate: 4.82
-#> - Estimand function r: psi1 - psi0
-#> - Estimand (r(Psi_1, Psi_0)) estimate (SE): 1.99 (0.0641)
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.827
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.821
+#> Estimand function r: psi1 - psi0
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.994 (0.06406)
 ```
 
 It’s evident that in this case where there is a non-linear relationship
