@@ -24,6 +24,9 @@ You can install the development version of PostCard from
 pak::pak("NNpackages/PostCard")
 ```
 
+Setup-chunk to load the package, set a seed and turn off verbosity for
+the rendering of the README.
+
 ``` r
 library(PostCard)
 withr::local_seed(1395878)
