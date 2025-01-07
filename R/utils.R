@@ -5,7 +5,9 @@ get_fun_args <- function(fun) {
 
 # To enable nice character priting of a function definition
 deparse_fun_body <- function(fun) {
-  body_as_char <- capture.output(body(fun))
+  body_as_char <- gsub(
+    "\\[\\d*\\]\\s*", "", utils::capture.output(body(fun))
+  )
   out <- paste(body_as_char, collapse = "\n")
   return(out)
 }
@@ -33,24 +35,27 @@ is_response_in_data <- function(formula, data) {
 # Create formula that is function of
 formula_everything <- function(formula) {
   response_var_name <- get_response_from_formula(formula)
-  paste0(response_var_name, " ~ .")
+  formula(
+    paste0(response_var_name, " ~ ."),
+    env = parent.frame()
+  )
 }
 
 # Get names of arguments containing 0 and 1 from function
-get01args = function(fun) {
+get01args <- function(fun) {
 
-  arg0 <- grep("0", get_fun_args(fun), value = TRUE)
-  arg1 <- grep("1", get_fun_args(fun), value = TRUE)
+  arg0 <- grep("0$", get_fun_args(fun), value = TRUE)
+  arg1 <- grep("1$", get_fun_args(fun), value = TRUE)
 
   if (length(arg0) == 0 | length(arg1) == 0) {
-    cli::cli_abort("Arguments of the {.var fun} need {.code 0} and {.code 1} in their names to be able to perform automatic symbolic differentiation. Alternatively, specify the partial derivatives, {.var estimand_fun_deriv0} and {.var estimand_fun_deriv1}, manually.")
+    cli::cli_abort("Arguments of the {.var estimand_fun} need to end in {.code 0} and {.code 1} to perform automatic symbolic differentiation. Alternatively, specify the partial derivatives, {.var estimand_fun_deriv0} and {.var estimand_fun_deriv1}, manually.")
   }
 
   return(list(arg0 = arg0, arg1 = arg1))
 }
 
 # Perform symbolic differentiation of function and print message
-print_symbolic_differentiation <- function(arg, fun, add_string = "", verbose = options::opt("verbose")) {
+print_symbolic_differentiation <- function(fun, arg, add_string = "", verbose = options::opt("verbose")) {
   derivative <- Deriv::Deriv(fun, arg)
 
   body_of_fun <- deparse_fun_body(fun)
