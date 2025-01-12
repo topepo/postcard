@@ -15,8 +15,6 @@
 #' @param ate         Minimum effect size that we should be able to detect.
 #' @param margin      Superiority margin (for non-inferiority margin, a negative value can be provided).
 #' @param alpha       Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
-#' @param deflation   Deflation parameter for decreasing rho or R2.
-#' @param inflation   Inflation parameter for increasing sigma.
 #'
 #' @details
 #' The formula in the case of an ANCOVA model with multiple covariate adjustement is:
@@ -48,9 +46,7 @@ power_gs <- function(n = 153,
                      R2 = NULL,
                      ate = 0.6,
                      margin = 0,
-                     alpha = 0.05,
-                     deflation = 1,
-                     inflation = 1) {
+                     alpha = 0.05) {
 
   var <- inflation*sigma^2
 
@@ -61,11 +57,9 @@ power_gs <- function(n = 153,
     }
 
     if (!is.null(rho) & is.null(R2)) {
-      rho <- deflation*rho
       var <- var*(1 - rho^2)
     }
     if (is.null(rho) & !is.null(R2)) {
-      R2 <- deflation*R2
       var <- var*(1 - R2)
     }
   }

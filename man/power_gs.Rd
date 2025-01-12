@@ -10,11 +10,9 @@ power_gs(
   sigma = sqrt(2),
   rho = NULL,
   R2 = NULL,
-  ATE = 0.6,
+  ate = 0.6,
   margin = 0,
-  alpha = 0.05,
-  deflation = 1,
-  inflation = 1
+  alpha = 0.05
 )
 }
 \arguments{
@@ -28,15 +26,11 @@ power_gs(
 
 \item{R2}{The estimated pooled multiple correlation coefficient between outcome and covariates.}
 
-\item{ATE}{Minimum effect size that we should be able to detect.}
+\item{ate}{Minimum effect size that we should be able to detect.}
 
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
 \item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
-
-\item{deflation}{Deflation parameter for decreasing rho or R2.}
-
-\item{inflation}{Inflation parameter for increasing sigma.}
 }
 \value{
 a \code{numeric} with power approximation based on the Guenther-Schouten approximation
