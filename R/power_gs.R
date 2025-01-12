@@ -50,6 +50,7 @@ power_gs <- function(n = 153,
                      method = c("ANOVA", "ANCOVA"),
                      deflation = 1,
                      inflation = 1) {
+  method <- match.arg(method)
 
   sigma <- inflation*sigma
 
@@ -61,43 +62,21 @@ power_gs <- function(n = 153,
     R2 <- deflation*R2
   }
 
-
-
-
-  if (method == "ANOVA") {
-
-    power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/sigma*(n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
-
-  }
-
   if (method == "ANCOVA") {
-
-
     if (!is.null(rho) & is.null(R2)) {
-
-      power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - rho^2)) * (n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
+      sigma <- sigma*(1 - rho^2)
     }
-
-
     if (is.null(rho) & !is.null(R2)) {
-
-      power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/(sigma*(1 - R2)) * (n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
+      sigma <- sigma*(1 - R2)
     }
-
     if (!is.null(rho) & !is.null(R2)) {
-
-      stop("Specify either rho or R2. If you adjust by multiple covariates use R2 otherwise use rho.")
+      cli::cli_abort("Specify either rho or R2. If you adjust by multiple covariates use R2 otherwise use rho.")
     }
-
-
     if (is.null(rho) & is.null(R2)) {
-
-      stop("Both rho and R2 are not specified. Either specify one of these or use method ANOVA.")
+      cli::cli_abort("Both rho and R2 are not specified. Either specify one of these or use method ANOVA.")
     }
-
   }
 
-
+  power <- stats::pnorm( sqrt(r/(1 + r)^2 * (ATE - margin)^2/sigma*(n - stats::qnorm(1 - alpha/2)^2/2)) - stats::qnorm(1 - alpha/2))
   return(power)
-
 }
