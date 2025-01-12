@@ -33,13 +33,13 @@
 #' The function returns a power approximation based on the Guenther-Schouten approximation
 #'
 #' @examples
-#' power.GS(method = "ANCOVA", rho = 0.7)
+#' power_gs(method = "ANCOVA", rho = 0.7)
 #'
 #' @importFrom stats pnorm qnorm
 #'
 #' @export
 #'
-power.GS <- function(n = 153,
+power_gs <- function(n = 153,
                      r = 1,
                      sigma = 2,
                      rho = NULL,
