@@ -3,30 +3,27 @@
 \name{rctglm_methods}
 \alias{rctglm_methods}
 \alias{print.rctglm}
-\alias{coef.rctglm}
-\alias{summary.rctglm}
-\alias{print.summary.rctglm}
 \alias{estimand}
 \alias{estimand.rctglm}
 \alias{se_estimand}
 \alias{se_estimand.rctglm}
+\alias{summary.rctglm}
+\alias{coef.rctglm}
 \title{Methods for objects of class \code{rctglm}}
 \usage{
 \method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 
-\method{coef}{rctglm}(object, ...)
+estimand(object)
+
+\method{estimand}{rctglm}(object)
+
+se_estimand(object)
+
+\method{se_estimand}{rctglm}(object)
 
 \method{summary}{rctglm}(object, ...)
 
-\method{print}{summary.rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
-
-estimand(x)
-
-\method{estimand}{rctglm}(x)
-
-se_estimand(x)
-
-\method{se_estimand}{rctglm}(x)
+\method{coef}{rctglm}(object, ...)
 }
 \arguments{
 \item{x}{an object of class \code{rctglm}}
@@ -42,19 +39,19 @@ Methods mostly to extract information from model fit and inference. See
 details for more information on each method.
 }
 \details{
-\code{coef} just use the corresponding \code{glm} methods on the \code{glm}
-fit contained within the \code{rctglm} object. Thus, this function is a
-shortcuts to running \code{coef(x$glm)}.
-
-\code{summary} summarises information related to the estimand as well as
-the underlying GLM fit.
-
 \code{estimand} and \code{se_estimand} are methods for extracting the estimated
 estimand value as well as the standard error (SE) of the estimand.
 Extract the plug-in estimation of the estimand, found by using the
 estimand function on the predicted counterfactual means of each group.
 These functions are a shortcut to extract the list elements \code{estimand}
-and \code{se_estimand}of an \code{rctglm} class object.
+and \code{se_estimand} of an \code{rctglm} class object.
+
+\code{summary} summarises information related to the estimand as well as
+the underlying GLM fit.
+
+\code{coef} just use the corresponding \code{glm} methods on the \code{glm}
+fit contained within the \code{rctglm} object. Thus, this function is a
+shortcuts to running \code{coef(x$glm)}.
 }
 \examples{
 # Generate some data to showcase example
@@ -76,6 +73,6 @@ ate <- rctglm(formula = Y ~ .,
 print(ate)
 estimand(ate)
 se_estimand(ate)
-coef(ate)
 summary(ate)
+coef(ate)
 }
