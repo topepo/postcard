@@ -33,6 +33,7 @@ reference:
     from a given sample size and assumed effect size together with other parameters.
   contents:
   - power_gs
+  - power_nc
 - title: Generate data from GLM model with known mean
   desc: >
     Used in development for examples, vignettes and tests, but exported to enable users to perform
