@@ -48,7 +48,7 @@ power_gs <- function(n = 153,
                      margin = 0,
                      alpha = 0.05) {
 
-  var <- inflation*sigma^2
+  var <- sigma^2
 
   no_covariate_correlation <- is.null(rho) & is.null(R2)
   if (!no_covariate_correlation) {
