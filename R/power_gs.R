@@ -37,9 +37,17 @@
 #' @export
 #'
 #' @examples
+#' # Approximate the power for an ANCOVA with a single adjustment covariate
 #' power_gs(rho = 0.7)
 #'
-power_gs <- function(n = 153,
+#' #' # Approximate power for an ANCOVA with several adjustment covariates
+#' power_gs(R2 = 0.8)
+#'
+#' # Approximate the power for an ANOVA with 2:1 randomisation, an assumed variance of
+#' # Y(w) of 4, an assumed effect size of 3 and a margin of 1
+#' power_gs(n = 400, r = 2/3, sigma = sqrt(4), ate = 1.5, margin = 1)
+#'
+power_gs <- function(n = 100,
                      r = 1,
                      sigma = sqrt(2),
                      rho = NULL,
