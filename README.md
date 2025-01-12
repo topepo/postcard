@@ -80,7 +80,7 @@ Thus, we can estimate the ATE by simply writing the below:
 
 > Note that as a default, information about the algorithm is printed in
 > the console, but here we suppress this behavior. See more in
-> `vignette("non-default")`.
+> `vignette("more-details")`.
 
 ``` r
 ate <- rctglm(formula = Y ~ A * W,
@@ -89,7 +89,7 @@ ate <- rctglm(formula = Y ~ A * W,
               family = "gaussian") # Default value
 ```
 
-This creates an `rctglm()` object which prints as
+This creates an `rctglm` object which prints as
 
 ``` r
 ate
@@ -245,7 +245,7 @@ Information on the prognostic model is available in the list element
   - Accessible through `ate$prognostic_info$model_fit` or with method
     `prog_model(ate)`
 - A list of the learners used for fitting the model using
-  \[fit_best_learner()\]
+  `fit_best_learner()`
   - Accessible through `ate$prognostic_info$learners`
 - The number of folds used for cross validation (`cv_folds`) and the
   historical data used for fitting the model
