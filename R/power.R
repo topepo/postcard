@@ -81,7 +81,8 @@ power_gs <- function(n = 100,
 #' This function calculates the power for ANOVA or ANCOVA based on the non-centrality parameter and the exact t-distributions.
 #'
 #' @inheritParams power_gs
-#' @param n.adj Number of adjustment covariates. Used for calculating the degrees of freedom
+#' @param n.adj Number of adjustment covariates. Used for calculating the degrees of freedom.
+#' Specification only necessary when specifying an `R2`.
 #'
 #' @details
 #' The prospective power estimations are based on (Kieser M. Methods and Applications of Sample Size Calculation and Recalculation in Clinical Trials. Springer; 2020).

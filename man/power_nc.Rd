@@ -27,7 +27,8 @@ power_nc(
 
 \item{R2}{The estimated pooled multiple correlation coefficient between outcome and covariates.}
 
-\item{n.adj}{Number of adjustment covariates. Used for calculating the degrees of freedom}
+\item{n.adj}{Number of adjustment covariates. Used for calculating the degrees of freedom.
+Specification only necessary when specifying an \code{R2}.}
 
 \item{ate}{Minimum effect size that we should be able to detect.}
 
