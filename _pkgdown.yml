@@ -20,11 +20,6 @@ reference:
   contents:
   - rctglm_with_prognosticscore
   - prog_model
-- title: Fitting a discrete super learner to data using cross validation
-  desc: >
-    The function fits and tunes a list of models specified by the user and selects the best model based
-    on RMSE in training data
-  contents:
   - fit_best_learner
 - title: Power approximation
   desc: >
