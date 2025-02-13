@@ -8,11 +8,14 @@
 #' @inheritParams stats::glm
 #' @inheritParams options
 #'
-#' @param group_indicator (name of) the variable in `data` that identifies randomisation groups
+#' @param group_indicator (name of) the *binary* variable in `data` that
+#' identifies randomisation groups. The variable is required to be binary to
+#' make the "orientation" of the `estimand_fun` clear.
 #' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0).
 #' As a default, the ratio of 1's in data is used.
-#' @param estimand_fun a `character` specifying a default estimand function, or `function` with
-#' arguments `psi0` and `psi1` specifying the estimand.
+#' @param estimand_fun a `function` with arguments `psi0` and `psi1` specifying
+#' the estimand or a `character` specifying a default estimand function. See
+#' more details in the "Estimand" section of this documentation.
 #' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default
@@ -23,7 +26,7 @@
 #' The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
 #' `group_indicator` variable, allocated randomly with probability `group_allocation_prob`. A GLM is
 #' fit and then used to predict the response of all observations in the event that the `group_indicator`
-#' is 0 and 1, respectively. Taking means of these predictions prodeuce the *counterfactual means*
+#' is 0 and 1, respectively. Taking means of these predictions produce the *counterfactual means*
 #' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
 #'
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
@@ -41,7 +44,7 @@
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
-#' @return an `rctglm` object
+#' @return an `rctglm` object. S3 class which inherits as a list.
 #' @export
 #'
 #' @examples
@@ -60,6 +63,9 @@
 #'               data = dat_binom,
 #'               family = binomial,
 #'               estimand_fun = "ate")
+#'
+#' # Pull information on estimand
+#' estimand(ate)
 rctglm <- function(formula,
                    group_indicator,
                    family,
@@ -86,7 +92,7 @@ rctglm <- function(formula,
     group_indicator_name <- as.character(ind_expr)
   }
 
-  group_vals <- data[, group_indicator_name]
+  group_vals <- dplyr::pull(data, group_indicator_name)
   group_vals_unique <- unique(group_vals)
   if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var group_indicator} column can only have 1's and 0's")
 
@@ -136,7 +142,7 @@ rctglm <- function(formula,
   counterfactual_mean0 <- mean(counterfactual_pred0)
   counterfactual_mean1 <- mean(counterfactual_pred1)
 
-  estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
+  estimate_estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
 
   if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
@@ -150,18 +156,20 @@ rctglm <- function(formula,
   var_estimand <- as.numeric(var(if_marginaleffect_val))
   se_estimand <- sqrt(var_estimand/nrow(data))
 
+  data_estimand <- data.frame(Estimate = estimate_estimand,
+                              `Std. Error` = se_estimand,
+                              Variance = var_estimand,
+                              check.names = FALSE)
+
   out <- list(
-    estimand = estimand,
-    se_estimand = se_estimand,
-    var_estimand = var_estimand,
+    estimand = data_estimand,
     estimand_fun = estimand_fun,
+    glm = model,
+    call = call,
     counterfactual_mean0 = counterfactual_mean0,
     counterfactual_mean1 = counterfactual_mean1,
     counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1,
-    group_indicator = group_indicator_name,
-    call = call,
-    glm = model
+    counterfactual_pred1 = counterfactual_pred1
   )
 
   return(structure(out, class = c("rctglm", class(out))))

@@ -112,28 +112,28 @@ such an object as seen above. Behind the S3 class of `rctglm` it is a
 list with
 
 - Estimand related information
-  - Value of plug-in estimation of estimand
-    - Accessible through `ate$estimand` or using method `estimand(ate)`
-  - Variance and standard error (SE) of estimand
-  - Accessible through `ate$var_estimand` and `ate$se_estimand` as well
-    as the SE with method `se_estimand(ate)`
+  - A `data.frame` of plug-in estimate of estimand, standard error (SE)
+    estimate and variance estimate of estimand
+    - Accessible through `ate$estimand` or using methods `estimand(ate)`
+      and `est(ate)`
   - Counterfactual predictions (for each observation) and counterfactual
     means for both groups
     - Accessible through `ate$counterfactual_mean<0/1>` and
       `ate$counterfactual_pred<0/1>`
 - Information on the underlying `glm` fit
   - Entire `glm` object available through `ate$glm`
-  - Methods `coef` and `summary` exist for the `rctglm` class, which
-    uses the corresponding methods on the `glm` object contained within
-    `rctglm`
+  - Method `coef` uses the corresponding method on the `glm` object
+    contained within `rctglm`
+  - `summary` creates a `summary.rctglm` object with some summarised
+    information
 
 Thus, methods available are:
 
 ``` r
-estimand(ate)
-#> [1] 2.091095
-se_estimand(ate)
-#> [1] 0.09208528
+# "estimate" also available as alternative to just "est"
+est(ate)
+#>   Estimate Std. Error Variance
+#> 1 2.091095 0.09208528 8.479699
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
@@ -144,7 +144,7 @@ summary(ate)
 #> 
 #> ── Summary of estimand related statistics: ──
 #> 
-#> Counterfactual means, psi0 and psi1, based on groups in column A
+#> Counterfactual means, psi0 and psi1, based on groups in column 
 #> Estimand function r: psi1 - psi0
 #> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
 #> ── Summary of glm fit: ──

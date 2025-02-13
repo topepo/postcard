@@ -13,12 +13,10 @@
 #' @param ... additional arguments passed to methods
 #'
 #' @details
-#' `estimand` and `se_estimand` are methods for extracting the estimated
-#' estimand value as well as the standard error (SE) of the estimand.
-#' Extract the plug-in estimation of the estimand, found by using the
-#' estimand function on the predicted counterfactual means of each group.
-#' These functions are a shortcut to extract the list elements `estimand`
-#' and `se_estimand` of an `rctglm` class object.
+#' `estimand` and short-hand form `est` are methods for extracting the estimated
+#' estimand value as well as the standard error (SE) and variance of the estimand.
+#' These functions are a shortcut to extract the list element `estimand`
+#' of an `rctglm` class object.
 #'
 #' `summary` summarises information related to the estimand as well as
 #' the underlying GLM fit.
@@ -46,10 +44,53 @@
 #'
 #' print(ate)
 #' estimand(ate)
-#' se_estimand(ate)
 #' summary(ate)
 #' coef(ate)
 NULL
+
+#' @export
+#' @rdname rctglm_methods
+estimand <- function(object) {
+  UseMethod("estimand")
+}
+
+#' @export
+#' @rdname rctglm_methods
+estimand.rctglm <- function(object) {
+  object$estimand
+}
+
+#' @export
+#' @rdname rctglm_methods
+estimand.summary.rctglm <- function(object) {
+  object$estimand
+}
+
+#' @export
+#' @rdname rctglm_methods
+est <- function(object) {
+  estimand(object)
+}
+
+#' @export
+#' @rdname rctglm_methods
+summary.rctglm <- function(object, ...) {
+  sum <- list(estimand = object$estimand,
+              estimand_fun = object$estimand_fun,
+              glm_summary = summary(object$glm, ...),
+              call = object$call
+              )
+
+  out <- structure(sum, class = "summary.rctglm")
+
+  return(out)
+}
+
+#' @export
+#' @rdname rctglm_methods
+coef.rctglm <- function(object, ...) {
+  coef(object$glm)
+}
 
 #' @rdname rctglm_methods
 #' @export
@@ -76,46 +117,6 @@ print.rctglm <- function(x,
 
 #' @export
 #' @rdname rctglm_methods
-estimand <- function(object) {
-  UseMethod("estimand")
-}
-
-#' @export
-#' @rdname rctglm_methods
-estimand.rctglm <- function(object) {
-  object$estimand
-}
-
-#' @export
-#' @rdname rctglm_methods
-se_estimand <- function(object) {
-  UseMethod("se_estimand")
-}
-
-#' @export
-#' @rdname rctglm_methods
-se_estimand.rctglm <- function(object) {
-  object$se_estimand
-}
-
-#' @export
-#' @rdname rctglm_methods
-summary.rctglm <- function(object, ...) {
-  sum <- list(estimand = object$estimand,
-              se_estimand = object$se_estimand,
-              var_estimand = object$var_estimand,
-              estimand_fun = object$estimand_fun,
-              group_indicator = object$group_indicator,
-              call = object$call,
-              glm_summary = summary(object$glm, ...))
-
-  out <- structure(sum, class = "summary.rctglm")
-
-  return(out)
-}
-
-#' @export
-#' @noRd
 print.summary.rctglm <- function(
     x,
     digits = max(3L, getOption("digits") - 3L),
@@ -140,12 +141,6 @@ print.summary.rctglm <- function(
   return(invisible())
 }
 
-#' @export
-#' @rdname rctglm_methods
-coef.rctglm <- function(object, ...) {
-  coef(object$glm)
-}
-
 print_estimand_info <- function(x,
                                 digits = max(3L, getOption("digits") - 3L),
                                 ...) {
@@ -154,9 +149,9 @@ print_estimand_info <- function(x,
       "\n",
       sep = "")
   cat("Estimand (r(psi_1, psi_0)) estimate (SE): ",
-      format(x$estimand, digits = digits),
+      format(est(x)[, "Estimate"], digits = digits),
       " (",
-      format(x$se_estimand, digits = digits),
+      format(est(x)[, "Std. Error"], digits = digits),
       ")\n",
       sep = "")
   return(invisible())

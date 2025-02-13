@@ -2,49 +2,50 @@
 % Please edit documentation in R/rctglm_methods.R
 \name{rctglm_methods}
 \alias{rctglm_methods}
-\alias{print.rctglm}
 \alias{estimand}
 \alias{estimand.rctglm}
-\alias{se_estimand}
-\alias{se_estimand.rctglm}
+\alias{estimand.summary.rctglm}
+\alias{est}
 \alias{summary.rctglm}
 \alias{coef.rctglm}
+\alias{print.rctglm}
+\alias{print.summary.rctglm}
 \title{Methods for objects of class \code{rctglm}}
 \usage{
-\method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
-
 estimand(object)
 
 \method{estimand}{rctglm}(object)
 
-se_estimand(object)
+\method{estimand}{summary.rctglm}(object)
 
-\method{se_estimand}{rctglm}(object)
+est(object)
 
 \method{summary}{rctglm}(object, ...)
 
 \method{coef}{rctglm}(object, ...)
+
+\method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
+
+\method{print}{summary.rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
-\item{x}{an object of class \code{rctglm}}
-
-\item{digits}{a \code{numeric} with the number of digits to display when printing}
+\item{object}{an object of class \code{rctglm}}
 
 \item{...}{additional arguments passed to methods}
 
-\item{object}{an object of class \code{rctglm}}
+\item{x}{an object of class \code{rctglm}}
+
+\item{digits}{a \code{numeric} with the number of digits to display when printing}
 }
 \description{
 Methods mostly to extract information from model fit and inference. See
 details for more information on each method.
 }
 \details{
-\code{estimand} and \code{se_estimand} are methods for extracting the estimated
-estimand value as well as the standard error (SE) of the estimand.
-Extract the plug-in estimation of the estimand, found by using the
-estimand function on the predicted counterfactual means of each group.
-These functions are a shortcut to extract the list elements \code{estimand}
-and \code{se_estimand} of an \code{rctglm} class object.
+\code{estimand} and short-hand form \code{est} are methods for extracting the estimated
+estimand value as well as the standard error (SE) and variance of the estimand.
+These functions are a shortcut to extract the list element \code{estimand}
+of an \code{rctglm} class object.
 
 \code{summary} summarises information related to the estimand as well as
 the underlying GLM fit.
@@ -72,7 +73,6 @@ ate <- rctglm(formula = Y ~ .,
 
 print(ate)
 estimand(ate)
-se_estimand(ate)
 summary(ate)
 coef(ate)
 }

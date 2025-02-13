@@ -24,7 +24,9 @@ rctglm(
     model to be fitted.  The details of model specification are given
     under \sQuote{Details}.}
 
-\item{group_indicator}{(name of) the variable in \code{data} that identifies randomisation groups}
+\item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
+identifies randomisation groups. The variable is required to be binary to
+make the "orientation" of the \code{estimand_fun} clear.}
 
 \item{family}{a description of the error distribution and link
     function to be used in the model.  For \code{glm} this can be a
@@ -42,8 +44,9 @@ rctglm(
 \item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
 As a default, the ratio of 1's in data is used.}
 
-\item{estimand_fun}{a \code{character} specifying a default estimand function, or \code{function} with
-arguments \code{psi0} and \code{psi1} specifying the estimand.}
+\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+the estimand or a \code{character} specifying a default estimand function. See
+more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -56,7 +59,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 }
 \value{
-an \code{rctglm} object
+an \code{rctglm} object. S3 class which inherits as a list.
 }
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
@@ -67,7 +70,7 @@ covariates in randomisation groups.
 The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
 \code{group_indicator} variable, allocated randomly with probability \code{group_allocation_prob}. A GLM is
 fit and then used to predict the response of all observations in the event that the \code{group_indicator}
-is 0 and 1, respectively. Taking means of these predictions prodeuce the \emph{counterfactual means}
+is 0 and 1, respectively. Taking means of these predictions produce the \emph{counterfactual means}
 \code{psi0} and \code{psi1}, and an estimand \code{r(psi0, psi1)} is calculated using any specified \code{estimand_fun}.
 
 The variance of the estimand is found by taking the variance of the influence function of the estimand.
@@ -103,4 +106,7 @@ ate <- rctglm(formula = Y ~ .,
               data = dat_binom,
               family = binomial,
               estimand_fun = "ate")
+
+# Pull information on estimand
+estimand(ate)
 }
