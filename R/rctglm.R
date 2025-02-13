@@ -8,11 +8,14 @@
 #' @inheritParams stats::glm
 #' @inheritParams options
 #'
-#' @param group_indicator (name of) the variable in `data` that identifies randomisation groups
+#' @param group_indicator (name of) the *binary* variable in `data` that
+#' identifies randomisation groups. The variable is required to be binary to
+#' make the "orientation" of the `estimand_fun` clear.
 #' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0).
 #' As a default, the ratio of 1's in data is used.
-#' @param estimand_fun a `character` specifying a default estimand function, or `function` with
-#' arguments `psi0` and `psi1` specifying the estimand.
+#' @param estimand_fun a `function` with arguments `psi0` and `psi1` specifying
+#' the estimand or a `character` specifying a default estimand function. See
+#' more details in the "Estimand" section of this documentation.
 #' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default
@@ -23,7 +26,7 @@
 #' The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
 #' `group_indicator` variable, allocated randomly with probability `group_allocation_prob`. A GLM is
 #' fit and then used to predict the response of all observations in the event that the `group_indicator`
-#' is 0 and 1, respectively. Taking means of these predictions prodeuce the *counterfactual means*
+#' is 0 and 1, respectively. Taking means of these predictions produce the *counterfactual means*
 #' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
 #'
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
@@ -86,7 +89,7 @@ rctglm <- function(formula,
     group_indicator_name <- as.character(ind_expr)
   }
 
-  group_vals <- data[, group_indicator_name]
+  group_vals <- dplyr::pull(data, group_indicator_name)
   group_vals_unique <- unique(group_vals)
   if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var group_indicator} column can only have 1's and 0's")
 

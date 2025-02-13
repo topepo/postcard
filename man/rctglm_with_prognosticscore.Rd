@@ -40,13 +40,16 @@ rctglm_with_prognosticscore(
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_indicator}{(name of) the variable in \code{data} that identifies randomisation groups}
+\item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
+identifies randomisation groups. The variable is required to be binary to
+make the "orientation" of the \code{estimand_fun} clear.}
 
 \item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
 As a default, the ratio of 1's in data is used.}
 
-\item{estimand_fun}{a \code{character} specifying a default estimand function, or \code{function} with
-arguments \code{psi0} and \code{psi1} specifying the estimand.}
+\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+the estimand or a \code{character} specifying a default estimand function. See
+more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
