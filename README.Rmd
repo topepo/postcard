@@ -90,20 +90,19 @@ ate
 The `print` method for the `rctglm` class specifies the way to print such an object as seen above. Behind the S3 class of `rctglm` it is a list with 
 
 -   Estimand related information
-    -   Value of plug-in estimation of estimand
-        -   Accessible through `ate$estimand` or using method `estimand(ate)`
-    -   Variance and standard error (SE) of estimand
-      -   Accessible through `ate$var_estimand` and `ate$se_estimand` as well as the SE with method `se_estimand(ate)`
+    -   A `data.frame` of plug-in estimate of estimand, standard error (SE) estimate and variance estimate of estimand
+        -   Accessible through `ate$estimand` or using methods `estimand(ate)` and `est(ate)`
     -   Counterfactual predictions (for each observation) and counterfactual means for both groups
-        - Accessible through `ate$counterfactual_mean<0/1>` and `ate$counterfactual_pred<0/1>`
+        -   Accessible through `ate$counterfactual_mean<0/1>` and `ate$counterfactual_pred<0/1>`
 -   Information on the underlying `glm` fit
     -   Entire `glm` object available through `ate$glm`
-    -   Methods `coef` and `summary` exist for the `rctglm` class, which uses the corresponding methods on the `glm` object contained within `rctglm`
+    -   Method `coef` uses the corresponding method on the `glm` object contained within `rctglm`
+    -   `summary` creates a `summary.rctglm` object with some summarised information
     
 Thus, methods available are:
 ```{r}
-estimand(ate)
-se_estimand(ate)
+# "estimate" also available as alternative to just "est"
+est(ate)
 coef(ate)
 summary(ate)
 ```

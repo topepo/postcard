@@ -44,7 +44,7 @@
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
-#' @return an `rctglm` object
+#' @return an `rctglm` object. S3 class which inherits as a list.
 #' @export
 #'
 #' @examples
@@ -63,6 +63,9 @@
 #'               data = dat_binom,
 #'               family = binomial,
 #'               estimand_fun = "ate")
+#'
+#' # Pull information on estimand
+#' estimand(ate)
 rctglm <- function(formula,
                    group_indicator,
                    family,
@@ -139,7 +142,7 @@ rctglm <- function(formula,
   counterfactual_mean0 <- mean(counterfactual_pred0)
   counterfactual_mean1 <- mean(counterfactual_pred1)
 
-  estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
+  estimate_estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
 
   if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
@@ -153,18 +156,20 @@ rctglm <- function(formula,
   var_estimand <- as.numeric(var(if_marginaleffect_val))
   se_estimand <- sqrt(var_estimand/nrow(data))
 
+  data_estimand <- data.frame(Estimate = estimate_estimand,
+                              `Std. Error` = se_estimand,
+                              Variance = var_estimand,
+                              check.names = FALSE)
+
   out <- list(
-    estimand = estimand,
-    se_estimand = se_estimand,
-    var_estimand = var_estimand,
+    estimand = data_estimand,
     estimand_fun = estimand_fun,
+    glm = model,
+    call = call,
     counterfactual_mean0 = counterfactual_mean0,
     counterfactual_mean1 = counterfactual_mean1,
     counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1,
-    group_indicator = group_indicator_name,
-    call = call,
-    glm = model
+    counterfactual_pred1 = counterfactual_pred1
   )
 
   return(structure(out, class = c("rctglm", class(out))))

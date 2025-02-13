@@ -59,7 +59,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 }
 \value{
-an \code{rctglm} object
+an \code{rctglm} object. S3 class which inherits as a list.
 }
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
@@ -106,4 +106,7 @@ ate <- rctglm(formula = Y ~ .,
               data = dat_binom,
               family = binomial,
               estimand_fun = "ate")
+
+# Pull information on estimand
+estimand(ate)
 }
