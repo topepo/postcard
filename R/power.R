@@ -19,7 +19,7 @@
 #' @details
 #' The formula in the case of an ANCOVA model with multiple covariate adjustement is:
 #'
-#' \eqn{
+#' \deqn{
 #' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha/2}+z_{1-\beta})^2\sigma^2(1-R^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha/2})^2}{2}
 #' }
 #'

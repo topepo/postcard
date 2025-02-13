@@ -48,7 +48,8 @@ make the "orientation" of the \code{estimand_fun} clear.}
 As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
-the estimand or a \code{character} specifying a default estimand function. See
+the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
+to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
@@ -71,7 +72,9 @@ evaluating models}
 \item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
 regression and boosted trees}
 
-\item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
+\item{verbose}{\code{numeric} verbosity level. Higher values means more information is
+printed in console. A value of 0 means nothing is printed to console during
+execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
 an \code{rctglm_prog} and \code{rctglm} object. Corresponds to an \link{rctglm} fitted with a

@@ -45,7 +45,8 @@ make the "orientation" of the \code{estimand_fun} clear.}
 As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
-the estimand or a \code{character} specifying a default estimand function. See
+the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
+to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
@@ -54,7 +55,9 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
-\item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
+\item{verbose}{\code{numeric} verbosity level. Higher values means more information is
+printed in console. A value of 0 means nothing is printed to console during
+execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 }
@@ -83,8 +86,12 @@ causal estimate of the estimand, as stated by articles XXXX.
 As noted in the description, \code{psi0} and \code{psi1} are the counterfactual means found by prediction using
 a fitted GLM in the binary groups defined by \code{group_indicator}.
 
-Default estimand functions can be specified via \code{"ate"} (taking the difference \code{psi1 - psi0}) and
-\code{"rate_ratio"} (taking the ratio \code{psi1 / psi0})
+Default estimand functions can be specified via \code{"ate"} (which uses the function
+\code{function(psi1, psi0) psi1-psi0}) and \code{"rate_ratio"} (which uses the function
+\code{function(psi1, psi0) psi1/psi0}). See more information on specifying the \code{estimand_fun}
+in section
+\href{https://nnpackages.github.io/PostCard/articles/more-details.html#specifying-any-estimand}{Specifying any estimand}
+in the vignette \code{vignette("more-details")}.
 
 As a default, the \code{Deriv} package is used to perform symbolic differentiation to find the derivatives of
 the \code{estimand_fun}.
@@ -93,6 +100,23 @@ the \code{estimand_fun}.
 \examples{
 # Generate some data to showcase example
 n <- 100
+dat_gaus <- glm_data(
+  1+1.5*X1+2*A,
+  X1 = rnorm(n),
+  A = rbinom(n, 1, .5),
+  family = gaussian()
+)
+
+# Fit the model
+ate <- rctglm(formula = Y ~ .,
+              group_indicator = A,
+              data = dat_gaus,
+              family = gaussian)
+
+# Pull information on estimand
+estimand(ate)
+
+## Another example with different family and specification of estimand_fun
 dat_binom <- glm_data(
   1+1.5*X1+2*A,
   X1 = rnorm(n),
@@ -100,13 +124,18 @@ dat_binom <- glm_data(
   family = binomial()
 )
 
-# Fit the model
-ate <- rctglm(formula = Y ~ .,
+rr <- rctglm(formula = Y ~ .,
+              group_indicator = A,
+              data = dat_binom,
+              family = binomial(),
+              estimand_fun = "rate_ratio")
+
+odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
+or <- rctglm(formula = Y ~ .,
               group_indicator = A,
               data = dat_binom,
               family = binomial,
-              estimand_fun = "ate")
+              estimand_fun = odds_ratio)
 
-# Pull information on estimand
-estimand(ate)
+
 }
