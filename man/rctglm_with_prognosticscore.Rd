@@ -48,7 +48,8 @@ make the "orientation" of the \code{estimand_fun} clear.}
 As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
-the estimand or a \code{character} specifying a default estimand function. See
+the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
+to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default

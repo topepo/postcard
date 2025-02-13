@@ -14,7 +14,8 @@
 #' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0).
 #' As a default, the ratio of 1's in data is used.
 #' @param estimand_fun a `function` with arguments `psi0` and `psi1` specifying
-#' the estimand or a `character` specifying a default estimand function. See
+#' the estimand. Alternative, specify "ate" or "rate_ratio" as a `character`
+#' to use one of the default estimand functions. See
 #' more details in the "Estimand" section of this documentation.
 #' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
@@ -38,8 +39,12 @@
 #' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using
 #' a fitted GLM in the binary groups defined by `group_indicator`.
 #'
-#' Default estimand functions can be specified via `"ate"` (taking the difference `psi1 - psi0`) and
-#' `"rate_ratio"` (taking the ratio `psi1 / psi0`)
+#' Default estimand functions can be specified via `"ate"` (which uses the function
+#' `function(psi1, psi0) psi1-psi0`) and `"rate_ratio"` (which uses the function
+#' `function(psi1, psi0) psi1/psi0`). See more information on specifying the `estimand_fun`
+#' in section
+#' [Specifying any estimand](https://nnpackages.github.io/PostCard/articles/more-details.html#specifying-any-estimand)
+#' in the vignette `vignette("more-details")`.
 #'
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
@@ -50,6 +55,23 @@
 #' @examples
 #' # Generate some data to showcase example
 #' n <- 100
+#' dat_gaus <- glm_data(
+#'   1+1.5*X1+2*A,
+#'   X1 = rnorm(n),
+#'   A = rbinom(n, 1, .5),
+#'   family = gaussian()
+#' )
+#'
+#' # Fit the model
+#' ate <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_gaus,
+#'               family = gaussian)
+#'
+#' # Pull information on estimand
+#' estimand(ate)
+#'
+#' ## Another example with different family and specification of estimand_fun
 #' dat_binom <- glm_data(
 #'   1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
@@ -57,15 +79,20 @@
 #'   family = binomial()
 #' )
 #'
-#' # Fit the model
-#' ate <- rctglm(formula = Y ~ .,
+#' rr <- rctglm(formula = Y ~ .,
+#'               group_indicator = A,
+#'               data = dat_binom,
+#'               family = binomial(),
+#'               estimand_fun = "rate_ratio")
+#'
+#' odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
+#' or <- rctglm(formula = Y ~ .,
 #'               group_indicator = A,
 #'               data = dat_binom,
 #'               family = binomial,
-#'               estimand_fun = "ate")
+#'               estimand_fun = odds_ratio)
 #'
-#' # Pull information on estimand
-#' estimand(ate)
+#'
 rctglm <- function(formula,
                    group_indicator,
                    family,
