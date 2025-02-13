@@ -4,7 +4,9 @@
 \alias{options}
 \title{PostCard Options}
 \arguments{
-\item{verbose}{\code{numeric} verbosity level specifying how much information should be printed to the user (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
+\item{verbose}{\code{numeric} verbosity level. Higher values means more information is
+printed in console. A value of 0 means nothing is printed to console during
+execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \description{
 Internally used, package-specific options. All options will prioritize R options() values, and fall back to environment variables if undefined. If neither the option nor the environment variable is set, a default value is used.
@@ -24,7 +26,9 @@ options::opt(x, default, env = "PostCard")
 
 \describe{
 \item{verbose}{\describe{
-\code{numeric} verbosity level specifying how much information should be printed to the user\item{default: }{\preformatted{2}}
+\code{numeric} verbosity level. Higher values means more information is
+printed in console. A value of 0 means nothing is printed to console during
+execution\item{default: }{\preformatted{2}}
 \item{option: }{PostCard.verbose}
 \item{envvar: }{R_POSTCARD_VERBOSE (evaluated if possible, raw string otherwise)}
 }}
