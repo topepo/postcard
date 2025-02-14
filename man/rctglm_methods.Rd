@@ -4,32 +4,20 @@
 \alias{rctglm_methods}
 \alias{estimand}
 \alias{estimand.rctglm}
-\alias{estimand.summary.rctglm}
 \alias{est}
-\alias{summary.rctglm}
 \alias{coef.rctglm}
-\alias{coef.summary.rctglm}
 \alias{print.rctglm}
-\alias{print.summary.rctglm}
 \title{Methods for objects of class \code{rctglm}}
 \usage{
 estimand(object)
 
 \method{estimand}{rctglm}(object)
 
-\method{estimand}{summary.rctglm}(object)
-
 est(object)
-
-\method{summary}{rctglm}(object, ...)
 
 \method{coef}{rctglm}(object, ...)
 
-\method{coef}{summary.rctglm}(object, ...)
-
 \method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
-
-\method{print}{summary.rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
 \item{object}{an object of class \code{rctglm}}
@@ -49,9 +37,6 @@ details for more information on each method.
 estimand value as well as the standard error (SE) and variance of the estimand.
 These functions are a shortcut to extract the list element \code{estimand}
 of an \code{rctglm} class object.
-
-\code{summary} summarises information related to the estimand as well as
-the underlying GLM fit.
 
 \code{coef} just use the corresponding \code{glm} methods on the \code{glm}
 fit contained within the \code{rctglm} object. Thus, this function is a
@@ -76,6 +61,5 @@ ate <- rctglm(formula = Y ~ .,
 
 print(ate)
 estimand(ate)
-summary(ate)
 coef(ate)
 }

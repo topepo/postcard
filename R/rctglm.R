@@ -54,14 +54,9 @@
 #' The function [estimand] (or short-hand version [est]) can be used to extract
 #' a `data.frame` with an estimated value and standard error of the estimand.
 #'
-#' The function [summary] (i.e., [summary.rctglm]) can be used to obtain an
-#' object of class `summary.rctglm`, which prints and contains a summary of the
-#' results.
-#'
-#' A method for the generic [coef] has been added for `rctglm` and `summary.rctglm`
-#' (i.e., [coef.rctglm] and [coef.summary.rctglm]), which uses the methods
-#' `coef.glm` and `coef.summary.glm` to extract coefficient information from
-#' the underlying `glm` fit in the procedure.
+#' A method for the generic [coef] has been added for `rctglm`
+#' (i.e., [coef.rctglm]), which uses the method `coef.glm` to extract coefficient
+#' information from the underlying `glm` fit in the procedure.
 #'
 #' An object of class `rctglm` is a list containing the following components:
 #' -   `estimand`: A `data.frame` with plug-in estimate of estimand, standard

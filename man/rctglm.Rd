@@ -67,14 +67,9 @@ execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or
 The function \link{estimand} (or short-hand version \link{est}) can be used to extract
 a \code{data.frame} with an estimated value and standard error of the estimand.
 
-The function \link{summary} (i.e., \link{summary.rctglm}) can be used to obtain an
-object of class \code{summary.rctglm}, which prints and contains a summary of the
-results.
-
-A method for the generic \link{coef} has been added for \code{rctglm} and \code{summary.rctglm}
-(i.e., \link{coef.rctglm} and \link{coef.summary.rctglm}), which uses the methods
-\code{coef.glm} and \code{coef.summary.glm} to extract coefficient information from
-the underlying \code{glm} fit in the procedure.
+A method for the generic \link{coef} has been added for \code{rctglm}
+(i.e., \link{coef.rctglm}), which uses the method \code{coef.glm} to extract coefficient
+information from the underlying \code{glm} fit in the procedure.
 
 An object of class \code{rctglm} is a list containing the following components:
 \itemize{
