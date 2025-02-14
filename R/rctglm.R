@@ -49,7 +49,31 @@
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
-#' @return an `rctglm` object. S3 class which inherits as a list.
+#' @return `rctglm` returns an object of class inheriting from `"rctglm"`.
+#'
+#' The function [estimand] (or short-hand version [est]) can be used to extract
+#' a `data.frame` with an estimated value and standard error of the estimand.
+#'
+#' The function [summary] (i.e., [summary.rctglm]) can be used to obtain an
+#' object of class `summary.rctglm`, which prints and contains a summary of the
+#' results.
+#'
+#' A method for the generic [coef] has been added for `rctglm` and `summary.rctglm`
+#' (i.e., [coef.rctglm] and [coef.summary.rctglm]), which uses the methods
+#' `coef.glm` and `coef.summary.glm` to extract coefficient information from
+#' the underlying `glm` fit in the procedure.
+#'
+#' An object of class `rctglm` is a list containing the following components:
+#' -   `estimand`: A `data.frame` with plug-in estimate of estimand, standard
+#' error (SE) estimate and variance estimate of estimand
+#' -   `estimand_fun`: The `function` used to obtain an estimate of the estimand
+#' from counterfactual means
+#' -   `means_counterfactual`: A `data.frame` with counterfactual means `psi0` and `psi1`
+#' -   `fitted.values_counterfactual`: A `data.frame` with counterfactual mean
+#' values, obtained by transforming the linear predictors for each group
+#' by the inverse of the link function.
+#' -   `glm`: A `glm` object returned from running [stats::glm] within the procedure
+#' -   `call`: The matched `call`
 #' @export
 #'
 #' @examples
@@ -185,18 +209,21 @@ rctglm <- function(formula,
 
   data_estimand <- data.frame(Estimate = estimate_estimand,
                               `Std. Error` = se_estimand,
-                              Variance = var_estimand,
+                              # Variance = var_estimand,
                               check.names = FALSE)
+
+  fitted.values_counterfactual <- data.frame(psi0 = counterfactual_pred0,
+                                             psi1 = counterfactual_pred1)
+  means_counterfactual <- data.frame(psi0 = counterfactual_mean0,
+                                     psi1 = counterfactual_mean1)
 
   out <- list(
     estimand = data_estimand,
     estimand_fun = estimand_fun,
+    means_counterfactual = means_counterfactual,
+    fitted.values_counterfactual = fitted.values_counterfactual,
     glm = model,
-    call = call,
-    counterfactual_mean0 = counterfactual_mean0,
-    counterfactual_mean1 = counterfactual_mean1,
-    counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1
+    call = call
   )
 
   return(structure(out, class = c("rctglm", class(out))))

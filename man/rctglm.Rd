@@ -62,7 +62,33 @@ execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 }
 \value{
-an \code{rctglm} object. S3 class which inherits as a list.
+\code{rctglm} returns an object of class inheriting from \code{"rctglm"}.
+
+The function \link{estimand} (or short-hand version \link{est}) can be used to extract
+a \code{data.frame} with an estimated value and standard error of the estimand.
+
+The function \link{summary} (i.e., \link{summary.rctglm}) can be used to obtain an
+object of class \code{summary.rctglm}, which prints and contains a summary of the
+results.
+
+A method for the generic \link{coef} has been added for \code{rctglm} and \code{summary.rctglm}
+(i.e., \link{coef.rctglm} and \link{coef.summary.rctglm}), which uses the methods
+\code{coef.glm} and \code{coef.summary.glm} to extract coefficient information from
+the underlying \code{glm} fit in the procedure.
+
+An object of class \code{rctglm} is a list containing the following components:
+\itemize{
+\item \code{estimand}: A \code{data.frame} with plug-in estimate of estimand, standard
+error (SE) estimate and variance estimate of estimand
+\item \code{estimand_fun}: The \code{function} used to obtain an estimate of the estimand
+from counterfactual means
+\item \code{means_counterfactual}: A \code{data.frame} with counterfactual means \code{psi0} and \code{psi1}
+\item \code{fitted.values_counterfactual}: A \code{data.frame} with counterfactual mean
+values, obtained by transforming the linear predictors for each group
+by the inverse of the link function.
+\item \code{glm}: A \code{glm} object returned from running \link[stats:glm]{stats::glm} within the procedure
+\item \code{call}: The matched \code{call}
+}
 }
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified

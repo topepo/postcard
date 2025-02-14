@@ -92,20 +92,26 @@ coef.rctglm <- function(object, ...) {
   coef(object$glm)
 }
 
+#' @export
+#' @rdname rctglm_methods
+coef.summary.rctglm <- function(object, ...) {
+  coef(object$glm_summary)
+}
+
 #' @rdname rctglm_methods
 #' @export
 print.rctglm <- function(x,
                          digits = max(3L, getOption("digits") - 3L),
                          ...) {
-  cat("\nObject of class 'rctglm'\n\n")
+  cat("\nObject of class", class(x)[1], "\n\n")
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   cat("Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: ",
-      format(x$counterfactual_mean0, digits = digits),
+      format(x$means_counterfactual$psi0, digits = digits),
       "\n",
       sep = "")
   cat("Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: ",
-      format(x$counterfactual_mean1, digits = digits),
+      format(x$means_counterfactual$psi1, digits = digits),
       "\n",
       sep = "")
   print_estimand_info(x,

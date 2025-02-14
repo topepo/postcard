@@ -16,8 +16,21 @@
 #' More details on prognostic models and scores being predictions of counterfactual means
 #' in control group.
 #'
-#' @return an `rctglm_prog` and `rctglm` object. Corresponds to an [rctglm] fitted with a
-#' prognostic score as a covariate in the model
+#' @return `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
+#' which inherits from [rctglm].
+#'
+#' Due to inheritance, methods described in the **Value** section of [rctglm] and
+#' [rctglm_methods] also work for extracting information from this object.
+#'
+#' An `rctglm_prog` object is a list with the same components as an [rctglm] object,
+#' but with an additional list element of:
+#' - `prognostic_info`: List with information about the fitted prognostic model
+#' on historical data. It has components:
+#'    - `model_fit`: A trained `workflow` - the result of [fit_best_learner]
+#'    - `learners`: A `list` of learners used for the discrete super learner
+#'    - `cv_folds`: The amount of folds used for cross validation
+#'    - `data`: The historical data used for cross validation when fitting and
+#'    testing models
 #' @export
 #'
 #' @examples

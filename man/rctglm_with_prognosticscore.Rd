@@ -77,8 +77,25 @@ printed in console. A value of 0 means nothing is printed to console during
 execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
-an \code{rctglm_prog} and \code{rctglm} object. Corresponds to an \link{rctglm} fitted with a
-prognostic score as a covariate in the model
+\code{rctglm_with_prognosticscore} returns an object of class \code{rctglm_prog},
+which inherits from \link{rctglm}.
+
+Due to inheritance, methods described in the \strong{Value} section of \link{rctglm} and
+\link{rctglm_methods} also work for extracting information from this object.
+
+An \code{rctglm_prog} object is a list with the same components as an \link{rctglm} object,
+but with an additional list element of:
+\itemize{
+\item \code{prognostic_info}: List with information about the fitted prognostic model
+on historical data. It has components:
+\itemize{
+\item \code{model_fit}: A trained \code{workflow} - the result of \link{fit_best_learner}
+\item \code{learners}: A \code{list} of learners used for the discrete super learner
+\item \code{cv_folds}: The amount of folds used for cross validation
+\item \code{data}: The historical data used for cross validation when fitting and
+testing models
+}
+}
 }
 \description{
 The procedure uses \link{fit_best_learner} to fit a prognostic model to historical data and uses

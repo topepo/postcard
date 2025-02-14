@@ -8,6 +8,7 @@
 \alias{est}
 \alias{summary.rctglm}
 \alias{coef.rctglm}
+\alias{coef.summary.rctglm}
 \alias{print.rctglm}
 \alias{print.summary.rctglm}
 \title{Methods for objects of class \code{rctglm}}
@@ -23,6 +24,8 @@ est(object)
 \method{summary}{rctglm}(object, ...)
 
 \method{coef}{rctglm}(object, ...)
+
+\method{coef}{summary.rctglm}(object, ...)
 
 \method{print}{rctglm}(x, digits = max(3L, getOption("digits") - 3L), ...)
 
