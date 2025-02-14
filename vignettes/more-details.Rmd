@@ -166,7 +166,7 @@ It's possible to view information regarding the fit of the prognostic model in t
 Inside this list element are elements
 
 - `model_fit`: The result of `fit_best_learner()`
-- `leaners`: The list of learners used
+- `learners`: The list of learners used
 - `cv_folds`: The number of folds used for cross validation
 
 ```{r prognostic-info-show}
