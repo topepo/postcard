@@ -8,6 +8,9 @@
 #' @inheritParams stats::glm
 #' @inheritParams options
 #'
+#' @param formula an object of class "formula" (or one that can be coerced to that class):
+#' a symbolic description of the model to be fitted. The details of model specification are
+#' given under ‘Details’ in the [glm] documentation.
 #' @param group_indicator (name of) the *binary* variable in `data` that
 #' identifies randomisation groups. The variable is required to be binary to
 #' make the "orientation" of the `estimand_fun` clear.

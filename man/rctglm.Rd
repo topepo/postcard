@@ -19,10 +19,9 @@ rctglm(
 )
 }
 \arguments{
-\item{formula}{an object of class \code{"\link[stats]{formula}"} (or one that
-    can be coerced to that class): a symbolic description of the
-    model to be fitted.  The details of model specification are given
-    under \sQuote{Details}.}
+\item{formula}{an object of class "formula" (or one that can be coerced to that class):
+a symbolic description of the model to be fitted. The details of model specification are
+given under ‘Details’ in the \link{glm} documentation.}
 
 \item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
 identifies randomisation groups. The variable is required to be binary to
