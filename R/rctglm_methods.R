@@ -18,9 +18,6 @@
 #' These functions are a shortcut to extract the list element `estimand`
 #' of an `rctglm` class object.
 #'
-#' `summary` summarises information related to the estimand as well as
-#' the underlying GLM fit.
-#'
 #' `coef` just use the corresponding `glm` methods on the `glm`
 #' fit contained within the `rctglm` object. Thus, this function is a
 #' shortcuts to running `coef(x$glm)`.
@@ -44,7 +41,6 @@
 #'
 #' print(ate)
 #' estimand(ate)
-#' summary(ate)
 #' coef(ate)
 NULL
 
@@ -62,28 +58,8 @@ estimand.rctglm <- function(object) {
 
 #' @export
 #' @rdname rctglm_methods
-estimand.summary.rctglm <- function(object) {
-  object$estimand
-}
-
-#' @export
-#' @rdname rctglm_methods
 est <- function(object) {
   estimand(object)
-}
-
-#' @export
-#' @rdname rctglm_methods
-summary.rctglm <- function(object, ...) {
-  sum <- list(estimand = object$estimand,
-              estimand_fun = object$estimand_fun,
-              glm_summary = summary(object$glm, ...),
-              call = object$call
-              )
-
-  out <- structure(sum, class = "summary.rctglm")
-
-  return(out)
 }
 
 #' @export
@@ -97,46 +73,20 @@ coef.rctglm <- function(object, ...) {
 print.rctglm <- function(x,
                          digits = max(3L, getOption("digits") - 3L),
                          ...) {
-  cat("\nObject of class 'rctglm'\n\n")
+  cat("\nObject of class", class(x)[1], "\n\n")
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   cat("Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: ",
-      format(x$counterfactual_mean0, digits = digits),
+      format(x$means_counterfactual$psi0, digits = digits),
       "\n",
       sep = "")
   cat("Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: ",
-      format(x$counterfactual_mean1, digits = digits),
+      format(x$means_counterfactual$psi1, digits = digits),
       "\n",
       sep = "")
   print_estimand_info(x,
                       digits = max(3L, getOption("digits") - 3L),
                       ...)
-
-  return(invisible())
-}
-
-#' @export
-#' @rdname rctglm_methods
-print.summary.rctglm <- function(
-    x,
-    digits = max(3L, getOption("digits") - 3L),
-    ...) {
-
-  cat("\nCall:  ",
-      paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
-
-  cli::cli_h2("Summary of estimand related statistics:")
-  cat("Counterfactual means, psi0 and psi1, based on groups in column ",
-      x$group_indicator,
-      "\n",
-      sep = "")
-  print_estimand_info(x,
-                      digits = max(3L, getOption("digits") - 3L),
-                      ...)
-  cat("\n")
-
-  cli::cli_h2("Summary of glm fit:")
-  glm_summary_without_call(x$glm_summary)
 
   return(invisible())
 }
@@ -154,17 +104,5 @@ print_estimand_info <- function(x,
       format(est(x)[, "Std. Error"], digits = digits),
       ")\n",
       sep = "")
-  return(invisible())
-}
-
-# Utility functions for methods
-glm_summary_without_call <- function(glm_summary) {
-  glm_summary$call <- NULL
-  glm_summary_as_str <- paste(
-    utils::capture.output(
-      print(glm_summary)
-    ),
-    collapse = "\n")
-  cat(gsub("\nCall:\nNULL\n\n", "", glm_summary_as_str))
   return(invisible())
 }

@@ -94,7 +94,7 @@ This creates an `rctglm` object which prints as
 ``` r
 ate
 #> 
-#> Object of class 'rctglm'
+#> Object of class rctglm 
 #> 
 #> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
 #>     data = dat_treat)
@@ -124,46 +124,17 @@ list with
   - Entire `glm` object available through `ate$glm`
   - Method `coef` uses the corresponding method on the `glm` object
     contained within `rctglm`
-  - `summary` creates a `summary.rctglm` object with some summarised
-    information
 
 Thus, methods available are:
 
 ``` r
 # "estimate" also available as alternative to just "est"
 est(ate)
-#>   Estimate Std. Error Variance
-#> 1 2.091095 0.09208528 8.479699
+#>   Estimate Std. Error
+#> 1 2.091095 0.09208528
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
-summary(ate)
-#> 
-#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
-#>     data = dat_treat)
-#> 
-#> ── Summary of estimand related statistics: ──
-#> 
-#> Counterfactual means, psi0 and psi1, based on groups in column 
-#> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
-#> ── Summary of glm fit: ──
-#> Coefficients:
-#>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)  2.77585    0.06543  42.425   <2e-16 ***
-#> A            2.09122    0.09242  22.628   <2e-16 ***
-#> W            0.02364    0.05687   0.416    0.678    
-#> A:W          0.04962    0.07908   0.627    0.530    
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#> (Dispersion parameter for gaussian family taken to be 2.125824)
-#> 
-#>     Null deviance: 3222.5  on 999  degrees of freedom
-#> Residual deviance: 2117.3  on 996  degrees of freedom
-#> AIC: 3598
-#> 
-#> Number of Fisher Scoring iterations: 2
 ```
 
 See more info in the documentation page `rctglm_methods()`.
@@ -220,7 +191,7 @@ Quick results of the fit can be seen by printing the object:
 ``` r
 ate_prog
 #> 
-#> Object of class 'rctglm'
+#> Object of class rctglm_prog 
 #> 
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
 #>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)

@@ -19,10 +19,9 @@ fit_best_learner(
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{formula}{an object of class \code{"\link[stats]{formula}"} (or one that
-    can be coerced to that class): a symbolic description of the
-    model to be fitted.  The details of model specification are given
-    under \sQuote{Details}.}
+\item{formula}{an object of class "formula" (or one that can be coerced to that class):
+a symbolic description of the model to be fitted. The details of model specification are
+given under ‘Details’ in the \link{glm} documentation.}
 
 \item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
