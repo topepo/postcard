@@ -76,7 +76,7 @@ test_that("`get_best_learner` returns a workflow object", {
                            formula = "y ~ .",
                            verbose = 0)
 
-  expect_equal(class(lrnr), "workflow")
+  expect_s3_class(lrnr, "workflow")
 })
 
 #### Test commented out to avoid running tests for longer than necessary
@@ -91,13 +91,13 @@ test_that("`get_best_learner` returns a workflow object", {
 #                                learners = default_learners(),
 #                                formula = "y ~ x1",
 #                                verbose = 0)
-#   expect_equal(class(lrnr_chr), "workflow")
+#   expect_s3_class(lrnr_chr, "workflow")
 #
 #   lrnr_all <- get_best_learner(resamples = cv_folds,
 #                                learners = default_learners(),
 #                                formula = y ~ .,
 #                                verbose = 0)
-#   expect_equal(class(lrnr_all), "workflow")
+#   expect_s3_class(lrnr_all, "workflow")
 # })
 
 cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
@@ -128,5 +128,5 @@ test_that("`fit_best_learner` returns a workflow object", {
   )
 
   fit <- fit_best_learner(y ~ ., data = dat, verbose = 0)
-  expect_equal(class(fit), "workflow")
+  expect_s3_class(fit, "workflow")
 })
