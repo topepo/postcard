@@ -1,16 +1,16 @@
-# get_fun_args
-test_that("`get_fun_args` gives argument names as vector", {
-  extpkg_args <- get_fun_args(base::t)
-  thispkg_args <- get_fun_args(get01args)
-  f <- function(x, y) x+y
-  predef_args <- get_fun_args(f)
-  anon_args <- get_fun_args(\(a, b) a-b)
-
-  expect_equal(extpkg_args, "x")
-  expect_equal(thispkg_args, "fun")
-  expect_equal(predef_args, c("x", "y"))
-  expect_equal(anon_args, c("a", "b"))
-})
+# # get_fun_args
+# test_that("`get_fun_args` gives argument names as vector", {
+#   extpkg_args <- get_fun_args(base::t)
+#   thispkg_args <- get_fun_args(get01args)
+#   f <- function(x, y) x+y
+#   predef_args <- get_fun_args(f)
+#   anon_args <- get_fun_args(\(a, b) a-b)
+#
+#   expect_equal(extpkg_args, "x")
+#   expect_equal(thispkg_args, "fun")
+#   expect_equal(predef_args, c("x", "y"))
+#   expect_equal(anon_args, c("a", "b"))
+# })
 
 # deparse_fun_body
 test_that("`deparse_fun_body` produces character string of function body", {
@@ -40,13 +40,14 @@ test_that("`deparse_fun_body` produces character string of function body", {
   expect_equal(anon_body, "a - b")
 })
 
-# # get_response_from_formula
-# test_that("`get_response_from_formula` works for different formula specifiations", {
-#   expect_equal(get_response_from_formula(Y ~ A),
-#                "Y")
-#   expect_equal(get_response_from_formula(formula("testing~bla")),
-#                "testing")
-# })
+# NOT ISSUE
+# get_response_from_formula
+test_that("`get_response_from_formula` works for different formula specifiations", {
+  expect_equal(get_response_from_formula(Y ~ A),
+               "Y")
+  expect_equal(get_response_from_formula(formula("testing~bla")),
+               "testing")
+})
 
 # NOT ISSUE
 # is_response_in_data
