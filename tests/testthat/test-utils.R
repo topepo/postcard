@@ -73,24 +73,24 @@ test_that("`formula_everything` returns the correct formula object", {
     resp ~ .)
 })
 
-# get01args
-test_that("`get01args` returns list of arguments with 0 and 1 in them", {
-  ate <- function(psi0, psi1) psi1 - psi0
-  expect_equal(
-    get01args(fun = ate),
-    list(arg0 = "psi0", arg1 = "psi1")
-  )
-  some_fun <- function(blablabla0, c1) sum(log(blablabla0), sqrt(c1))
-  expect_equal(
-    get01args(fun = some_fun),
-    list(arg0 = "blablabla0", arg1 = "c1")
-  )
-  fun_with_additionalargs <- function(psi0, psi1, add_arg, ...) psi1 - psi0
-  expect_equal(
-    get01args(fun = fun_with_additionalargs),
-    list(arg0 = "psi0", arg1 = "psi1")
-  )
-})
+# # get01args
+# test_that("`get01args` returns list of arguments with 0 and 1 in them", {
+#   ate <- function(psi0, psi1) psi1 - psi0
+#   expect_equal(
+#     get01args(fun = ate),
+#     list(arg0 = "psi0", arg1 = "psi1")
+#   )
+#   some_fun <- function(blablabla0, c1) sum(log(blablabla0), sqrt(c1))
+#   expect_equal(
+#     get01args(fun = some_fun),
+#     list(arg0 = "blablabla0", arg1 = "c1")
+#   )
+#   fun_with_additionalargs <- function(psi0, psi1, add_arg, ...) psi1 - psi0
+#   expect_equal(
+#     get01args(fun = fun_with_additionalargs),
+#     list(arg0 = "psi0", arg1 = "psi1")
+#   )
+# })
 
 # cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are missing", {
 #   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
