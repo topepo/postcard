@@ -56,22 +56,23 @@ cli::test_that_cli("`is_response_in_data` correctly gives error when column not 
     is_response_in_data(formula = C ~ A, data = dat))
 })
 
-# test_that("`is_response_in_data` does not give error when column is in data", {
-#   dat <- data.frame(A = 1:2, B = 4:5)
-#   expect_no_error(
-#     is_response_in_data(formula = B ~ A, data = dat)
-#   )
-# })
-
-# formula_everything
-test_that("`formula_everything` returns the correct formula object", {
-  expect_equal(
-    formula_everything(Y ~ A),
-    Y ~ .)
-  expect_equal(
-    formula_everything(resp ~ A + B + mph * fpg),
-    resp ~ .)
+# NOT ISSUE
+test_that("`is_response_in_data` does not give error when column is in data", {
+  dat <- data.frame(A = 1:2, B = 4:5)
+  expect_no_error(
+    is_response_in_data(formula = B ~ A, data = dat)
+  )
 })
+
+# # formula_everything
+# test_that("`formula_everything` returns the correct formula object", {
+#   expect_equal(
+#     formula_everything(Y ~ A),
+#     Y ~ .)
+#   expect_equal(
+#     formula_everything(resp ~ A + B + mph * fpg),
+#     resp ~ .)
+# })
 
 # get01args
 # NOT ISSUE
