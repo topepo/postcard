@@ -1,4 +1,3 @@
-# NOT ISSUE
 # get_fun_args
 test_that("`get_fun_args` gives argument names as vector", {
   extpkg_args <- get_fun_args(base::t)
@@ -13,35 +12,35 @@ test_that("`get_fun_args` gives argument names as vector", {
   expect_equal(anon_args, c("a", "b"))
 })
 
-# # deparse_fun_body
-# test_that("`deparse_fun_body` produces character string of function body", {
-#   extpkg_body <- deparse_fun_body(base::t)
-#   thispkg_body <- deparse_fun_body(get01args)
-#   f <- function(x, y) {
-#     z <- x+y
-#     return(z)
-#   }
-#   predef_body <- deparse_fun_body(f)
-#   anon_body <- deparse_fun_body(\(a, b) a-b)
-#
-#   expect_type(extpkg_body, "character")
-#   expect_length(extpkg_body, 1)
-#   expect_snapshot(extpkg_body)
-#
-#   expect_type(thispkg_body, "character")
-#   expect_length(thispkg_body, 1)
-#   expect_snapshot(thispkg_body)
-#
-#   expect_type(predef_body, "character")
-#   expect_length(predef_body, 1)
-#   expect_snapshot(predef_body)
-#
-#   expect_type(anon_body, "character")
-#   expect_length(anon_body, 1)
-#   expect_equal(anon_body, "a - b")
-# })
+# ISSUE WITH 1 FAILING TEST ON GITHUB IS HERE
+# deparse_fun_body
+test_that("`deparse_fun_body` produces character string of function body", {
+  extpkg_body <- deparse_fun_body(base::t)
+  thispkg_body <- deparse_fun_body(get01args)
+  f <- function(x, y) {
+    z <- x+y
+    return(z)
+  }
+  predef_body <- deparse_fun_body(f)
+  anon_body <- deparse_fun_body(\(a, b) a-b)
 
-# NOT ISSUE
+  expect_type(extpkg_body, "character")
+  expect_length(extpkg_body, 1)
+  expect_snapshot(extpkg_body)
+
+  expect_type(thispkg_body, "character")
+  expect_length(thispkg_body, 1)
+  expect_snapshot(thispkg_body)
+
+  expect_type(predef_body, "character")
+  expect_length(predef_body, 1)
+  expect_snapshot(predef_body)
+
+  expect_type(anon_body, "character")
+  expect_length(anon_body, 1)
+  # expect_equal(anon_body, "a - b")
+})
+
 # get_response_from_formula
 test_that("`get_response_from_formula` works for different formula specifiations", {
   expect_equal(get_response_from_formula(Y ~ A),
@@ -50,7 +49,6 @@ test_that("`get_response_from_formula` works for different formula specifiations
                "testing")
 })
 
-# NOT ISSUE
 # is_response_in_data
 cli::test_that_cli("`is_response_in_data` correctly gives error when column not in data", {
   dat <- data.frame(A = 1:2, B = 4:5)
@@ -59,7 +57,6 @@ cli::test_that_cli("`is_response_in_data` correctly gives error when column not 
     is_response_in_data(formula = C ~ A, data = dat))
 })
 
-# NOT ISSUE
 test_that("`is_response_in_data` does not give error when column is in data", {
   dat <- data.frame(A = 1:2, B = 4:5)
   expect_no_error(
@@ -67,7 +64,6 @@ test_that("`is_response_in_data` does not give error when column is in data", {
   )
 })
 
-# NOT ISSUE
 # formula_everything
 test_that("`formula_everything` returns the correct formula object", {
   expect_equal(
@@ -79,7 +75,6 @@ test_that("`formula_everything` returns the correct formula object", {
 })
 
 # get01args
-# NOT ISSUE
 test_that("`get01args` returns list of arguments with 0 and 1 in them", {
   ate <- function(psi0, psi1) psi1 - psi0
   expect_equal(
@@ -98,7 +93,6 @@ test_that("`get01args` returns list of arguments with 0 and 1 in them", {
   )
 })
 
-# NOT ISSUE
 cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are missing", {
   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
   expect_error({
@@ -126,7 +120,6 @@ cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are miss
   )
 })
 
-# NOT ISSUE
 # print_symbolic_differentiation
 test_that("`print_symbolic_differentiation` returns the result of Deriv", {
   ate <- function(psi0, psi1) psi1 - psi0
@@ -136,7 +129,6 @@ test_that("`print_symbolic_differentiation` returns the result of Deriv", {
   )
 })
 
-# NOT ISSUE
 cli::test_that_cli("`print_symbolic_differentiation` provides message", {
   withr::local_options(PostCard.verbose = 1)
   ate <- function(psi0, psi1) psi1 - psi0
