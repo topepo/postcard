@@ -13,6 +13,7 @@ test_that("`rctglm` returns an object of same class", {
                 data = dat_gaus,
                 family = gaussian)
   expect_s3_class(ate, "rctglm")
+  expect_snapshot(estimand(ate))
 })
 
 test_that("`rctglm` fails when `group_indicator` is non-binary", {
