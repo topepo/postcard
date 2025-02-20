@@ -40,21 +40,22 @@ test_that("`deparse_fun_body` produces character string of function body", {
   expect_equal(anon_body, "a - b")
 })
 
-# get_response_from_formula
-test_that("`get_response_from_formula` works for different formula specifiations", {
-  expect_equal(get_response_from_formula(Y ~ A),
-               "Y")
-  expect_equal(get_response_from_formula(formula("testing~bla")),
-               "testing")
-})
-
-# # is_response_in_data
-# cli::test_that_cli("`is_response_in_data` correctly gives error when column not in data", {
-#   dat <- data.frame(A = 1:2, B = 4:5)
-#   expect_snapshot(
-#     error = TRUE,
-#     is_response_in_data(formula = C ~ A, data = dat))
+# # get_response_from_formula
+# test_that("`get_response_from_formula` works for different formula specifiations", {
+#   expect_equal(get_response_from_formula(Y ~ A),
+#                "Y")
+#   expect_equal(get_response_from_formula(formula("testing~bla")),
+#                "testing")
 # })
+
+# NOT ISSUE
+# is_response_in_data
+cli::test_that_cli("`is_response_in_data` correctly gives error when column not in data", {
+  dat <- data.frame(A = 1:2, B = 4:5)
+  expect_snapshot(
+    error = TRUE,
+    is_response_in_data(formula = C ~ A, data = dat))
+})
 
 # NOT ISSUE
 test_that("`is_response_in_data` does not give error when column is in data", {
