@@ -94,24 +94,28 @@ test_that("`get01args` returns list of arguments with 0 and 1 in them", {
 
 cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are missing", {
   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(argsnotendingwith0and1)
+    },
+    regexp = "need to end in"
   )
   missing1 <- function(a0, b) a0 - b
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(missing1)
+  },
+  regexp = "need to end in"
   )
   missing0 <- function(a, b1) a - b1
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(missing0)
+  },
+  regexp = "need to end in"
   )
   # missing both
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(sum)
+  },
+  regexp = "need to end in"
   )
 })
 
