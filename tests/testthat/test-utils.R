@@ -16,7 +16,7 @@ test_that("`get_fun_args` gives argument names as vector", {
 # deparse_fun_body
 test_that("`deparse_fun_body` produces character string of function body", {
   extpkg_body <- deparse_fun_body(base::t)
-  # thispkg_body <- deparse_fun_body(get01args)
+  thispkg_body <- deparse_fun_body(get01args)
   f <- function(x, y) {
     z <- x+y
     return(z)
@@ -30,8 +30,8 @@ test_that("`deparse_fun_body` produces character string of function body", {
   expect_snapshot(extpkg_body)
 
   # # NOT ISSUE
-  # expect_type(thispkg_body, "character")
-  # expect_length(thispkg_body, 1)
+  expect_type(thispkg_body, "character")
+  expect_length(thispkg_body, 1)
   # expect_snapshot(thispkg_body)
 
   expect_type(predef_body, "character")
