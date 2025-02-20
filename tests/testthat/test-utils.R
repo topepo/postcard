@@ -121,26 +121,27 @@ cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are miss
   )
 })
 
-# print_symbolic_differentiation
-test_that("`print_symbolic_differentiation` returns the result of Deriv", {
-  ate <- function(psi0, psi1) psi1 - psi0
-  expect_equal(
-    print_symbolic_differentiation(ate, "psi0"),
-    Deriv::Deriv(ate, "psi0")
-  )
-})
-
-# cli::test_that_cli("`print_symbolic_differentiation` provides message", {
-#   withr::local_options(PostCard.verbose = 1)
+# # print_symbolic_differentiation
+# test_that("`print_symbolic_differentiation` returns the result of Deriv", {
 #   ate <- function(psi0, psi1) psi1 - psi0
-#   # Note we are using the transform argument to remove printing of
-#   # the environment which changes between each run
-#   expect_snapshot(
-#     print_symbolic_differentiation(
-#       ate,
-#       "psi1",
-#       add_string = "test string add"
-#     ),
-#     transform = function(x) gsub("^<environment:.*>$", "", x)
+#   expect_equal(
+#     print_symbolic_differentiation(ate, "psi0"),
+#     Deriv::Deriv(ate, "psi0")
 #   )
 # })
+
+# NOT ISSUE
+cli::test_that_cli("`print_symbolic_differentiation` provides message", {
+  withr::local_options(PostCard.verbose = 1)
+  ate <- function(psi0, psi1) psi1 - psi0
+  # Note we are using the transform argument to remove printing of
+  # the environment which changes between each run
+  expect_snapshot(
+    print_symbolic_differentiation(
+      ate,
+      "psi1",
+      add_string = "test string add"
+    ),
+    transform = function(x) gsub("^<environment:.*>$", "", x)
+  )
+})
