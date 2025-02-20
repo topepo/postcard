@@ -49,7 +49,7 @@ test_that("`get_response_from_formula` works for different formula specifiations
 })
 
 # is_response_in_data
-test_that("`is_response_in_data` correctly gives error when column not in data", {
+cli::test_that_cli("`is_response_in_data` correctly gives error when column not in data", {
   dat <- data.frame(A = 1:2, B = 4:5)
   expect_snapshot(
     error = TRUE,
@@ -124,7 +124,7 @@ test_that("`print_symbolic_differentiation` returns the result of Deriv", {
   )
 })
 
-test_that("`print_symbolic_differentiation` provides message", {
+cli::test_that_cli("`print_symbolic_differentiation` provides message", {
   withr::local_options(PostCard.verbose = 1)
   ate <- function(psi0, psi1) psi1 - psi0
   # Note we are using the transform argument to remove printing of
