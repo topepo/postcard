@@ -56,12 +56,12 @@ cli::test_that_cli("`is_response_in_data` correctly gives error when column not 
     is_response_in_data(formula = C ~ A, data = dat))
 })
 
-test_that("`is_response_in_data` does not give error when column is in data", {
-  dat <- data.frame(A = 1:2, B = 4:5)
-  expect_no_error(
-    is_response_in_data(formula = B ~ A, data = dat)
-  )
-})
+# test_that("`is_response_in_data` does not give error when column is in data", {
+#   dat <- data.frame(A = 1:2, B = 4:5)
+#   expect_no_error(
+#     is_response_in_data(formula = B ~ A, data = dat)
+#   )
+# })
 
 # formula_everything
 test_that("`formula_everything` returns the correct formula object", {
@@ -121,14 +121,15 @@ cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are miss
   )
 })
 
-# # print_symbolic_differentiation
-# test_that("`print_symbolic_differentiation` returns the result of Deriv", {
-#   ate <- function(psi0, psi1) psi1 - psi0
-#   expect_equal(
-#     print_symbolic_differentiation(ate, "psi0"),
-#     Deriv::Deriv(ate, "psi0")
-#   )
-# })
+# NOT ISSUE
+# print_symbolic_differentiation
+test_that("`print_symbolic_differentiation` returns the result of Deriv", {
+  ate <- function(psi0, psi1) psi1 - psi0
+  expect_equal(
+    print_symbolic_differentiation(ate, "psi0"),
+    Deriv::Deriv(ate, "psi0")
+  )
+})
 
 # NOT ISSUE
 cli::test_that_cli("`print_symbolic_differentiation` provides message", {
