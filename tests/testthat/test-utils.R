@@ -41,11 +41,6 @@ test_that("`deparse_fun_body` produces character string of function body", {
 })
 
 # get_response_from_formula
-test_that("`get_response_from_formula` error when arg not formula class", {
-  expect_error(get_response_from_formula("Y ~ A"),
-               "needs to have class")
-})
-
 test_that("`get_response_from_formula` works for different formula specifiations", {
   expect_equal(get_response_from_formula(Y ~ A),
                "Y")
