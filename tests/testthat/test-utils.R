@@ -92,7 +92,7 @@ test_that("`get01args` returns list of arguments with 0 and 1 in them", {
   )
 })
 
-test_that("`get01args` gives error when arguments with 0 and 1 are missing", {
+cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are missing", {
   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
   expect_snapshot(
     error = TRUE,
