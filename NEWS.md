@@ -1,6 +1,4 @@
-# PostCard (development version)
-
-## Version 0.2.1.9000 (development version)
+# PostCard 0.2.1.9000 (development version)
 
 Major overhaul of package. Still focuses on analysing data with the use of
 prognostic scores, but takes a more general approach that allows any
@@ -15,7 +13,7 @@ The package provides novel methods for:
 * `rctglm_with_prognosticscore`: Do the above, but leveraging historical data
   to increase precision with prognostic scores.
 
-# Version 0.2.1
+# PostCard 0.2.1
 
 ## Features
 
