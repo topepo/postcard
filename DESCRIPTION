@@ -1,7 +1,7 @@
 Type: Package
 Package: PostCard
 Title: Prognostic covariate adjustment for estimation of estimands
-Version: 1.0.0.9000
+Version: 0.2.1.9000
 Authors@R: c(
     person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
     person("Emilie", "Hoejbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut")
