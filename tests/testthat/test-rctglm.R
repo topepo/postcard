@@ -1,4 +1,5 @@
 test_that("`rctglm` returns an object of same class", {
+  withr::local_seed(42)
   n <- 100
   dat_gaus <- glm_data(
     1+1.5*X1+2*A,

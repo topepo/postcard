@@ -1,3 +1,11 @@
+# `rctglm` returns an object of same class
+
+    Code
+      estimand(ate)
+    Output
+        Estimate Std. Error
+      1 1.762089  0.1885315
+
 # `estimand_fun_derivX` can be left as NULL or specified manually
 
     Code
