@@ -180,7 +180,6 @@ rctglm <- function(formula,
   group_indicator_var <- data %>%
     dplyr::pull(group_indicator_name)
 
-
   counterfactual_pred0 <- predict_counterfactual_means(group_val = 0,
                                                        model = model,
                                                        group_indicator_name = group_indicator_name)
@@ -192,6 +191,41 @@ rctglm <- function(formula,
   counterfactual_mean1 <- mean(counterfactual_pred1)
 
   estimate_estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
+
+  # Variance estimation
+  if (TRUE) {
+    folds <- rsample::vfold_cv(data, v = 5)
+    train_test_folds <- lapply(
+      folds$splits,
+      function(x) {
+        train_data <- x$data[x$in_id, ]
+        out_id <- setdiff(1:nrow(x$data), x$in_id)
+        test_data <- x$data[out_id, ]
+        return(list(in_id = x$in_id, train = train_data, test = test_data))
+      }
+    )
+
+    counterfactual_preds <- lapply(train_test_folds, function(x) {
+      args_glm_copy <- args_glm
+      args_glm_copy$data <- x$train
+
+      model <- do.call(glm, args = args_glm_copy)
+
+      counterfactual_pred0 <- predict_counterfactual_means(group_val = 0,
+                                                           model = model,
+                                                           group_indicator_name = group_indicator_name,
+                                                           newdata = x$test)
+      counterfactual_pred1 <- predict_counterfactual_means(group_val = 1,
+                                                           model = model,
+                                                           group_indicator_name = group_indicator_name,
+                                                           newdata = x$test)
+
+      return(data.frame(grp0 = counterfactual_pred0, grp1 = counterfactual_pred1))
+    }) %>%
+      dplyr::bind_rows()
+
+    # sort them and extract each counterfactual mean 0 and 1
+  }
 
   if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
