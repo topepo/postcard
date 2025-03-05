@@ -19,6 +19,13 @@ test_that("`estimand` method works", {
   expect_equal(est2, ate$estimand)
   expect_named(est1, c("Estimate", "Std. Error"))
   expect_snapshot(est1)
+
+  ate_wo_cvvariance <- rctglm(formula = Y ~ .,
+                              group_indicator = A,
+                              data = dat_gaus,
+                              family = gaussian,
+                              cv_variance = FALSE)
+  expect_snapshot(estimand(ate_wo_cvvariance))
 })
 
 test_that("`coef` method works", {

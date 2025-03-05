@@ -11,6 +11,8 @@
 #' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
 #' model on the historical data `data_hist`. Default models the response (assumed same as in
 #' `formula`) using all columns in the `data_hist` data
+#' @param cv_folds_prog a `numeric` with the number of cross-validation folds used when fitting and
+#' evaluating models
 #'
 #' @details
 #' More details on prognostic models and scores being predictions of counterfactual means
@@ -72,10 +74,12 @@ rctglm_with_prognosticscore <- function(
     group_allocation_prob = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+    cv_variance = TRUE,
+    cv_folds_variance = 5,
     ...,
     data_hist,
     prog_formula = NULL,
-    cv_folds = 5,
+    cv_folds_prog = 5,
     learners = default_learners(),
     verbose = options::opt("verbose")) {
 
@@ -110,7 +114,7 @@ rctglm_with_prognosticscore <- function(
 
   lrnr_fit <- fit_best_learner(formula = prog_formula,
                                data = data_hist,
-                               cv_folds = cv_folds,
+                               cv_folds = cv_folds_prog,
                                learners = learners,
                                verbose = verbose)
 
@@ -142,7 +146,7 @@ rctglm_with_prognosticscore <- function(
       formula = prog_formula,
       model_fit = lrnr_fit,
       learners = learners,
-      cv_folds = cv_folds,
+      cv_folds = cv_folds_prog,
       data = data_hist
     ))
 

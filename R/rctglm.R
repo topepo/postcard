@@ -25,8 +25,8 @@
 #' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param cv_variance a `logical` determining whether to estimate the variance
-#' using cross-validation (see details).
-#' @param cv_folds a `numeric` with the number of folds to use for cross
+#' using cross-validation (see details of [rctglm]).
+#' @param cv_folds_variance a `numeric` with the number of folds to use for cross
 #' validation if `cv_variance` is `TRUE`.
 #' @param ... Additional arguments passed to [stats::glm()]
 #'
@@ -130,7 +130,7 @@ rctglm <- function(formula,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
                    cv_variance = TRUE,
-                   cv_folds = 5,
+                   cv_folds_variance = 5,
                    verbose = options::opt("verbose"),
                    ...
 ) {
@@ -202,7 +202,7 @@ rctglm <- function(formula,
 
   # Variance estimation
   if (cv_variance) {
-    folds <- rsample::vfold_cv(data, v = cv_folds)
+    folds <- rsample::vfold_cv(data, v = cv_folds_variance)
     train_test_folds <- lapply(
       folds$splits,
       function(x) {

@@ -14,6 +14,8 @@ rctglm(
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
+  cv_variance = TRUE,
+  cv_folds_variance = 5,
   verbose = options::opt("verbose"),
   ...
 )
@@ -53,6 +55,12 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 
 \item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
+
+\item{cv_variance}{a \code{logical} determining whether to estimate the variance
+using cross-validation (see details of \link{rctglm}).}
+
+\item{cv_folds_variance}{a \code{numeric} with the number of folds to use for cross
+validation if \code{cv_variance} is \code{TRUE}.}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
@@ -97,6 +105,9 @@ is 0 and 1, respectively. Taking means of these predictions produce the \emph{co
 \code{psi0} and \code{psi1}, and an estimand \code{r(psi0, psi1)} is calculated using any specified \code{estimand_fun}.
 
 The variance of the estimand is found by taking the variance of the influence function of the estimand.
+If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for each observation (which are
+used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
+using cross validation with number of folds specified by \code{cv_folds}.
 
 This method of inference using plug-in estimation and influence functions for the variance produces a
 causal estimate of the estimand, as stated by articles XXXX.

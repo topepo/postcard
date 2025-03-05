@@ -1,5 +1,5 @@
-# predict_counterfactual_means
-test_that("`predict_counterfactual_means` predicts correctly", {
+# predict_counterfactual_mean
+test_that("`predict_counterfactual_mean` predicts correctly", {
   treat_diff <- 10
   dat <- data.frame(
     Y = 1:(2*treat_diff),
@@ -8,12 +8,12 @@ test_that("`predict_counterfactual_means` predicts correctly", {
     )
   )
   mod <- glm(Y ~ X + A, data = dat)
-  pred0 <- predict_counterfactual_means(
+  pred0 <- predict_counterfactual_mean(
     model = mod,
     group_indicator_name = "A",
     group_val = 0)
 
-  pred1 <- predict_counterfactual_means(
+  pred1 <- predict_counterfactual_mean(
     model = mod,
     group_indicator_name = "A",
     group_val = 1)
@@ -21,7 +21,7 @@ test_that("`predict_counterfactual_means` predicts correctly", {
   expect_equal(pred0, pred1 - treat_diff)
 })
 
-test_that("`predict_counterfactual_means` gives error when `group_indicator_name` not in model or data", {
+test_that("`predict_counterfactual_mean` gives error when `group_indicator_name` not in model or data", {
   dat <- data.frame(
     Y = 1:10,
     X = 1:10,
@@ -31,7 +31,7 @@ test_that("`predict_counterfactual_means` gives error when `group_indicator_name
   mod <- glm(Y ~ X + A, data = dat)
 
   expect_error(
-    predict_counterfactual_means(
+    predict_counterfactual_mean(
       model = mod,
       group_indicator_name = "test",
       group_val = 0),
@@ -39,7 +39,7 @@ test_that("`predict_counterfactual_means` gives error when `group_indicator_name
   )
 })
 
-test_that("`predict_counterfactual_means` works with and without data specification", {
+test_that("`predict_counterfactual_mean` works with and without data specification", {
   dat_fit <- data.frame(
     Y = 1:10,
     X = 1:10,
@@ -48,11 +48,11 @@ test_that("`predict_counterfactual_means` works with and without data specificat
   )
   mod <- glm(Y ~ X + A, data = dat_fit)
 
-  pred_nodatspec <- predict_counterfactual_means(
+  pred_nodatspec <- predict_counterfactual_mean(
     model = mod,
     group_indicator_name = "A",
     group_val = 0)
-  pred_datspec <- predict_counterfactual_means(
+  pred_datspec <- predict_counterfactual_mean(
     model = mod,
     group_indicator_name = "A",
     group_val = 0,
@@ -64,13 +64,31 @@ test_that("`predict_counterfactual_means` works with and without data specificat
     Y = 1:11,
     X = -5:5
   )
-  pred_newdata <- predict_counterfactual_means(
+  pred_newdata <- predict_counterfactual_mean(
     model = mod,
     group_indicator_name = "A",
     group_val = 0,
     data = dat_pred)
 
   expect_type(pred_newdata, "double")
+})
+
+# predict_counterfactual_means
+test_that("`predict_counterfactual_mean` predicts correctly", {
+  treat_diff <- 10
+  dat <- data.frame(
+    Y = 1:(2*treat_diff),
+    X = rep(1:treat_diff, 2),
+    A = c(rep(0, treat_diff), rep(1, treat_diff)
+    )
+  )
+  mod <- glm(Y ~ X + A, data = dat)
+  preds <- predict_counterfactual_means(
+    model = mod,
+    group_indicator_name = "A")
+
+  expect_s3_class(preds, "data.frame")
+  expect_equal(preds$psi0, preds$psi1 - treat_diff)
 })
 
 # default_estimand_funs
