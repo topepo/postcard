@@ -97,9 +97,6 @@ is 0 and 1, respectively. Taking means of these predictions produce the \emph{co
 \code{psi0} and \code{psi1}, and an estimand \code{r(psi0, psi1)} is calculated using any specified \code{estimand_fun}.
 
 The variance of the estimand is found by taking the variance of the influence function of the estimand.
-
-This method of inference using plug-in estimation and influence functions for the variance produces a
-causal estimate of the estimand, as stated by articles XXXX.
 }
 \section{Estimands}{
 

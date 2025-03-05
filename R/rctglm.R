@@ -1,3 +1,8 @@
+# TODO: Add something along the lines of this:
+## This method of inference using plug-in estimation and influence functions for the variance produces a
+## causal estimate of the estimand, as stated by articles XXXX.
+# when article is out
+
 #' Fit GLM and find any estimand (marginal effect) using plug-in estimation with variance estimation using
 #' influence functions
 #'
@@ -34,9 +39,6 @@
 #' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
 #'
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
-#'
-#' This method of inference using plug-in estimation and influence functions for the variance produces a
-#' causal estimate of the estimand, as stated by articles XXXX.
 #'
 #' @section Estimands:
 #' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using
