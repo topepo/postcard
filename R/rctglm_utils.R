@@ -1,5 +1,5 @@
 # Modify data to have the same value of a group identifier and then predict
-predict_counterfactual_means <- function(model,
+predict_counterfactual_mean <- function(model,
                                          group_indicator_name,
                                          group_val,
                                          newdata = NULL,
@@ -15,6 +15,23 @@ predict_counterfactual_means <- function(model,
   predict(model,
           type = "response",
           newdata = newdata_same_group_val)
+}
+
+predict_counterfactual_means <- function(model,
+                                         group_indicator_name,
+                                         newdata = NULL,
+                                         data = NULL) {
+  args <- as.list(environment())
+  counterfactual_preds <- sapply(c(0,1), function(x) {
+    do.call(
+      predict_counterfactual_mean,
+      c(args, list(group_val = x))
+    )
+  }) %>%
+    as.data.frame() %>%
+    setNames(c("psi0", "psi1"))
+
+  return(counterfactual_preds)
 }
 
 # Default estimand functions
