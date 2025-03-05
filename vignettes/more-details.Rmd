@@ -53,7 +53,7 @@ The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is 
 
 #### Built-in estimands - average treatment effect and rate ratio
 
-Built in is the ATE and rate ratio, which can be specified with character strings. As is apparent from the documentation of `rctglm()` and `rctglm_with_prognosticscore()`, the default of `estimand_fun` is `"ate"`, and similarly the user can specify `estimand_fun = "ratio_ratio"` to use the estimand function `psi1 / psi0` as seen below:
+Built in is the ATE and rate ratio, which can be specified with character strings. As is apparent from the documentation of `rctglm()` and `rctglm_with_prognosticscore()`, the default of `estimand_fun` is `"ate"`, and similarly the user can specify `estimand_fun = "rate_ratio"` to use the estimand function `psi1 / psi0` as seen below:
 
 ```{r rate-ratio-run-show}
 rate_ratio <- rctglm(
