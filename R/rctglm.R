@@ -224,9 +224,11 @@ rctglm <- function(formula,
                                           newdata = x$test)
       return(out)
     }) %>%
-      dplyr::bind_rows() %>%
-      dplyr::mutate(rowname = as.numeric(rownames(.))) %>%
-      dplyr::arrange(rowname)
+      dplyr::bind_rows()
+
+    oos_fitted.values_counterfactual$rowname <- row.names(oos_fitted.values_counterfactual)
+    oos_fitted.values_counterfactual <- oos_fitted.values_counterfactual %>%
+      dplyr::arrange(as.numeric(.data$rowname))
   }
 
   # If cv_variance then use out-of-sample counterfactual predictions, otherwise

@@ -29,7 +29,7 @@ predict_counterfactual_means <- function(model,
     )
   }) %>%
     as.data.frame() %>%
-    setNames(c("psi0", "psi1"))
+    stats::setNames(c("psi0", "psi1"))
 
   return(counterfactual_preds)
 }
