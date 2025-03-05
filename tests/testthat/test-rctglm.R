@@ -1,4 +1,5 @@
-test_that("`rctglm` returns an object of same class", {
+test_that("`rctglm` snapshot tests", {
+  withr::local_seed(42)
   n <- 100
   dat_gaus <- glm_data(
     1+1.5*X1+2*A,
@@ -8,12 +9,19 @@ test_that("`rctglm` returns an object of same class", {
   )
 
   # Fit the model
-  ate <- rctglm(formula = Y ~ .,
+  ate_wo_cv <- rctglm(formula = Y ~ .,
                 group_indicator = A,
                 data = dat_gaus,
-                family = gaussian)
-  expect_s3_class(ate, "rctglm")
-  expect_snapshot(estimand(ate))
+                family = gaussian,
+                cv_variance = FALSE)
+  ate_with_cv <- rctglm(formula = Y ~ .,
+                      group_indicator = A,
+                      data = dat_gaus,
+                      family = gaussian)
+  expect_s3_class(ate_wo_cv, "rctglm")
+  expect_snapshot(estimand(ate_wo_cv))
+  expect_snapshot(estimand(ate_with_cv))
+  expect_equal(estimand(ate_wo_cv)$Estimate, estimand(ate_with_cv)$Estimate)
 })
 
 test_that("`rctglm` fails when `group_indicator` is non-binary", {

@@ -24,6 +24,10 @@
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
+#' @param cv_variance a `logical` determining whether to estimate the variance
+#' using cross-validation (see details of [rctglm]).
+#' @param cv_folds_variance a `numeric` with the number of folds to use for cross
+#' validation if `cv_variance` is `TRUE`.
 #' @param ... Additional arguments passed to [stats::glm()]
 #'
 #' @details
@@ -34,6 +38,9 @@
 #' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
 #'
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
+#' If `cv_variance` is `TRUE`, then the counterfactual predictions for each observation (which are
+#' used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
+#' using cross validation with number of folds specified by `cv_folds`.
 #'
 #' This method of inference using plug-in estimation and influence functions for the variance produces a
 #' causal estimate of the estimand, as stated by articles XXXX.
@@ -122,6 +129,8 @@ rctglm <- function(formula,
                    group_allocation_prob = NULL,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+                   cv_variance = TRUE,
+                   cv_folds_variance = 5,
                    verbose = options::opt("verbose"),
                    ...
 ) {
@@ -131,7 +140,7 @@ rctglm <- function(formula,
 
   group_indicator <- rlang::enquo(group_indicator)
   args <- as.list(environment())
-  call <- match.call()
+  cal <- match.call()
 
   ind_expr <- rlang::quo_get_expr(group_indicator)
   called_within_prognosticscore <- ind_expr == "group_indicator"
@@ -180,25 +189,62 @@ rctglm <- function(formula,
   group_indicator_var <- data %>%
     dplyr::pull(group_indicator_name)
 
+  full_model_fitted.values_counterfactual <- predict_counterfactual_means(
+    model = model,
+    group_indicator_name = group_indicator_name
+  )
+  full_model_means_counterfactual <- colMeans(full_model_fitted.values_counterfactual)
 
-  counterfactual_pred0 <- predict_counterfactual_means(group_val = 0,
-                                                       model = model,
-                                                       group_indicator_name = group_indicator_name)
-  counterfactual_pred1 <- predict_counterfactual_means(group_val = 1,
-                                                       model = model,
-                                                       group_indicator_name = group_indicator_name)
+  estimate_estimand <- estimand_fun(
+    as.numeric(full_model_means_counterfactual["psi1"]),
+    as.numeric(full_model_means_counterfactual["psi0"])
+  )
 
-  counterfactual_mean0 <- mean(counterfactual_pred0)
-  counterfactual_mean1 <- mean(counterfactual_pred1)
+  # Variance estimation
+  if (cv_variance) {
+    folds <- rsample::vfold_cv(data, v = cv_folds_variance)
+    train_test_folds <- lapply(
+      folds$splits,
+      function(x) {
+        train_data <- x$data[x$in_id, ]
+        out_id <- setdiff(1:nrow(x$data), x$in_id)
+        test_data <- x$data[out_id, ]
+        return(list(train = train_data, test = test_data))
+      }
+    )
 
-  estimate_estimand <- estimand_fun(counterfactual_mean1, counterfactual_mean0)
+    oos_fitted.values_counterfactual <- lapply(train_test_folds, function(x) {
+      args_glm_copy <- args_glm
+      args_glm_copy$data <- x$train
+
+      model_train <- do.call(glm, args = args_glm_copy)
+
+      out <- predict_counterfactual_means(model = model_train,
+                                          group_indicator_name = group_indicator_name,
+                                          newdata = x$test)
+      return(out)
+    }) %>%
+      dplyr::bind_rows()
+
+    oos_fitted.values_counterfactual$rowname <- row.names(oos_fitted.values_counterfactual)
+    oos_fitted.values_counterfactual <- oos_fitted.values_counterfactual %>%
+      dplyr::arrange(as.numeric(.data$rowname))
+  }
+
+  # If cv_variance then use out-of-sample counterfactual predictions, otherwise
+  # use predictions from full model fitted to all data
+  preds_for_variance <- if (cv_variance) {
+    oos_fitted.values_counterfactual}
+  else {
+    full_model_fitted.values_counterfactual
+  }
 
   if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
     group_indicator = group_indicator_var,
     group_allocation_prob = group_allocation_prob,
-    counterfactual_pred0 = counterfactual_pred0,
-    counterfactual_pred1 = counterfactual_pred1,
+    counterfactual_pred0 = preds_for_variance$psi0,
+    counterfactual_pred1 = preds_for_variance$psi1,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1)
 
@@ -207,21 +253,15 @@ rctglm <- function(formula,
 
   data_estimand <- data.frame(Estimate = estimate_estimand,
                               `Std. Error` = se_estimand,
-                              # Variance = var_estimand,
                               check.names = FALSE)
-
-  fitted.values_counterfactual <- data.frame(psi0 = counterfactual_pred0,
-                                             psi1 = counterfactual_pred1)
-  means_counterfactual <- data.frame(psi0 = counterfactual_mean0,
-                                     psi1 = counterfactual_mean1)
 
   out <- list(
     estimand = data_estimand,
     estimand_fun = estimand_fun,
-    means_counterfactual = means_counterfactual,
-    fitted.values_counterfactual = fitted.values_counterfactual,
+    means_counterfactual = full_model_means_counterfactual,
+    fitted.values_counterfactual = full_model_fitted.values_counterfactual,
     glm = model,
-    call = call
+    call = cal
   )
 
   return(structure(out, class = c("rctglm", class(out))))

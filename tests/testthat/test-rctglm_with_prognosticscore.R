@@ -1,4 +1,4 @@
-test_that("`rctglm_with_prognosticscore` returns object of correct class", {
+test_that("`rctglm_with_prognosticscore` snapshot tests", {
   withr::local_seed(42)
   # Generate some data
   n <- 100
@@ -47,5 +47,17 @@ test_that("`rctglm_with_prognosticscore` returns object of correct class", {
   })
 
   expect_equal(est(ate), est(ate_spec_prog))
-  expect_snapshot(ate)
+
+  ate_wo_cvvariance <- withr::with_seed(42, {
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      group_indicator = A,
+      data = dat_treat,
+      family = gaussian(),
+      estimand_fun = "ate",
+      data_hist = dat_notreat,
+      cv_variance = FALSE,
+      verbose = 0)
+  })
+  expect_snapshot(ate_wo_cvvariance)
 })

@@ -13,10 +13,12 @@ rctglm_with_prognosticscore(
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
+  cv_variance = TRUE,
+  cv_folds_variance = 5,
   ...,
   data_hist,
   prog_formula = NULL,
-  cv_folds = 5,
+  cv_folds_prog = 5,
   learners = default_learners(),
   verbose = options::opt("verbose")
 )
@@ -57,6 +59,12 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
+\item{cv_variance}{a \code{logical} determining whether to estimate the variance
+using cross-validation (see details of \link{rctglm}).}
+
+\item{cv_folds_variance}{a \code{numeric} with the number of folds to use for cross
+validation if \code{cv_variance} is \code{TRUE}.}
+
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 
 \item{data_hist}{a \code{data.frame} with historical data on which to fit a prognostic model}
@@ -65,7 +73,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 model on the historical data \code{data_hist}. Default models the response (assumed same as in
 \code{formula}) using all columns in the \code{data_hist} data}
 
-\item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
+\item{cv_folds_prog}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}}

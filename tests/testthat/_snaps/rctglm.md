@@ -1,3 +1,19 @@
+# `rctglm` snapshot tests
+
+    Code
+      estimand(ate_wo_cv)
+    Output
+        Estimate Std. Error
+      1 1.762089  0.1885315
+
+---
+
+    Code
+      estimand(ate_with_cv)
+    Output
+        Estimate Std. Error
+      1 1.762089  0.1928675
+
 # `estimand_fun_derivX` can be left as NULL or specified manually
 
     Code
