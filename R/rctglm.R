@@ -208,7 +208,7 @@ rctglm <- function(formula,
       data = data,
       group_indicator_name = group_indicator_name,
       full_model.args_glm = args_glm,
-      cv_folds_variance = cv_folds_variance
+      cv_variance_folds = cv_variance_folds
     )
   } else {
     full_model_fitted.values_counterfactual

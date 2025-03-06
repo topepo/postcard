@@ -75,7 +75,7 @@ rctglm_with_prognosticscore <- function(
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     cv_variance = TRUE,
-    cv_folds_variance = 5,
+    cv_variance_folds = 5,
     ...,
     data_hist,
     prog_formula = NULL,
