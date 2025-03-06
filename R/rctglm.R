@@ -40,7 +40,8 @@
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
 #' If `cv_variance` is `TRUE`, then the counterfactual predictions for each observation (which are
 #' used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
-#' using cross validation with number of folds specified by `cv_folds`.
+#' using cross validation with number of folds specified by `cv_folds`. The cross validation splits
+#' are performed using stratified sampling with `group_indicator` as the `strata` argument in [rsample::vfold_cv].
 #'
 #' This method of inference using plug-in estimation and influence functions for the variance produces a
 #' causal estimate of the estimand, as stated by articles XXXX.
@@ -150,7 +151,7 @@ rctglm <- function(formula,
     group_indicator_name <- as.character(ind_expr)
   }
 
-  group_vals <- dplyr::pull(data, group_indicator_name)
+  group_vals <- dplyr::pull(data, tidyselect::all_of(group_indicator_name))
   group_vals_unique <- unique(group_vals)
   if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var group_indicator} column can only have 1's and 0's")
 
@@ -187,7 +188,7 @@ rctglm <- function(formula,
 
   response_var <- model$y
   group_indicator_var <- data %>%
-    dplyr::pull(group_indicator_name)
+    dplyr::pull(tidyselect::all_of(group_indicator_name))
 
   full_model_fitted.values_counterfactual <- predict_counterfactual_means(
     model = model,
@@ -200,42 +201,16 @@ rctglm <- function(formula,
     as.numeric(full_model_means_counterfactual["psi0"])
   )
 
-  # Variance estimation
-  if (cv_variance) {
-    folds <- rsample::vfold_cv(data, v = cv_folds_variance)
-    train_test_folds <- lapply(
-      folds$splits,
-      function(x) {
-        train_data <- x$data[x$in_id, ]
-        out_id <- setdiff(1:nrow(x$data), x$in_id)
-        test_data <- x$data[out_id, ]
-        return(list(train = train_data, test = test_data))
-      }
-    )
-
-    oos_fitted.values_counterfactual <- lapply(train_test_folds, function(x) {
-      args_glm_copy <- args_glm
-      args_glm_copy$data <- x$train
-
-      model_train <- do.call(glm, args = args_glm_copy)
-
-      out <- predict_counterfactual_means(model = model_train,
-                                          group_indicator_name = group_indicator_name,
-                                          newdata = x$test)
-      return(out)
-    }) %>%
-      dplyr::bind_rows()
-
-    oos_fitted.values_counterfactual$rowname <- row.names(oos_fitted.values_counterfactual)
-    oos_fitted.values_counterfactual <- oos_fitted.values_counterfactual %>%
-      dplyr::arrange(as.numeric(.data$rowname))
-  }
-
   # If cv_variance then use out-of-sample counterfactual predictions, otherwise
   # use predictions from full model fitted to all data
   preds_for_variance <- if (cv_variance) {
-    oos_fitted.values_counterfactual}
-  else {
+    oos_fitted.values_counterfactual(
+      data = data,
+      group_indicator_name = group_indicator_name,
+      full_model.args_glm = args_glm,
+      cv_folds_variance = cv_folds_variance
+    )
+  } else {
     full_model_fitted.values_counterfactual
   }
 

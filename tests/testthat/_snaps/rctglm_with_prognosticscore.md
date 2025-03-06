@@ -50,5 +50,5 @@
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.017
       Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 3.975
       Estimand function r: psi1 - psi0
-      Estimand (r(psi_1, psi_0)) estimate (SE): 1.957 (0.2025)
+      Estimand (r(psi_1, psi_0)) estimate (SE): 1.957 (0.2052)
 

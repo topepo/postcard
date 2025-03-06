@@ -1,9 +1,9 @@
 # Modify data to have the same value of a group identifier and then predict
 predict_counterfactual_mean <- function(model,
-                                         group_indicator_name,
-                                         group_val,
-                                         newdata = NULL,
-                                         data = NULL) {
+                                        group_indicator_name,
+                                        group_val,
+                                        newdata = NULL,
+                                        data = NULL) {
   if (is.null(data)) data <- model$data
   if (is.null(newdata)) newdata <- data
   newdata_same_group_val <- newdata |>
@@ -22,12 +22,16 @@ predict_counterfactual_means <- function(model,
                                          newdata = NULL,
                                          data = NULL) {
   args <- as.list(environment())
-  counterfactual_preds <- sapply(c(0,1), function(x) {
-    do.call(
-      predict_counterfactual_mean,
-      c(args, list(group_val = x))
-    )
-  }) %>%
+  counterfactual_preds <- sapply(
+    c(0,1),
+    function(x) {
+      do.call(
+        predict_counterfactual_mean,
+        c(args, list(group_val = x))
+      )
+    },
+    simplify = FALSE
+  ) %>%
     as.data.frame() %>%
     stats::setNames(c("psi0", "psi1"))
 
@@ -42,4 +46,53 @@ default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
          ate = function(psi1, psi0) psi1-psi0,
          rate_ratio = function(psi1, psi0) psi1/psi0
   )
+}
+
+# Do cross validation splits, fit models to training data and predict on test
+# data to obtain out-of-sample predictions
+oos_fitted.values_counterfactual <- function(
+    data,
+    group_indicator_name,
+    full_model.args_glm,
+    cv_folds_variance = 5
+) {
+  folds <- rsample::vfold_cv(
+    data,
+    v = cv_folds_variance,
+    strata = tidyselect::all_of(group_indicator_name)
+  )
+  train_test_folds <- lapply(
+    folds$splits,
+    extract_train_test
+  )
+
+  out <- lapply(train_test_folds, function(x) {
+    args_glm_copy <- full_model.args_glm
+    args_glm_copy$data <- x$train
+
+    model_train <- do.call(glm, args = args_glm_copy)
+
+    preds <- predict_counterfactual_means(
+      model = model_train,
+      group_indicator_name = group_indicator_name,
+      newdata = x$test
+    )
+    return(preds)
+  }) %>%
+    dplyr::bind_rows()
+
+  out$rowname <- row.names(out)
+  out <- out %>%
+    dplyr::arrange(as.numeric(.data$rowname))
+
+  return(out)
+}
+
+
+# x of class c("vfold_split", "rsplit"). Result of rsample::vfold_cv
+extract_train_test <- function(x) {
+  train_data <- x$data[x$in_id, ]
+  out_id <- setdiff(1:nrow(x$data), x$in_id)
+  test_data <- x$data[out_id, ]
+  return(list(train = train_data, test = test_data))
 }

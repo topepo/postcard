@@ -4,7 +4,7 @@
       est1
     Output
         Estimate Std. Error
-      1 1.325113   1.130491
+      1 1.325113   1.269777
 
 ---
 
