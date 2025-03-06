@@ -160,4 +160,4 @@ Information on the prognostic model is available in the list element `prognostic
     -   Accessible through `ate$prognostic_info$model_fit` or with method `prog_model(ate)`
 -   A list of the learners used for fitting the model using `fit_best_learner()`
     -   Accessible through `ate$prognostic_info$learners`
--   The number of folds used for cross validation (`cv_folds`) and the historical data used for fitting the model
+-   The number of folds used for cross validation (`cv_prog_folds`) and the historical data used for fitting the model

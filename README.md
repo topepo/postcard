@@ -104,7 +104,7 @@ ate
 #> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.776
 #> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.867
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09225)
 ```
 
 ### Structure of `rctglm` and methods for extracting entities
@@ -133,7 +133,7 @@ Thus, methods available are:
 # "estimate" also available as alternative to just "est"
 est(ate)
 #>   Estimate Std. Error
-#> 1 2.091095 0.09208528
+#> 1 2.091095 0.09224543
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
@@ -198,10 +198,10 @@ ate_prog
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
 #>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
 #> 
-#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.827
-#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.821
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.828
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.819
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.994 (0.06406)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.992 (0.06445)
 ```
 
 It’s evident that in this case where there is a non-linear relationship
@@ -220,5 +220,5 @@ Information on the prognostic model is available in the list element
 - A list of the learners used for fitting the model using
   `fit_best_learner()`
   - Accessible through `ate$prognostic_info$learners`
-- The number of folds used for cross validation (`cv_folds`) and the
-  historical data used for fitting the model
+- The number of folds used for cross validation (`cv_prog_folds`) and
+  the historical data used for fitting the model
