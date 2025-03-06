@@ -26,7 +26,7 @@
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param cv_variance a `logical` determining whether to estimate the variance
 #' using cross-validation (see details of [rctglm]).
-#' @param cv_folds_variance a `numeric` with the number of folds to use for cross
+#' @param cv_variance_folds a `numeric` with the number of folds to use for cross
 #' validation if `cv_variance` is `TRUE`.
 #' @param ... Additional arguments passed to [stats::glm()]
 #'
@@ -40,7 +40,7 @@
 #' The variance of the estimand is found by taking the variance of the influence function of the estimand.
 #' If `cv_variance` is `TRUE`, then the counterfactual predictions for each observation (which are
 #' used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
-#' using cross validation with number of folds specified by `cv_folds`. The cross validation splits
+#' using cross validation with number of folds specified by `cv_variance_folds`. The cross validation splits
 #' are performed using stratified sampling with `group_indicator` as the `strata` argument in [rsample::vfold_cv].
 #'
 #' This method of inference using plug-in estimation and influence functions for the variance produces a
@@ -131,7 +131,7 @@ rctglm <- function(formula,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
                    cv_variance = TRUE,
-                   cv_folds_variance = 5,
+                   cv_variance_folds = 5,
                    verbose = options::opt("verbose"),
                    ...
 ) {
@@ -208,7 +208,7 @@ rctglm <- function(formula,
       data = data,
       group_indicator_name = group_indicator_name,
       full_model.args_glm = args_glm,
-      cv_folds_variance = cv_folds_variance
+      cv_variance_folds = cv_variance_folds
     )
   } else {
     full_model_fitted.values_counterfactual

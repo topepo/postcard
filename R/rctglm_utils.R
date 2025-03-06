@@ -54,11 +54,11 @@ oos_fitted.values_counterfactual <- function(
     data,
     group_indicator_name,
     full_model.args_glm,
-    cv_folds_variance = 5
+    cv_variance_folds = 5
 ) {
   folds <- rsample::vfold_cv(
     data,
-    v = cv_folds_variance,
+    v = cv_variance_folds,
     strata = tidyselect::all_of(group_indicator_name)
   )
   train_test_folds <- lapply(

@@ -11,7 +11,7 @@
 #' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
 #' model on the historical data `data_hist`. Default models the response (assumed same as in
 #' `formula`) using all columns in the `data_hist` data
-#' @param cv_folds_prog a `numeric` with the number of cross-validation folds used when fitting and
+#' @param cv_prog_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
 #'
 #' @details
@@ -75,11 +75,11 @@ rctglm_with_prognosticscore <- function(
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     cv_variance = TRUE,
-    cv_folds_variance = 5,
+    cv_variance_folds = 5,
     ...,
     data_hist,
     prog_formula = NULL,
-    cv_folds_prog = 5,
+    cv_prog_folds = 5,
     learners = default_learners(),
     verbose = options::opt("verbose")) {
 
@@ -114,19 +114,19 @@ rctglm_with_prognosticscore <- function(
 
   lrnr_fit <- fit_best_learner(formula = prog_formula,
                                data = data_hist,
-                               cv_folds = cv_folds_prog,
+                               cv_folds = cv_prog_folds,
                                learners = learners,
                                verbose = verbose)
 
   lrnr_pred <- predict(lrnr_fit, data) %>%
     dplyr::pull(.data$.pred)
   data %<>%
-    dplyr::mutate(prog = lrnr_pred)
+    dplyr::mutate(link_prog = family$linkfun(lrnr_pred))
 
   if (verbose >= 2)
     cli::cli_alert_info("Investigate trained learners and fitted model in {.var prognostic_info} list element")
 
-  formula_with_prognosticscore <- paste0(formula_to_str(formula), " + prog")
+  formula_with_prognosticscore <- paste0(formula_to_str(formula), " + link_prog")
 
   rctglm_with_prognosticscore <- rctglm(
     formula = formula_with_prognosticscore,
@@ -146,7 +146,7 @@ rctglm_with_prognosticscore <- function(
       formula = prog_formula,
       model_fit = lrnr_fit,
       learners = learners,
-      cv_folds = cv_folds_prog,
+      cv_folds = cv_prog_folds,
       data = data_hist
     ))
 

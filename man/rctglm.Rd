@@ -15,7 +15,7 @@ rctglm(
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   cv_variance = TRUE,
-  cv_folds_variance = 5,
+  cv_variance_folds = 5,
   verbose = options::opt("verbose"),
   ...
 )
@@ -59,7 +59,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{cv_variance}{a \code{logical} determining whether to estimate the variance
 using cross-validation (see details of \link{rctglm}).}
 
-\item{cv_folds_variance}{a \code{numeric} with the number of folds to use for cross
+\item{cv_variance_folds}{a \code{numeric} with the number of folds to use for cross
 validation if \code{cv_variance} is \code{TRUE}.}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
@@ -107,7 +107,7 @@ is 0 and 1, respectively. Taking means of these predictions produce the \emph{co
 The variance of the estimand is found by taking the variance of the influence function of the estimand.
 If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for each observation (which are
 used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
-using cross validation with number of folds specified by \code{cv_folds}. The cross validation splits
+using cross validation with number of folds specified by \code{cv_variance_folds}. The cross validation splits
 are performed using stratified sampling with \code{group_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
 
 This method of inference using plug-in estimation and influence functions for the variance produces a

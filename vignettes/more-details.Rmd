@@ -86,6 +86,12 @@ nonsense_estimand <- rctglm(
 nonsense_estimand
 ```
 
+### Variance estimation using cross validation
+
+The variance is estimated as the variance of the influence function of the marginal effect. During the calculation of this function, counterfactual prediction are made for all observations, using a GLM to predict their outcome in case they were in group 0 and 1, respectively. 
+
+`cv_variance` is an argument in `rctglm` and `rctglm_with_prognosticscore` that enables obtaining these counterfactual predictions as out-of-sample (OOS) prediction by using cross validation. Using cross validation for the variance estimation is the default behavior in the package.
+
 ### Prognostic covariate adjustment
 
 The `rctglm_with_prognosticscore()` uses the function `fit_best_learner()` to fit a prognostic model to the historical data, `data_hist`. Thereafter, the model is used to predict prognostic scores for all observations in `data` before using these scores as a covariate when performing plug-in etimation in a GLM using `rctglm`.

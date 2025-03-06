@@ -60,4 +60,28 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       verbose = 0)
   })
   expect_snapshot(ate_wo_cvvariance)
+
+  dat_treat_pois <- glm_data(
+    b0+b1*abs(sin(W1))+b2*A,
+    W1 = W1,
+    A = rbinom (n, 1, .5),
+    family = poisson()
+  )
+  dat_notreat_pois <- glm_data(
+    b0+b1*abs(sin(W1)),
+    W1 = W1,
+    family = poisson()
+  )
+
+  ate_pois <- withr::with_seed(42, {
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      group_indicator = A,
+      data = dat_treat_pois,
+      family = poisson(),
+      estimand_fun = "rate_ratio",
+      data_hist = dat_notreat_pois,
+      verbose = 0)
+  })
+  expect_snapshot(ate_pois)
 })
