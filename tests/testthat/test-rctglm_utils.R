@@ -106,3 +106,44 @@ test_that("`default_estimand_funs` error when giving non-legal default", {
   expect_error(default_estimand_funs("test"),
                "should be one of")
 })
+
+# oos_fitted.values_counterfactual
+test_that("`oos_fitted.values_counterfactual` snapshot test", {
+  dat <- data.frame(
+    Y = 1:10,
+    X = 1:10,
+    A = c(rep(0, 5), rep(1, 5)
+    )
+  )
+
+  args_glm <- list(
+    formula = formula(Y ~ X + A)
+  )
+
+  oos <- oos_fitted.values_counterfactual(
+    data = dat,
+    group_indicator_name = "A",
+    full_model.args_glm = args_glm
+  )
+  expect_named(oos, c("psi0", "psi1", "rowname"))
+  expect_s3_class(oos, "data.frame")
+  expect_snapshot(oos)
+})
+
+# extract_train_test
+test_that("`extract_train_test` returns list of train and test data", {
+  dat <- data.frame(
+    Y = 1:10,
+    X = 1:10,
+    A = c(rep(0, 5), rep(1, 5)
+    )
+  )
+
+  withr::local_seed(42)
+  folds <- rsample::vfold_cv(dat)
+  single_fold <- folds$splits[[1]]
+  list_of_train_test <- extract_train_test(single_fold)
+  expect_type(list_of_train_test, "list")
+  expect_named(list_of_train_test, c("train", "test"))
+  expect_snapshot(list_of_train_test)
+})

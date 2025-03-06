@@ -107,7 +107,8 @@ is 0 and 1, respectively. Taking means of these predictions produce the \emph{co
 The variance of the estimand is found by taking the variance of the influence function of the estimand.
 If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for each observation (which are
 used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
-using cross validation with number of folds specified by \code{cv_folds}.
+using cross validation with number of folds specified by \code{cv_folds}. The cross validation splits
+are performed using stratified sampling with \code{group_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
 
 This method of inference using plug-in estimation and influence functions for the variance produces a
 causal estimate of the estimand, as stated by articles XXXX.
