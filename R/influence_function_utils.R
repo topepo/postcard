@@ -56,12 +56,12 @@ if_counterfactual_mean_glm <- function(response_variable,
                                        group_indicator,
                                        counterfactual_pred,
                                        group_allocation_prob = 1/2
-                                       ) {
+) {
   counterfactual_mean <- mean(counterfactual_pred)
 
   group_indicator/group_allocation_prob *
-     (response_variable - counterfactual_pred) +
-     (counterfactual_pred - counterfactual_mean)
+    (response_variable - counterfactual_pred) +
+    (counterfactual_pred - counterfactual_mean)
 }
 
 #' Evaluate the influence function of a marginal effect in a GLM model
@@ -107,10 +107,14 @@ if_marginaleffect <- function(response_variable,
   counterfactual_mean0 <- mean(counterfactual_pred0)
   counterfactual_mean1 <- mean(counterfactual_pred1)
 
-  if_estimand <- estimand_fun_deriv1(counterfactual_mean0,
-                                     counterfactual_mean1) * counterfactual_mean_IF1 +
-    estimand_fun_deriv0(counterfactual_mean0,
-                        counterfactual_mean1) * counterfactual_mean_IF0
+  if_estimand <- estimand_fun_deriv1(
+    psi1 = counterfactual_mean1,
+    psi0 = counterfactual_mean0
+  ) * counterfactual_mean_IF1 +
+    estimand_fun_deriv0(
+      psi1 = counterfactual_mean1,
+      psi0 = counterfactual_mean0
+    ) * counterfactual_mean_IF0
 
   return(if_estimand)
 }
