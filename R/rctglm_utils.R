@@ -79,7 +79,7 @@ oos_fitted.values_counterfactual <- function(
       group_indicator_name = group_indicator_name,
       newdata = x$test
     ) %>%
-      dplyr::mutate(rowname = x$test$rowname)
+      dplyr::mutate(rowname = as.numeric(x$test$rowname))
     return(preds)
   }) %>%
     dplyr::bind_rows()
@@ -87,7 +87,7 @@ oos_fitted.values_counterfactual <- function(
   # Added the rowname before, and sorting now to "collect" the out-of-sample
   # predictions in the same order as data was originally
   out <- out %>%
-    dplyr::arrange(as.numeric(.data$rowname))
+    dplyr::arrange(.data$rowname)
 
   return(out)
 }
