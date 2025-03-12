@@ -8,20 +8,85 @@ test_that("`rctglm` snapshot tests", {
     family = gaussian()
   )
 
-  # Fit the model
-  ate_wo_cv <- rctglm(formula = Y ~ .,
-                group_indicator = A,
-                data = dat_gaus,
-                family = gaussian,
-                cv_variance = FALSE)
   ate_with_cv <- rctglm(formula = Y ~ .,
+                        group_indicator = A,
+                        data = dat_gaus,
+                        family = gaussian)
+  expect_s3_class(ate_with_cv, "rctglm")
+  expect_snapshot(estimand(ate_with_cv))
+
+  ate_wo_cv <- rctglm(formula = Y ~ .,
                       group_indicator = A,
                       data = dat_gaus,
-                      family = gaussian)
-  expect_s3_class(ate_wo_cv, "rctglm")
+                      family = gaussian,
+                      cv_variance = FALSE)
   expect_snapshot(estimand(ate_wo_cv))
-  expect_snapshot(estimand(ate_with_cv))
-  expect_equal(estimand(ate_wo_cv)$Estimate, estimand(ate_with_cv)$Estimate)
+})
+
+test_that("`cv_variance` produces same point estimates but different SE estimates", {
+  withr::local_seed(42)
+  n <- 100
+  dat_gaus <- glm_data(
+    1+1.5*X1+2*A,
+    X1 = rnorm(n),
+    A = rbinom(n, 1, .5),
+    family = gaussian()
+  )
+
+  ate_with_cv <- rctglm(formula = Y ~ .,
+                        group_indicator = A,
+                        data = dat_gaus,
+                        family = gaussian,
+                        cv_variance = TRUE)
+  ate_wo_cv <- rctglm(formula = Y ~ .,
+                      group_indicator = A,
+                      data = dat_gaus,
+                      family = gaussian,
+                      cv_variance = FALSE)
+  expect_equal(
+    estimand(ate_wo_cv)$Estimate,
+    estimand(ate_with_cv)$Estimate
+  )
+  expect_failure(
+    expect_identical(
+      estimand(ate_wo_cv)$`Std. Error`,
+      estimand(ate_with_cv)$`Std. Error`
+    )
+  )
+})
+
+test_that("Different `cv_variance_folds` produces same estimate but different estimated SE", {
+  withr::local_seed(42)
+  n <- 100
+  dat_gaus <- glm_data(
+    1+1.5*X1+2*A,
+    X1 = rnorm(n),
+    A = rbinom(n, 1, .5),
+    family = gaussian()
+  )
+
+  ate_wo_cv <- rctglm(formula = Y ~ .,
+                      group_indicator = A,
+                      data = dat_gaus,
+                      family = gaussian,
+                      cv_variance = TRUE,
+                      cv_variance_folds = 2)
+  ate_wo_cv_difffolds <- rctglm(formula = Y ~ .,
+                                group_indicator = A,
+                                data = dat_gaus,
+                                family = gaussian,
+                                cv_variance = TRUE,
+                                cv_variance_folds = 10)
+  expect_equal(
+    estimand(ate_wo_cv)$Estimate,
+    estimand(ate_wo_cv_difffolds)$Estimate
+  )
+  expect_failure(
+    expect_identical(
+      estimand(ate_wo_cv)$`Std. Error`,
+      estimand(ate_wo_cv_difffolds)$`Std. Error`
+    )
+  )
 })
 
 test_that("`rctglm` fails when `group_indicator` is non-binary", {
