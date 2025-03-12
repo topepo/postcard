@@ -181,8 +181,8 @@ var_update_rho_R2 <- function(var, rho, R2) {
 
 #' Title
 #'
-#' @param data
-#' @param response
+#' @param data the data used to estimate the variance bound
+#' @param response the response variable in the data for which
 #' @param ...
 #' @param inflation
 #' @param deflation
@@ -197,19 +197,31 @@ var_update_rho_R2 <- function(var, rho, R2) {
 #' @export
 #'
 #' @examples
-variance_bound_gs <- function(data, response = Y, ..., inflation = 1.25, deflation = 1) {
+variance_bound_gs <- function(data, response_name, ..., inflation = 1.25, deflation = 1) {
   response_vec <- data %>%
-    dplyr::pull({{response_name}})
+    dplyr::pull(response_name)
   var_Y <- response_vec %>%
     var()
   var_Y_inf <- var_Y * inflation
 
-  Sigma_X.I <- data %>%
-    dplyr::select(...) %>%
+  browser()
+  covs <- rlang::enquos(...)
+  lapply(covs, rlang::as_name)
+  no_covs_specified <- length(covs) == 0
+  if (no_covs_specified)
+    data_sel <- data
+  else
+    data_sel <- data %>%
+    dplyr::select(...)
+
+  data_covs <- data_sel %>%
+    dplyr::select(-tidyselect::any_of(response_name))
+
+  Sigma_X.I <- data_covs %>%
     cov() %>%
     chol() %>%
     chol2inv()
-  sigma_XY <- cov(data %>% dplyr::select(adjustment_cov), response)
+  sigma_XY <- cov(data_covs, response_vec)
 
   R2 <- as.numeric((t(sigma_XY) %*% Sigma_X.I %*% sigma_XY) / var_Y_inf)
   R2_def <- R2 * deflation
