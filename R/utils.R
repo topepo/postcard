@@ -14,6 +14,16 @@ deparse_fun_body <- function(fun) {
 
 #' Transform character or family function to a call
 check_formula <- function(formula) {
+  tryCatch(
+    formula,
+    error = function(e) cli::cli_abort(
+      c(
+        "{.arg formula} was not of class `formula` or could not be coerced to one.",
+        i = "This usually means you did not include a response followed by a `~`.",
+        i = "Did you mean `Y ~ `formula``?"
+      )
+    )
+  )
   if (is.character(formula)) {
     formula <- formula(formula)
   }
@@ -26,6 +36,10 @@ check_formula <- function(formula) {
 
 formula_to_str <- function(formula) {
   deparse(formula)
+}
+
+formula_to_str2 <- function(formula) {
+  rlang::as_label(rlang::enquo(formula))
 }
 
 # Extract response from formula to

@@ -48,20 +48,21 @@ glm_data <- function(formula,
                      ...,
                      family = gaussian(),
                      family_args = list(sd = 1)) {
-  family = check_family(family)
+  formula <- check_formula(formula)
+  family <- check_family(family)
 
-  data_list <- list(...)
-  if (length(data_list) == 0) cli::cli_abort("You need to specify columns to generate data from")
+  covs <- list(...)
+  if (length(covs) == 0) cli::cli_abort("You need to specify columns to generate data from")
   # if (length(data_list) == 0 && is.null(formula)) {
   #   data_list <- list(A = rbinom(10, size = 1, prob = .5),
   #                     X1 = rnorm(10))
   #   formula <- expression(A + X1)
   # }
-  data <- as.data.frame(data_list)
-  n_obs <- nrow(data)
+  covs_data <- as.data.frame(covs)
+  n_obs <- nrow(covs_data)
 
   cols_env <- rlang::new_environment(
-    data = data,
+    data = covs_data,
     parent = parent.frame()
   )
   rhs_of_formula <- formula[[3]]
@@ -72,49 +73,11 @@ glm_data <- function(formula,
                          mu = mu,
                          family = family),
                     family_args)
-  y <- do.call(generate_from_family, args_to_rfun)
+  Y <- do.call(generate_from_family, args_to_rfun)
 
   response_name <- get_response_from_formula(formula)
-  out <- data %>%
-    dplyr::mutate("{response_name}" := y,
-                  .before = dplyr::everything())
-
-  return(out)
-}
-
-glm_data_old <- function(formula_eta,
-                         ...,
-                         family = gaussian(),
-                         family_args = list(sd = 1),
-                         response_name = "Y") {
-  family = check_family(family)
-
-  data_list <- list(...)
-  if (length(data_list) == 0) cli::cli_abort("You need to specify columns to generate data from")
-  # if (length(data_list) == 0 && is.null(formula_eta)) {
-  #   data_list <- list(A = rbinom(10, size = 1, prob = .5),
-  #                     X1 = rnorm(10))
-  #   formula_eta <- expression(A + X1)
-  # }
-  data <- as.data.frame(data_list)
-  n <- nrow(data)
-
-  cols_env <- rlang::new_environment(data)
-  linear_predictor <- withr::with_environment(
-    env = cols_env,
-    code = eval(formula_eta)
-  )
-  mu <- family$linkinv(linear_predictor)
-
-
-  args_to_rfun <- c(list(n = n,
-                         mu = mu,
-                         family = family),
-                    family_args)
-  y <- do.call(generate_from_family, args_to_rfun)
-
-  out <- data %>%
-    dplyr::mutate("{response_name}" := y,
+  out <- covs_data %>%
+    dplyr::mutate("{response_name}" := Y,
                   .before = dplyr::everything())
 
   return(out)

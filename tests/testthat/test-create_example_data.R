@@ -16,12 +16,12 @@ test_that("Response is created as intended", {
 })
 
 test_that("Coefficients can be defined variables outside the formula", {
-  withr::with_environment(rlang::new_environment(data = list(b0 = 1, b1 = 2)), {
-    data_extvars <- glm_data(
-      Y ~ b0+b1*x1,
-      x1 = 1:2,
-      family_args = list(sd = 0))
-  })
+  b0 <- 1
+  b1 <- 2
+  data_extvars <- glm_data(
+    Y ~ b0+b1*x1,
+    x1 = 1:2,
+    family_args = list(sd = 0))
   data_reg <- glm_data(
     Y ~ 1+2*x1,
     x1 = 1:2,
@@ -117,4 +117,12 @@ test_that("Error occurs in `check_family` when family is not valid", {
     },
     regexp = "'family' not recognized")
   })
+})
+
+test_that("Error occurs when response and `~` is missing", {
+  expect_error({
+    glm_data(1+2*x1,
+             x1 = rnorm(10))
+  },
+  regexp = "was not of class")
 })

@@ -4,7 +4,7 @@
       estimand(ate_with_cv)
     Output
         Estimate Std. Error
-      1 1.762089  0.1932432
+      1 1.762089  0.1981473
 
 ---
 

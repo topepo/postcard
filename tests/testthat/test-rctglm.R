@@ -14,13 +14,11 @@ test_that("`rctglm` snapshot tests", {
     family = poisson()
   )
 
-  ate_with_cv <- withr::with_seed(42, {
-    rctglm(formula = Y ~ .,
+  ate_with_cv <- rctglm(formula = Y ~ .,
                         group_indicator = A,
                         data = dat_gaus,
                         family = gaussian,
                         cv_variance = TRUE)
-  })
   expect_s3_class(ate_with_cv, "rctglm")
   expect_snapshot(estimand(ate_with_cv))
 

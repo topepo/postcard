@@ -142,6 +142,7 @@ rctglm <- function(formula,
   group_indicator <- rlang::enquo(group_indicator)
   args <- as.list(environment())
   cal <- match.call()
+  formula <- check_formula(formula)
 
   ind_expr <- rlang::quo_get_expr(group_indicator)
   called_within_prognosticscore <- ind_expr == "group_indicator"
