@@ -4,20 +4,15 @@
 \alias{glm_data}
 \title{Generate data simulated from a GLM}
 \usage{
-glm_data(
-  formula_eta,
-  ...,
-  family = gaussian(),
-  family_args = list(sd = 1),
-  response_name = "Y"
-)
+glm_data(formula, ..., family = gaussian(), family_args = list(sd = 1))
 }
 \arguments{
-\item{formula_eta}{an \code{expression} specifying how
-to generate the mean of the response (together with the inverse link from \code{family})}
+\item{formula}{an object of class "formula" (or one that can be coerced to that class):
+a symbolic description of the model to be fitted. The details of model specification are
+given under ‘Details’ in the \link{glm} documentation.}
 
 \item{...}{a \code{data.frame} with columns corresponding to variables used
-in \code{formula_eta}, a named \code{list} of those variables, or individually provided
+in \code{formula}, a named \code{list} of those variables, or individually provided
 named arguments of variables
 from}
 
@@ -26,9 +21,7 @@ string naming a family function, a family \code{function} or the result of
 a \code{call} to a family function}
 
 \item{family_args}{a named \code{list} with values of arguments passed to
-family relevant r<family_name> function for simulating the data}
-
-\item{response_name}{a \code{character} giving the name of the simulated response}
+family relevant \verb{r<family_name>} function for simulating the data}
 }
 \value{
 a \code{data.frame}
@@ -42,22 +35,23 @@ to the chosen family.
 }
 \examples{
 # Generate a gaussian response from a single covariate
-glm_data(1+2*x1,
+glm_data(Y ~ 1+2*x1,
                 x1 = rnorm(10))
 
-# Generate a gaussian response from a single covariate with
-# non-linear effects
-glm_data(1+2*abs(sin(x1)),
-                x1 = runif(10, min = -2, max = 2))
+# Generate a gaussian response from a single covariate with non-linear
+# effects. Specify that the response should have standard deviation sqrt(3)
+glm_data(Y ~ 1+2*abs(sin(x1)),
+                x1 = runif(10, min = -2, max = 2),
+                family_args = list(sd = sqrt(3)))
 
 # Generate a negative binomial response
-glm_data(1+2*x1-x2,
+glm_data(Y ~ 1+2*x1-x2,
                 x1 = rnorm(10),
                 x2 = rgamma(10, shape = 2),
                 family = MASS::negative.binomial(2))
 
 # Provide variables as a list/data.frame
-glm_data(1+2*x1-x2,
+glm_data(resp ~ 1+2*x1-x2,
                 data.frame(
                   x1 = rnorm(10),
                   x2 = rgamma(10, shape = 2)

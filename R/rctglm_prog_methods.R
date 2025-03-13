@@ -19,13 +19,13 @@
 #' exposure_prob <- .5
 #'
 #' dat_treat <- glm_data(
-#'   b0+b1*abs(sin(W1))+b2*A,
+#'   Y ~ b0+b1*abs(sin(W1))+b2*A,
 #'   W1 = W1,
 #'   A = rbinom(n, 1, exposure_prob)
 #' )
 #'
 #' dat_notreat <- glm_data(
-#'   b0+b1*abs(sin(W1)),
+#'   Y ~ b0+b1*abs(sin(W1)),
 #'   W1 = W1
 #' )
 #'

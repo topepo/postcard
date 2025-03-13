@@ -57,8 +57,8 @@
           estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
           verbose = 0)
       
-      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.609
-      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 64.14
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 58.48
       Estimand function r: psi1/psi0
       Estimand (r(psi_1, psi_0)) estimate (SE): 7.45 (0.4797)
 
@@ -75,8 +75,8 @@
           estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
           verbose = 0)
       
-      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.478
-      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 65.41
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 57.7
       Estimand function r: psi1/psi0
       Estimand (r(psi_1, psi_0)) estimate (SE): 7.715 (0.5098)
 
