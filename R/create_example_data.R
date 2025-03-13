@@ -60,15 +60,12 @@ glm_data <- function(formula,
   data <- as.data.frame(data_list)
   n_obs <- nrow(data)
 
-  rhs_of_formula <- get_explanatory_from_formula(formula)
   cols_env <- rlang::new_environment(
-    data = data
-    # , parent = parent.frame()
+    data = data,
+    parent = parent.frame()
   )
-  linear_predictor <- withr::with_environment(
-    env = cols_env,
-    code = eval(parse(text = rhs_of_formula))
-  )
+  rhs_of_formula <- formula[[3]]
+  linear_predictor <- eval(rhs_of_formula, envir = cols_env)
   mu <- family$linkinv(linear_predictor)
 
   args_to_rfun <- c(list(n = n_obs,
