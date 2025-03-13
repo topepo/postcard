@@ -204,3 +204,33 @@ test_that("`estimand_fun_derivX` can be left as NULL or specified manually", {
   })
   expect_equal(ate_auto$estimand, ate_man$estimand)
 })
+
+test_that("`rctglm` provides error if `exposure_prob` is not a numeric between 0 and 1", {
+  withr::local_seed(42)
+  n <- 100
+  exposure_prob <- 0.5
+
+    dat_gaus <- glm_data(
+      1+1.5*X1+2*A,
+      X1 = rnorm(n),
+      A = rbinom(n, 1, exposure_prob),
+      family = gaussian()
+    )
+
+    expect_error(
+      rctglm(formula = Y ~ .,
+           exposure_indicator = A,
+           exposure_prob = "1/2",
+           data = dat_gaus,
+           family = gaussian,
+           verbose = 0)
+      )
+    expect_error(
+      rctglm(formula = Y ~ .,
+             exposure_indicator = A,
+             exposure_prob = 1.2,
+             data = dat_gaus,
+             family = gaussian,
+             verbose = 0)
+    )
+})

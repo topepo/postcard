@@ -161,7 +161,10 @@ rctglm <- function(formula,
   group_vals_unique <- unique(group_vals)
   if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var exposure_indicator} column can only have 1's and 0's")
 
-  checkmate::assert_numeric(exposure_prob)
+  exposure_prob_is_num <- inherits(exposure_prob, "numeric")
+  exposure_in_range <- exposure_prob > 0 & exposure_prob < 1
+  if (!exposure_prob_is_num | !exposure_in_range)
+    cli::cli_abort("`exposure_prob` needs to be a probability, i.e. a numeric between 0 and 1")
   # if (is.null(exposure_prob)) {
   #   exposure_prob <- mean(group_vals)
   #   if (verbose >= 1)
