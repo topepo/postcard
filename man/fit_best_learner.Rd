@@ -42,13 +42,13 @@ Find the best learner in terms of RMSE among specified learners using cross vali
 # Generate some synthetic 2-armed RCT data along with historical controls
 n <- 100
 dat_rct <- glm_data(
-  1+2*x1+3*a,
+  Y ~ 1+2*x1+3*a,
   x1 = rnorm(n, 2),
   a = rbinom (n, 1, .5),
   family = gaussian()
 )
 dat_hist <- glm_data(
-  1+2*x1,
+  Y ~ 1+2*x1,
   x1 = rnorm(n, 2),
   family = gaussian()
 )

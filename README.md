@@ -51,7 +51,7 @@ b2 <- 2
 
 # Simulate data with a non-linear effect
 dat_treat <- glm_data(
-  b0+b1*sin(W)^2+b2*A,
+  Y ~ b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
   A = rbinom(n, 1, .5),
   family = gaussian() # Default value
@@ -104,7 +104,7 @@ ate
 #> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.776
 #> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.867
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09225)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09236)
 ```
 
 ### Structure of `rctglm` and methods for extracting entities
@@ -133,7 +133,7 @@ Thus, methods available are:
 # "estimate" also available as alternative to just "est"
 est(ate)
 #>   Estimate Std. Error
-#> 1 2.091095 0.09224543
+#> 1 2.091095 0.09235538
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
@@ -160,7 +160,7 @@ well:
 
 ``` r
 dat_notreat <- glm_data(
-  b0+b1*sin(W)^2,
+  Y ~ b0+b1*sin(W)^2,
   W = runif(n, min = -2, max = 2),
   family = gaussian # Default value
 )
@@ -198,10 +198,10 @@ ate_prog
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
 #>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
 #> 
-#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.828
-#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.819
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.824
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.822
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.992 (0.06445)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.999 (0.0639)
 ```
 
 It’s evident that in this case where there is a non-linear relationship

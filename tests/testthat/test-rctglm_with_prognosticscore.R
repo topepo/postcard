@@ -1,21 +1,24 @@
 test_that("`rctglm_with_prognosticscore` snapshot tests", {
   withr::local_seed(42)
-  # Generate some data
-  n <- 100
-  b0 <- 1
-  b1 <- 1.5
-  b2 <- 2
-  W1 <- runif(n, min = -2, max = 2)
 
-  dat_treat <- glm_data(
-    b0+b1*abs(sin(W1))+b2*A,
-    W1 = W1,
-    A = rbinom (n, 1, .5)
-  )
-  dat_notreat <- glm_data(
-    b0+b1*abs(sin(W1)),
-    W1 = W1
-  )
+  withr::with_environment(
+    rlang::new_environment(
+      data = list(b0 = 1,
+                  b1 = 1.5,
+                  b2 = 2,
+                  W1 = runif(100, min = -2, max = 2),
+                  A = rbinom (100, 1, .5))),
+    {
+      dat_treat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1))+b2*A,
+        W1 = W1,
+        A = A
+      )
+      dat_notreat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1)),
+        W1 = W1
+      )
+    })
 
   elapsed_time_pattern <- "\\d+\\.?\\d*m?s"
   expect_snapshot({
@@ -50,17 +53,26 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   },
   transform = function(x) gsub(elapsed_time_pattern, "", x))
 
-  dat_treat_pois <- glm_data(
-    b0+b1*abs(sin(W1))+b2*A,
-    W1 = W1,
-    A = rbinom (n, 1, .5),
-    family = poisson()
-  )
-  dat_notreat_pois <- glm_data(
-    b0+b1*abs(sin(W1)),
-    W1 = W1,
-    family = poisson()
-  )
+  withr::with_environment(
+    rlang::new_environment(
+      data = list(b0 = 1,
+                  b1 = 1.5,
+                  b2 = 2,
+                  W1 = runif(100, min = -2, max = 2),
+                  A = rbinom (100, 1, .5))),
+    {
+      dat_treat_pois <- glm_data(
+        Y ~ b0+b1*abs(sin(W1))+b2*A,
+        W1 = W1,
+        A = A,
+        family = poisson()
+      )
+      dat_notreat_pois <- glm_data(
+        Y ~ b0+b1*abs(sin(W1)),
+        W1 = W1,
+        family = poisson()
+      )
+    })
 
   rr_pois <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
@@ -89,45 +101,48 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
   withr::local_seed(42)
-  # Generate some data
-  n <- 100
-  b0 <- 1
-  b1 <- 1.5
-  b2 <- 2
-  W1 <- runif(n, min = -2, max = 2)
 
-  dat_treat <- glm_data(
-    b0+b1*abs(sin(W1))+b2*A,
-    W1 = W1,
-    A = rbinom (n, 1, .5)
-  )
-  dat_notreat <- glm_data(
-    b0+b1*abs(sin(W1)),
-    W1 = W1
-  )
+  withr::with_environment(
+    rlang::new_environment(
+      data = list(b0 = 1,
+                  b1 = 1.5,
+                  b2 = 2,
+                  W1 = runif(100, min = -2, max = 2),
+                  A = rbinom (100, 1, .5))),
+    {
+      dat_treat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1))+b2*A,
+        W1 = W1,
+        A = A
+      )
+      dat_notreat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1)),
+        W1 = W1
+      )
+    })
 
   ate_w_cvvariance <- withr::with_seed(42, {
-      rctglm_with_prognosticscore(
-        formula = Y ~ .,
-        group_indicator = A,
-        data = dat_treat,
-        family = gaussian(),
-        estimand_fun = "ate",
-        data_hist = dat_notreat,
-        cv_variance = TRUE,
-        verbose = 0)
-    })
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      group_indicator = A,
+      data = dat_treat,
+      family = gaussian(),
+      estimand_fun = "ate",
+      data_hist = dat_notreat,
+      cv_variance = TRUE,
+      verbose = 0)
+  })
   ate_wo_cvvariance <- withr::with_seed(42, {
-      rctglm_with_prognosticscore(
-        formula = Y ~ .,
-        group_indicator = A,
-        data = dat_treat,
-        family = gaussian(),
-        estimand_fun = "ate",
-        data_hist = dat_notreat,
-        cv_variance = FALSE,
-        verbose = 0)
-    })
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      group_indicator = A,
+      data = dat_treat,
+      family = gaussian(),
+      estimand_fun = "ate",
+      data_hist = dat_notreat,
+      cv_variance = FALSE,
+      verbose = 0)
+  })
 
   expect_equal(
     estimand(ate_wo_cvvariance)$Estimate,
@@ -143,34 +158,37 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
 
 test_that("`prog_formula` manual specification consistent with default behavior", {
   withr::local_seed(42)
-  # Generate some data
-  n <- 100
-  b0 <- 1
-  b1 <- 1.5
-  b2 <- 2
-  W1 <- runif(n, min = -2, max = 2)
 
-  dat_treat <- glm_data(
-    b0+b1*abs(sin(W1))+b2*A,
-    W1 = W1,
-    A = rbinom (n, 1, .5)
-  )
-  dat_notreat <- glm_data(
-    b0+b1*abs(sin(W1)),
-    W1 = W1
-  )
+  withr::with_environment(
+    rlang::new_environment(
+      data = list(b0 = 1,
+                  b1 = 1.5,
+                  b2 = 2,
+                  W1 = runif(100, min = -2, max = 2),
+                  A = rbinom (100, 1, .5))),
+    {
+      dat_treat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1))+b2*A,
+        W1 = W1,
+        A = A
+      )
+      dat_notreat <- glm_data(
+        Y ~ b0+b1*abs(sin(W1)),
+        W1 = W1
+      )
+    })
 
   # Note default behavior models response as all variables in data, in this case just W1
   ate_wo_prog_formula <- withr::with_seed(42, {
-      rctglm_with_prognosticscore(
-        formula = Y ~ .,
-        group_indicator = A,
-        data = dat_treat,
-        family = gaussian(),
-        estimand_fun = "ate",
-        data_hist = dat_notreat,
-        verbose = 2)
-    })
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      group_indicator = A,
+      data = dat_treat,
+      family = gaussian(),
+      estimand_fun = "ate",
+      data_hist = dat_notreat,
+      verbose = 2)
+  })
 
   ate_w_prog_formula <- withr::with_seed(42, {
     rctglm_with_prognosticscore(

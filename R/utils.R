@@ -28,10 +28,17 @@ formula_to_str <- function(formula) {
   deparse(formula)
 }
 
+# Extract right hand side of formula as string
+get_explanatory_from_formula <- function(formula) {
+  formula <- check_formula(formula)
+  formula <- formula_to_str(formula)
+  rhs_oftilde <- gsub(".*~\\s*", "", formula)
+  return(rhs_oftilde)
+}
+
 # Extract response from formula to
 get_response_from_formula <- function(formula) {
   formula <- check_formula(formula)
-
   formula <- formula_to_str(formula)
   lhs_oftilde <- gsub("\\s*~.*", "", formula)
   return(lhs_oftilde)
