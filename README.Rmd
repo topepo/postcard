@@ -76,7 +76,7 @@ Thus, we can estimate the ATE by simply writing the below:
 
 ```{r noprog-run}
 ate <- rctglm(formula = Y ~ A * W,
-              group_indicator = A,
+              exposure_indicator = A,
               data = dat_treat,
               family = "gaussian") # Default value
 ```
@@ -139,7 +139,7 @@ Thus, a simple call which estimates the average treatment effect, adjusting for 
 ```{r prog-run}
 ate_prog <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
-  group_indicator = A,
+  exposure_indicator = A,
   data = dat_treat,
   family = gaussian(link = "identity"), # Default value
   data_hist = dat_notreat)

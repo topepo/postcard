@@ -30,7 +30,7 @@
 #'
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
-#'   group_indicator = A,
+#'   exposure_indicator = A,
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",

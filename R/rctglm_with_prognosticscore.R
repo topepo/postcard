@@ -58,7 +58,7 @@
 #'
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
-#'   group_indicator = A,
+#'   exposure_indicator = A,
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
@@ -70,8 +70,8 @@ rctglm_with_prognosticscore <- function(
     formula,
     family,
     data,
-    group_indicator,
-    group_allocation_prob = NULL,
+    exposure_indicator,
+    exposure_prob = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     cv_variance = TRUE,
@@ -85,7 +85,7 @@ rctglm_with_prognosticscore <- function(
 
   call <- match.call()
 
-  group_indicator <- rlang::enquo(group_indicator)
+  exposure_indicator <- rlang::enquo(exposure_indicator)
   named_args <- as.list(environment())
   extra_glm_args <- list(...)
 
@@ -132,8 +132,8 @@ rctglm_with_prognosticscore <- function(
     formula = formula_with_prognosticscore,
     family = family,
     data = data,
-    group_indicator = group_indicator,
-    group_allocation_prob = group_allocation_prob,
+    exposure_indicator = exposure_indicator,
+    exposure_prob = exposure_prob,
     estimand_fun = estimand_fun,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1,

@@ -54,7 +54,7 @@ dat_binom <- glm_data(
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
-              group_indicator = A,
+              exposure_indicator = A,
               data = dat_binom,
               family = binomial,
               estimand_fun = "ate")

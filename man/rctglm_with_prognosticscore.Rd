@@ -8,8 +8,8 @@ rctglm_with_prognosticscore(
   formula,
   family,
   data,
-  group_indicator,
-  group_allocation_prob = NULL,
+  exposure_indicator,
+  exposure_prob = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -41,11 +41,12 @@ given under ‘Details’ in the \link{glm} documentation.}
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
+\item{exposure_indicator}{(name of) the \emph{binary} variable in \code{data} that
 identifies randomisation groups. The variable is required to be binary to
 make the "orientation" of the \code{estimand_fun} clear.}
 
-\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
+\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
+"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
@@ -135,7 +136,7 @@ dat_notreat <- glm_data(
 
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
-  group_indicator = A,
+  exposure_indicator = A,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",

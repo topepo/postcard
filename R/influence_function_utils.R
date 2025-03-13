@@ -5,7 +5,7 @@
 #' @param response_variable a `numeric vector` with the response variable in the model
 #' @param counterfactual_pred a `numeric vector` with predictions of the response variable for all
 #' observations a hypothetic scenario of all observations being in the same group defined by
-#' `group_indicator`. See more in details.
+#' `exposure_indicator`. See more in details.
 #'
 #' @details
 #' Assuming we have a response variable \eqn{Y}, design matrix \eqn{X} and link function \eqn{g}, a GLM
@@ -48,18 +48,18 @@
 #' pred0 <- predict(mod, type = "response", newdata = dat0)
 #' if_countmean0 <- if_counterfactual_mean_glm(
 #'   response_variable = dat0$Y,
-#'   group_indicator = dat0$A,
+#'   exposure_indicator = dat0$A,
 #'   counterfactual_pred = pred0)
 #'
 #' @noRd
 if_counterfactual_mean_glm <- function(response_variable,
-                                       group_indicator,
+                                       exposure_indicator,
                                        counterfactual_pred,
-                                       group_allocation_prob = 1/2
+                                       exposure_prob = 1/2
 ) {
   counterfactual_mean <- mean(counterfactual_pred)
 
-  group_indicator/group_allocation_prob *
+  exposure_indicator/exposure_prob *
     (response_variable - counterfactual_pred) +
     (counterfactual_pred - counterfactual_mean)
 }
@@ -84,23 +84,23 @@ if_counterfactual_mean_glm <- function(response_variable,
 #'
 #' @noRd
 if_marginaleffect <- function(response_variable,
-                              group_indicator,
+                              exposure_indicator,
                               counterfactual_pred0,
                               counterfactual_pred1,
-                              group_allocation_prob,
+                              exposure_prob,
                               estimand_fun_deriv0,
                               estimand_fun_deriv1) {
 
   counterfactual_mean_IF0 <- if_counterfactual_mean_glm(
     response_variable = response_variable,
-    group_indicator = 1 - group_indicator,
-    group_allocation_prob = 1 - group_allocation_prob,
+    exposure_indicator = 1 - exposure_indicator,
+    exposure_prob = 1 - exposure_prob,
     counterfactual_pred = counterfactual_pred0
   )
   counterfactual_mean_IF1 <- if_counterfactual_mean_glm(
     response_variable = response_variable,
-    group_indicator = group_indicator,
-    group_allocation_prob = group_allocation_prob,
+    exposure_indicator = exposure_indicator,
+    exposure_prob = exposure_prob,
     counterfactual_pred = counterfactual_pred1
   )
 
