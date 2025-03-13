@@ -44,11 +44,12 @@
 #' b1 <- 1.5
 #' b2 <- 2
 #' W1 <- runif(n, min = -2, max = 2)
+#' exposure_prob <- .5
 #'
 #' dat_treat <- glm_data(
 #'   Y ~ b0+b1*abs(sin(W1))+b2*A,
 #'   W1 = W1,
-#'   A = rbinom (n, 1, .5)
+#'   A = rbinom (n, 1, exposure_prob)
 #' )
 #'
 #' dat_notreat <- glm_data(
@@ -58,7 +59,8 @@
 #'
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
-#'   group_indicator = A,
+#'   exposure_indicator = A,
+#'   exposure_prob = exposure_prob,
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
@@ -70,12 +72,12 @@ rctglm_with_prognosticscore <- function(
     formula,
     family,
     data,
-    group_indicator,
-    group_allocation_prob = NULL,
+    exposure_indicator,
+    exposure_prob = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     cv_variance = TRUE,
-    cv_variance_folds = 5,
+    cv_variance_folds = 10,
     ...,
     data_hist,
     prog_formula = NULL,
@@ -85,7 +87,7 @@ rctglm_with_prognosticscore <- function(
 
   call <- match.call()
 
-  group_indicator <- rlang::enquo(group_indicator)
+  exposure_indicator <- rlang::enquo(exposure_indicator)
   named_args <- as.list(environment())
   extra_glm_args <- list(...)
 
@@ -132,8 +134,8 @@ rctglm_with_prognosticscore <- function(
     formula = formula_with_prognosticscore,
     family = family,
     data = data,
-    group_indicator = group_indicator,
-    group_allocation_prob = group_allocation_prob,
+    exposure_indicator = exposure_indicator,
+    exposure_prob = exposure_prob,
     estimand_fun = estimand_fun,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1,

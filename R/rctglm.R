@@ -11,12 +11,13 @@
 #' @param formula an object of class "formula" (or one that can be coerced to that class):
 #' a symbolic description of the model to be fitted. The details of model specification are
 #' given under ‘Details’ in the [glm] documentation.
-#' @param group_indicator (name of) the *binary* variable in `data` that
+#' @param exposure_indicator (name of) the *binary* variable in `data` that
 #' identifies randomisation groups. The variable is required to be binary to
 #' make the "orientation" of the `estimand_fun` clear.
-#' @param group_allocation_prob a `numeric` with the probabiliy of being assigned "group 1" (rather than group 0).
+#' @param exposure_prob a `numeric` with the probabiliy of being in
+#' "group 1" (rather than group 0) in groups defined by `exposure_indicator`.
 #' As a default, the ratio of 1's in data is used.
-#' @param estimand_fun a `function` with arguments `psi0` and `psi1` specifying
+#' @param estimand_fun a `function` with arguments `psi1` and `psi0` specifying
 #' the estimand. Alternative, specify "ate" or "rate_ratio" as a `character`
 #' to use one of the default estimand functions. See
 #' more details in the "Estimand" section of this documentation.
@@ -32,8 +33,8 @@
 #'
 #' @details
 #' The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
-#' `group_indicator` variable, allocated randomly with probability `group_allocation_prob`. A GLM is
-#' fit and then used to predict the response of all observations in the event that the `group_indicator`
+#' `exposure_indicator` variable, allocated randomly with probability `exposure_prob`. A GLM is
+#' fit and then used to predict the response of all observations in the event that the `exposure_indicator`
 #' is 0 and 1, respectively. Taking means of these predictions produce the *counterfactual means*
 #' `psi0` and `psi1`, and an estimand `r(psi0, psi1)` is calculated using any specified `estimand_fun`.
 #'
@@ -41,14 +42,14 @@
 #' If `cv_variance` is `TRUE`, then the counterfactual predictions for each observation (which are
 #' used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
 #' using cross validation with number of folds specified by `cv_variance_folds`. The cross validation splits
-#' are performed using stratified sampling with `group_indicator` as the `strata` argument in [rsample::vfold_cv].
+#' are performed using stratified sampling with `exposure_indicator` as the `strata` argument in [rsample::vfold_cv].
 #'
 #' This method of inference using plug-in estimation and influence functions for the variance produces a
 #' causal estimate of the estimand, as stated by articles XXXX.
 #'
 #' @section Estimands:
 #' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using
-#' a fitted GLM in the binary groups defined by `group_indicator`.
+#' a fitted GLM in the binary groups defined by `exposure_indicator`.
 #'
 #' Default estimand functions can be specified via `"ate"` (which uses the function
 #' `function(psi1, psi0) psi1-psi0`) and `"rate_ratio"` (which uses the function
@@ -85,16 +86,19 @@
 #' @examples
 #' # Generate some data to showcase example
 #' n <- 100
+#' exposure_prob <- .5
+#'
 #' dat_gaus <- glm_data(
 #'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
-#'   A = rbinom(n, 1, .5),
+#'   A = rbinom(n, 1, exposure_prob),
 #'   family = gaussian()
 #' )
 #'
 #' # Fit the model
 #' ate <- rctglm(formula = Y ~ .,
-#'               group_indicator = A,
+#'               exposure_indicator = A,
+#'               exposure_prob = exposure_prob,
 #'               data = dat_gaus,
 #'               family = gaussian)
 #'
@@ -105,62 +109,68 @@
 #' dat_binom <- glm_data(
 #'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
-#'   A = rbinom(n, 1, .5),
+#'   A = rbinom(n, 1, exposure_prob),
 #'   family = binomial()
 #' )
 #'
 #' rr <- rctglm(formula = Y ~ .,
-#'               group_indicator = A,
+#'               exposure_indicator = A,
+#'               exposure_prob = exposure_prob,
 #'               data = dat_binom,
 #'               family = binomial(),
 #'               estimand_fun = "rate_ratio")
 #'
 #' odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
 #' or <- rctglm(formula = Y ~ .,
-#'               group_indicator = A,
+#'               exposure_indicator = A,
+#'               exposure_prob = exposure_prob,
 #'               data = dat_binom,
 #'               family = binomial,
 #'               estimand_fun = odds_ratio)
 #'
 #'
 rctglm <- function(formula,
-                   group_indicator,
+                   exposure_indicator,
+                   exposure_prob,
                    family,
                    data,
-                   group_allocation_prob = NULL,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
                    cv_variance = TRUE,
-                   cv_variance_folds = 5,
+                   cv_variance_folds = 10,
                    verbose = options::opt("verbose"),
                    ...
 ) {
 
-  # TODO: Right now, estimand_fun needs to have arguments with 0 and 1 in them, and the group_indicator
+  # TODO: Right now, estimand_fun needs to have arguments with 0 and 1 in them, and the exposure_indicator
   # needs to take values 0 and 1. Generalise this to work for factors and be able to set reference level
 
-  group_indicator <- rlang::enquo(group_indicator)
+  exposure_indicator <- rlang::enquo(exposure_indicator)
   args <- as.list(environment())
   cal <- match.call()
   formula <- check_formula(formula)
 
-  ind_expr <- rlang::quo_get_expr(group_indicator)
-  called_within_prognosticscore <- ind_expr == "group_indicator"
+  ind_expr <- rlang::quo_get_expr(exposure_indicator)
+  called_within_prognosticscore <- ind_expr == "exposure_indicator"
   if (called_within_prognosticscore) {
-    group_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(group_indicator)))
+    exposure_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(exposure_indicator)))
   } else {
-    group_indicator_name <- as.character(ind_expr)
+    exposure_indicator_name <- as.character(ind_expr)
   }
 
-  group_vals <- dplyr::pull(data, tidyselect::all_of(group_indicator_name))
+  group_vals <- dplyr::pull(data, tidyselect::all_of(exposure_indicator_name))
   group_vals_unique <- unique(group_vals)
-  if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var group_indicator} column can only have 1's and 0's")
+  if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var exposure_indicator} column can only have 1's and 0's")
 
-  if (is.null(group_allocation_prob)) {
-    group_allocation_prob <- mean(group_vals)
-    if (verbose >= 1)
-      cli::cli_alert_info("Setting the group allocation probability {.var group_allocation_prob} as the mean of column {.var {group_indicator_name}} in data: {group_allocation_prob}")
-  }
+  exposure_prob_is_num <- inherits(exposure_prob, "numeric")
+  exposure_in_range <- exposure_prob > 0 & exposure_prob < 1
+  if (!exposure_prob_is_num | !exposure_in_range)
+    cli::cli_abort("`exposure_prob` needs to be a probability, i.e. a numeric between 0 and 1")
+  # if (is.null(exposure_prob)) {
+  #   exposure_prob <- mean(group_vals)
+  #   if (verbose >= 1)
+  #     cli::cli_alert_info("Setting the group allocation probability {.var exposure_prob} as the mean of column {.var {exposure_indicator_name}} in data: {exposure_prob}")
+  # }
 
   if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
 
@@ -188,18 +198,20 @@ rctglm <- function(formula,
   model <- do.call(glm, args = args_glm)
 
   response_var <- model$y
-  group_indicator_var <- data %>%
-    dplyr::pull(tidyselect::all_of(group_indicator_name))
+  exposure_indicator_var <- data %>%
+    dplyr::pull(tidyselect::all_of(exposure_indicator_name))
 
   full_model_fitted.values_counterfactual <- predict_counterfactual_means(
     model = model,
-    group_indicator_name = group_indicator_name
+    exposure_indicator_name = exposure_indicator_name
   )
   full_model_means_counterfactual <- colMeans(full_model_fitted.values_counterfactual)
+  full_model_means_counterfactual0 <- as.numeric(full_model_means_counterfactual["psi0"])
+  full_model_means_counterfactual1 <- as.numeric(full_model_means_counterfactual["psi1"])
 
   estimate_estimand <- estimand_fun(
-    as.numeric(full_model_means_counterfactual["psi1"]),
-    as.numeric(full_model_means_counterfactual["psi0"])
+    psi1 = full_model_means_counterfactual1,
+    psi0 = full_model_means_counterfactual0
   )
 
   # If cv_variance then use out-of-sample counterfactual predictions, otherwise
@@ -207,7 +219,7 @@ rctglm <- function(formula,
   preds_for_variance <- if (cv_variance) {
     oos_fitted.values_counterfactual(
       data = data,
-      group_indicator_name = group_indicator_name,
+      exposure_indicator_name = exposure_indicator_name,
       full_model.args_glm = args_glm,
       cv_variance_folds = cv_variance_folds
     )
@@ -217,10 +229,12 @@ rctglm <- function(formula,
 
   if_marginaleffect_val <- if_marginaleffect(
     response_variable = response_var,
-    group_indicator = group_indicator_var,
-    group_allocation_prob = group_allocation_prob,
+    exposure_indicator = exposure_indicator_var,
+    exposure_prob = exposure_prob,
     counterfactual_pred0 = preds_for_variance$psi0,
     counterfactual_pred1 = preds_for_variance$psi1,
+    counterfactual_mean0 = full_model_means_counterfactual0,
+    counterfactual_mean1 = full_model_means_counterfactual1,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1)
 

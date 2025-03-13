@@ -7,15 +7,15 @@ influence functions}
 \usage{
 rctglm(
   formula,
-  group_indicator,
+  exposure_indicator,
+  exposure_prob,
   family,
   data,
-  group_allocation_prob = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   cv_variance = TRUE,
-  cv_variance_folds = 5,
+  cv_variance_folds = 10,
   verbose = options::opt("verbose"),
   ...
 )
@@ -25,9 +25,13 @@ rctglm(
 a symbolic description of the model to be fitted. The details of model specification are
 given under ‘Details’ in the \link{glm} documentation.}
 
-\item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
+\item{exposure_indicator}{(name of) the \emph{binary} variable in \code{data} that
 identifies randomisation groups. The variable is required to be binary to
 make the "orientation" of the \code{estimand_fun} clear.}
+
+\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
+"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
+As a default, the ratio of 1's in data is used.}
 
 \item{family}{a description of the error distribution and link
     function to be used in the model.  For \code{glm} this can be a
@@ -42,10 +46,7 @@ make the "orientation" of the \code{estimand_fun} clear.}
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
-As a default, the ratio of 1's in data is used.}
-
-\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+\item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
@@ -99,8 +100,8 @@ covariates in randomisation groups.
 }
 \details{
 The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
-\code{group_indicator} variable, allocated randomly with probability \code{group_allocation_prob}. A GLM is
-fit and then used to predict the response of all observations in the event that the \code{group_indicator}
+\code{exposure_indicator} variable, allocated randomly with probability \code{exposure_prob}. A GLM is
+fit and then used to predict the response of all observations in the event that the \code{exposure_indicator}
 is 0 and 1, respectively. Taking means of these predictions produce the \emph{counterfactual means}
 \code{psi0} and \code{psi1}, and an estimand \code{r(psi0, psi1)} is calculated using any specified \code{estimand_fun}.
 
@@ -108,7 +109,7 @@ The variance of the estimand is found by taking the variance of the influence fu
 If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for each observation (which are
 used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
 using cross validation with number of folds specified by \code{cv_variance_folds}. The cross validation splits
-are performed using stratified sampling with \code{group_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
+are performed using stratified sampling with \code{exposure_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
 
 This method of inference using plug-in estimation and influence functions for the variance produces a
 causal estimate of the estimand, as stated by articles XXXX.
@@ -116,7 +117,7 @@ causal estimate of the estimand, as stated by articles XXXX.
 \section{Estimands}{
 
 As noted in the description, \code{psi0} and \code{psi1} are the counterfactual means found by prediction using
-a fitted GLM in the binary groups defined by \code{group_indicator}.
+a fitted GLM in the binary groups defined by \code{exposure_indicator}.
 
 Default estimand functions can be specified via \code{"ate"} (which uses the function
 \code{function(psi1, psi0) psi1-psi0}) and \code{"rate_ratio"} (which uses the function
@@ -132,16 +133,19 @@ the \code{estimand_fun}.
 \examples{
 # Generate some data to showcase example
 n <- 100
+exposure_prob <- .5
+
 dat_gaus <- glm_data(
   Y ~ 1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, exposure_prob),
   family = gaussian()
 )
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
-              group_indicator = A,
+              exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_gaus,
               family = gaussian)
 
@@ -152,19 +156,21 @@ estimand(ate)
 dat_binom <- glm_data(
   Y ~ 1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, exposure_prob),
   family = binomial()
 )
 
 rr <- rctglm(formula = Y ~ .,
-              group_indicator = A,
+              exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_binom,
               family = binomial(),
               estimand_fun = "rate_ratio")
 
 odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
 or <- rctglm(formula = Y ~ .,
-              group_indicator = A,
+              exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_binom,
               family = binomial,
               estimand_fun = odds_ratio)
