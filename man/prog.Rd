@@ -27,11 +27,12 @@ b0 <- 1
 b1 <- 1.5
 b2 <- 2
 W1 <- runif(n, min = -2, max = 2)
+exposure_prob <- .5
 
 dat_treat <- glm_data(
   b0+b1*abs(sin(W1))+b2*A,
   W1 = W1,
-  A = rbinom (n, 1, .5)
+  A = rbinom(n, 1, exposure_prob)
 )
 
 dat_notreat <- glm_data(
@@ -42,6 +43,7 @@ dat_notreat <- glm_data(
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
+  exposure_prob = exposure_prob,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",

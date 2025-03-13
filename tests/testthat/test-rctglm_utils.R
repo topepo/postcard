@@ -10,18 +10,18 @@ test_that("`predict_counterfactual_mean` predicts correctly", {
   mod <- glm(Y ~ X + A, data = dat)
   pred0 <- predict_counterfactual_mean(
     model = mod,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     group_val = 0)
 
   pred1 <- predict_counterfactual_mean(
     model = mod,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     group_val = 1)
 
   expect_equal(pred0, pred1 - treat_diff)
 })
 
-test_that("`predict_counterfactual_mean` gives error when `group_indicator_name` not in model or data", {
+test_that("`predict_counterfactual_mean` gives error when `exposure_indicator_name` not in model or data", {
   dat <- data.frame(
     Y = 1:10,
     X = 1:10,
@@ -33,7 +33,7 @@ test_that("`predict_counterfactual_mean` gives error when `group_indicator_name`
   expect_error(
     predict_counterfactual_mean(
       model = mod,
-      group_indicator_name = "test",
+      exposure_indicator_name = "test",
       group_val = 0),
     regexp = "is not in"
   )
@@ -50,11 +50,11 @@ test_that("`predict_counterfactual_mean` works with and without data specificati
 
   pred_nodatspec <- predict_counterfactual_mean(
     model = mod,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     group_val = 0)
   pred_datspec <- predict_counterfactual_mean(
     model = mod,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     group_val = 0,
     data = dat_fit)
 
@@ -66,7 +66,7 @@ test_that("`predict_counterfactual_mean` works with and without data specificati
   )
   pred_newdata <- predict_counterfactual_mean(
     model = mod,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     group_val = 0,
     data = dat_pred)
 
@@ -85,7 +85,7 @@ test_that("`predict_counterfactual_mean` predicts correctly", {
   mod <- glm(Y ~ X + A, data = dat)
   preds <- predict_counterfactual_means(
     model = mod,
-    group_indicator_name = "A")
+    exposure_indicator_name = "A")
 
   expect_s3_class(preds, "data.frame")
   expect_equal(preds$psi0, preds$psi1 - treat_diff)
@@ -122,7 +122,7 @@ test_that("`oos_fitted.values_counterfactual` snapshot test", {
 
   oos <- oos_fitted.values_counterfactual(
     data = dat,
-    group_indicator_name = "A",
+    exposure_indicator_name = "A",
     full_model.args_glm = args_glm
   )
   expect_named(oos, c("psi0", "psi1", "rowname"))

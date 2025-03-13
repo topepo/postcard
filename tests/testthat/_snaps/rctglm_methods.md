@@ -4,7 +4,7 @@
       est1
     Output
         Estimate Std. Error
-      1 1.325113   1.392244
+      1 1.325113   1.152001
 
 ---
 
@@ -12,7 +12,7 @@
       estimand(ate_wo_cvvariance)
     Output
         Estimate Std. Error
-      1 1.325113  0.9627868
+      1 1.325113  0.9875967
 
 # `coef` method works
 

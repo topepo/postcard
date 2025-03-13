@@ -51,7 +51,7 @@ b2 <- 2
 dat_treat <- glm_data(
   b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, prob = 1/2),
   family = gaussian() # Default value
 )
 ```
@@ -77,6 +77,7 @@ Thus, we can estimate the ATE by simply writing the below:
 ```{r noprog-run}
 ate <- rctglm(formula = Y ~ A * W,
               exposure_indicator = A,
+              exposure_prob = 1/2,
               data = dat_treat,
               family = "gaussian") # Default value
 ```
@@ -140,6 +141,7 @@ Thus, a simple call which estimates the average treatment effect, adjusting for 
 ate_prog <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
   exposure_indicator = A,
+  exposure_prob = 1/2,
   data = dat_treat,
   family = gaussian(link = "identity"), # Default value
   data_hist = dat_notreat)

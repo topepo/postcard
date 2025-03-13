@@ -45,16 +45,18 @@ shortcuts to running \code{coef(x$glm)}.
 \examples{
 # Generate some data to showcase example
 n <- 100
+exposure_prob <- .5
 dat_binom <- glm_data(
   1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, exposure_prob),
   family = binomial()
 )
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
               exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_binom,
               family = binomial,
               estimand_fun = "ate")

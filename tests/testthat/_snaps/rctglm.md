@@ -4,7 +4,7 @@
       estimand(ate_with_cv)
     Output
         Estimate Std. Error
-      1 1.762089  0.1932432
+      1 1.762089  0.1858713
 
 ---
 
@@ -12,17 +12,16 @@
       estimand(ate_wo_cv)
     Output
         Estimate Std. Error
-      1 1.762089  0.1885315
+      1 1.762089  0.1846456
 
 # `estimand_fun_derivX` can be left as NULL or specified manually
 
     Code
       ate_auto <- withr::with_seed(42, {
-        rctglm(formula = Y ~ ., group_indicator = A, data = dat_gaus, family = gaussian,
-        estimand_fun = "ate", verbose = 1)
+        rctglm(formula = Y ~ ., exposure_indicator = A, exposure_prob = exposure_prob,
+        data = dat_gaus, family = gaussian, estimand_fun = "ate", verbose = 1)
       })
     Message
-      i Setting the group allocation probability `group_allocation_prob` as the mean of column `A` in data: 0.38
       
       -- Symbolic differentiation of estimand function --
       

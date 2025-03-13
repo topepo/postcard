@@ -53,7 +53,7 @@ b2 <- 2
 dat_treat <- glm_data(
   b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, prob = 1/2),
   family = gaussian() # Default value
 )
 ```
@@ -86,7 +86,8 @@ Thus, we can estimate the ATE by simply writing the below:
 
 ``` r
 ate <- rctglm(formula = Y ~ A * W,
-              group_indicator = A,
+              exposure_indicator = A,
+              exposure_prob = 1/2,
               data = dat_treat,
               family = "gaussian") # Default value
 ```
@@ -98,13 +99,13 @@ ate
 #> 
 #> Object of class rctglm 
 #> 
-#> Call:  rctglm(formula = Y ~ A * W, group_indicator = A, family = "gaussian", 
-#>     data = dat_treat)
+#> Call:  rctglm(formula = Y ~ A * W, exposure_indicator = A, exposure_prob = 1/2, 
+#>     family = "gaussian", data = dat_treat)
 #> 
 #> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.776
 #> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.867
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09225)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09229)
 ```
 
 ### Structure of `rctglm` and methods for extracting entities
@@ -133,7 +134,7 @@ Thus, methods available are:
 # "estimate" also available as alternative to just "est"
 est(ate)
 #>   Estimate Std. Error
-#> 1 2.091095 0.09224543
+#> 1 2.091095 0.09229488
 coef(ate)
 #> (Intercept)           A           W         A:W 
 #>  2.77585401  2.09122279  0.02364106  0.04961895
@@ -182,7 +183,8 @@ adjusting for a prognostic score, is seen below:
 ``` r
 ate_prog <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
-  group_indicator = A,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
   data = dat_treat,
   family = gaussian(link = "identity"), # Default value
   data_hist = dat_notreat)
@@ -196,12 +198,13 @@ ate_prog
 #> Object of class rctglm_prog 
 #> 
 #> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
-#>     data = dat_treat, group_indicator = A, data_hist = dat_notreat)
+#>     data = dat_treat, exposure_indicator = A, exposure_prob = 1/2, 
+#>     data_hist = dat_notreat)
 #> 
-#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.828
-#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.819
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.824
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.822
 #> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.992 (0.06445)
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.999 (0.06393)
 ```
 
 It’s evident that in this case where there is a non-linear relationship

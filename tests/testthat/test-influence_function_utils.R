@@ -3,8 +3,8 @@ test_that("`if_counterfactual_mean_glm` returns vector of evaluated IF", {
   withr::local_seed(13746)
 
   n <- 10
-  al_prob <- 0.5
-  treatindicator <- rbinom(n, size = 1, prob = al_prob)
+  exposure_prob <- 0.5
+  treatindicator <- rbinom(n, size = 1, prob = exposure_prob)
   treateffect <- 2
   mean_treatgroup <- rep(treateffect, n)
   truemean <- treatindicator * mean_treatgroup
@@ -12,9 +12,10 @@ test_that("`if_counterfactual_mean_glm` returns vector of evaluated IF", {
 
   res <- if_counterfactual_mean_glm(
     response_variable = y,
-    group_indicator = treatindicator,
+    exposure_indicator = treatindicator,
     counterfactual_pred = mean_treatgroup,
-    group_allocation_prob = al_prob
+    counterfactual_mean = treateffect,
+    exposure_prob = exposure_prob
   )
 
   expect_length(res, n)
@@ -26,8 +27,8 @@ test_that("`if_marginaleffect` returns vector of evaluated IF", {
   withr::local_seed(13746)
 
   n <- 10
-  al_prob <- 0.5
-  treatindicator <- rbinom(n, size = 1, prob = al_prob)
+  exposure_prob <- 0.5
+  treatindicator <- rbinom(n, size = 1, prob = exposure_prob)
   treateffect <- 2
   mean_treatgroup <- rep(treateffect, n)
   truemean <- treatindicator * mean_treatgroup
@@ -39,10 +40,12 @@ test_that("`if_marginaleffect` returns vector of evaluated IF", {
 
   res <- if_marginaleffect(
     response_variable = y,
-    group_indicator = treatindicator,
+    exposure_indicator = treatindicator,
+    exposure_prob = exposure_prob,
     counterfactual_pred0 = rep(0, n),
     counterfactual_pred1 = mean_treatgroup,
-    group_allocation_prob = al_prob,
+    counterfactual_mean0 = 0,
+    counterfactual_mean1 = treateffect,
     estimand_fun_deriv0 = ate_deriv0,
     estimand_fun_deriv1 = ate_deriv1
   )

@@ -15,7 +15,7 @@ rctglm(
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   cv_variance = TRUE,
-  cv_variance_folds = 5,
+  cv_variance_folds = 10,
   verbose = options::opt("verbose"),
   ...
 )
@@ -46,7 +46,7 @@ As a default, the ratio of 1's in data is used.}
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+\item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
@@ -133,16 +133,19 @@ the \code{estimand_fun}.
 \examples{
 # Generate some data to showcase example
 n <- 100
+exposure_prob <- .5
+
 dat_gaus <- glm_data(
   1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, exposure_prob),
   family = gaussian()
 )
 
 # Fit the model
 ate <- rctglm(formula = Y ~ .,
               exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_gaus,
               family = gaussian)
 
@@ -153,12 +156,13 @@ estimand(ate)
 dat_binom <- glm_data(
   1+1.5*X1+2*A,
   X1 = rnorm(n),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, exposure_prob),
   family = binomial()
 )
 
 rr <- rctglm(formula = Y ~ .,
               exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_binom,
               family = binomial(),
               estimand_fun = "rate_ratio")
@@ -166,6 +170,7 @@ rr <- rctglm(formula = Y ~ .,
 odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
 or <- rctglm(formula = Y ~ .,
               exposure_indicator = A,
+              exposure_prob = exposure_prob,
               data = dat_binom,
               family = binomial,
               estimand_fun = odds_ratio)

@@ -14,7 +14,7 @@ rctglm_with_prognosticscore(
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   cv_variance = TRUE,
-  cv_variance_folds = 5,
+  cv_variance_folds = 10,
   ...,
   data_hist,
   prog_formula = NULL,
@@ -49,7 +49,7 @@ make the "orientation" of the \code{estimand_fun} clear.}
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
-\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+\item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
@@ -122,11 +122,12 @@ b0 <- 1
 b1 <- 1.5
 b2 <- 2
 W1 <- runif(n, min = -2, max = 2)
+exposure_prob <- .5
 
 dat_treat <- glm_data(
   b0+b1*abs(sin(W1))+b2*A,
   W1 = W1,
-  A = rbinom (n, 1, .5)
+  A = rbinom (n, 1, exposure_prob)
 )
 
 dat_notreat <- glm_data(
@@ -137,6 +138,7 @@ dat_notreat <- glm_data(
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
+  exposure_prob = exposure_prob,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",

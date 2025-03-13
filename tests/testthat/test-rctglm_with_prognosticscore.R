@@ -6,11 +6,12 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   b1 <- 1.5
   b2 <- 2
   W1 <- runif(n, min = -2, max = 2)
+  exposure_prob <- .5
 
   dat_treat <- glm_data(
     b0+b1*abs(sin(W1))+b2*A,
     W1 = W1,
-    A = rbinom (n, 1, .5)
+    A = rbinom (n, 1, exposure_prob)
   )
   dat_notreat <- glm_data(
     b0+b1*abs(sin(W1)),
@@ -22,7 +23,8 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
     ate <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
-        group_indicator = A,
+        exposure_indicator = A,
+        exposure_prob = exposure_prob,
         data = dat_treat,
         family = gaussian(),
         estimand_fun = "ate",
@@ -39,7 +41,8 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
     ate_wo_cvvariance <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
-        group_indicator = A,
+        exposure_indicator = A,
+        exposure_prob = exposure_prob,
         data = dat_treat,
         family = gaussian(),
         estimand_fun = "ate",
@@ -53,7 +56,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   dat_treat_pois <- glm_data(
     b0+b1*abs(sin(W1))+b2*A,
     W1 = W1,
-    A = rbinom (n, 1, .5),
+    A = rbinom (n, 1, exposure_prob),
     family = poisson()
   )
   dat_notreat_pois <- glm_data(
@@ -65,7 +68,8 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   rr_pois <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
       formula = Y ~ .,
-      group_indicator = A,
+      exposure_indicator = A,
+      exposure_prob = exposure_prob,
       data = dat_treat_pois,
       family = poisson(),
       estimand_fun = "rate_ratio",
@@ -77,7 +81,8 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   rr_nb <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
       formula = Y ~ .,
-      group_indicator = A,
+      exposure_indicator = A,
+      exposure_prob = exposure_prob,
       data = dat_treat_pois,
       family = MASS::negative.binomial(2),
       estimand_fun = "rate_ratio",
@@ -95,11 +100,12 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
   b1 <- 1.5
   b2 <- 2
   W1 <- runif(n, min = -2, max = 2)
+  exposure_prob <- .5
 
   dat_treat <- glm_data(
     b0+b1*abs(sin(W1))+b2*A,
     W1 = W1,
-    A = rbinom (n, 1, .5)
+    A = rbinom (n, 1, exposure_prob)
   )
   dat_notreat <- glm_data(
     b0+b1*abs(sin(W1)),
@@ -109,7 +115,8 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
   ate_w_cvvariance <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
-        group_indicator = A,
+        exposure_indicator = A,
+        exposure_prob = exposure_prob,
         data = dat_treat,
         family = gaussian(),
         estimand_fun = "ate",
@@ -120,7 +127,8 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
   ate_wo_cvvariance <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
-        group_indicator = A,
+        exposure_indicator = A,
+        exposure_prob = exposure_prob,
         data = dat_treat,
         family = gaussian(),
         estimand_fun = "ate",
@@ -149,11 +157,12 @@ test_that("`prog_formula` manual specification consistent with default behavior"
   b1 <- 1.5
   b2 <- 2
   W1 <- runif(n, min = -2, max = 2)
+  exposure_prob <- .5
 
   dat_treat <- glm_data(
     b0+b1*abs(sin(W1))+b2*A,
     W1 = W1,
-    A = rbinom (n, 1, .5)
+    A = rbinom (n, 1, exposure_prob)
   )
   dat_notreat <- glm_data(
     b0+b1*abs(sin(W1)),
@@ -164,7 +173,8 @@ test_that("`prog_formula` manual specification consistent with default behavior"
   ate_wo_prog_formula <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
-        group_indicator = A,
+        exposure_indicator = A,
+        exposure_prob = exposure_prob,
         data = dat_treat,
         family = gaussian(),
         estimand_fun = "ate",
@@ -175,7 +185,8 @@ test_that("`prog_formula` manual specification consistent with default behavior"
   ate_w_prog_formula <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
       formula = Y ~ .,
-      group_indicator = A,
+      exposure_indicator = A,
+      exposure_prob = exposure_prob,
       data = dat_treat,
       family = gaussian(),
       estimand_fun = "ate",
