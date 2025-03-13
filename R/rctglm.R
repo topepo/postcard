@@ -17,7 +17,7 @@
 #' @param exposure_prob a `numeric` with the probabiliy of being in
 #' "group 1" (rather than group 0) in groups defined by `exposure_indicator`.
 #' As a default, the ratio of 1's in data is used.
-#' @param estimand_fun a `function` with arguments `psi0` and `psi1` specifying
+#' @param estimand_fun a `function` with arguments `psi1` and `psi0` specifying
 #' the estimand. Alternative, specify "ate" or "rate_ratio" as a `character`
 #' to use one of the default estimand functions. See
 #' more details in the "Estimand" section of this documentation.
@@ -197,10 +197,12 @@ rctglm <- function(formula,
     exposure_indicator_name = exposure_indicator_name
   )
   full_model_means_counterfactual <- colMeans(full_model_fitted.values_counterfactual)
+  full_model_means_counterfactual0 <- as.numeric(full_model_means_counterfactual["psi0"])
+  full_model_means_counterfactual1 <- as.numeric(full_model_means_counterfactual["psi1"])
 
   estimate_estimand <- estimand_fun(
-    as.numeric(full_model_means_counterfactual["psi1"]),
-    as.numeric(full_model_means_counterfactual["psi0"])
+    psi1 = full_model_means_counterfactual1,
+    psi0 = full_model_means_counterfactual0
   )
 
   # If cv_variance then use out-of-sample counterfactual predictions, otherwise
@@ -222,6 +224,8 @@ rctglm <- function(formula,
     exposure_prob = exposure_prob,
     counterfactual_pred0 = preds_for_variance$psi0,
     counterfactual_pred1 = preds_for_variance$psi1,
+    counterfactual_mean0 = full_model_means_counterfactual0,
+    counterfactual_mean1 = full_model_means_counterfactual1,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1)
 

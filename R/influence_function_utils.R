@@ -55,10 +55,9 @@
 if_counterfactual_mean_glm <- function(response_variable,
                                        exposure_indicator,
                                        counterfactual_pred,
-                                       exposure_prob = 1/2
+                                       counterfactual_mean,
+                                       exposure_prob
 ) {
-  counterfactual_mean <- mean(counterfactual_pred)
-
   exposure_indicator/exposure_prob *
     (response_variable - counterfactual_pred) +
     (counterfactual_pred - counterfactual_mean)
@@ -85,9 +84,11 @@ if_counterfactual_mean_glm <- function(response_variable,
 #' @noRd
 if_marginaleffect <- function(response_variable,
                               exposure_indicator,
+                              exposure_prob,
                               counterfactual_pred0,
                               counterfactual_pred1,
-                              exposure_prob,
+                              counterfactual_mean0,
+                              counterfactual_mean1,
                               estimand_fun_deriv0,
                               estimand_fun_deriv1) {
 
@@ -95,17 +96,16 @@ if_marginaleffect <- function(response_variable,
     response_variable = response_variable,
     exposure_indicator = 1 - exposure_indicator,
     exposure_prob = 1 - exposure_prob,
-    counterfactual_pred = counterfactual_pred0
+    counterfactual_pred = counterfactual_pred0,
+    counterfactual_mean = counterfactual_mean0
   )
   counterfactual_mean_IF1 <- if_counterfactual_mean_glm(
     response_variable = response_variable,
     exposure_indicator = exposure_indicator,
     exposure_prob = exposure_prob,
-    counterfactual_pred = counterfactual_pred1
+    counterfactual_pred = counterfactual_pred1,
+    counterfactual_mean = counterfactual_mean1
   )
-
-  counterfactual_mean0 <- mean(counterfactual_pred0)
-  counterfactual_mean1 <- mean(counterfactual_pred1)
 
   if_estimand <- estimand_fun_deriv1(
     psi1 = counterfactual_mean1,
