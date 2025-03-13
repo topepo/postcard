@@ -1,24 +1,24 @@
 # Modify data to have the same value of a group identifier and then predict
 predict_counterfactual_mean <- function(model,
-                                        group_indicator_name,
+                                        exposure_indicator_name,
                                         group_val,
                                         newdata = NULL,
                                         data = NULL) {
   if (is.null(data)) data <- model$data
   if (is.null(newdata)) newdata <- data
   newdata_same_group_val <- newdata %>%
-    dplyr::mutate("{group_indicator_name}" := group_val)
+    dplyr::mutate("{exposure_indicator_name}" := group_val)
 
-  group_indicator_in_model <- group_indicator_name %in% names(coef(model))
-  if (!group_indicator_in_model)
-    cli::cli_abort("{.arg {group_indicator_name}} is not in {.arg {model}}. Specify name of a binary predictor in the {.arg {model}}")
+  exposure_indicator_in_model <- exposure_indicator_name %in% names(coef(model))
+  if (!exposure_indicator_in_model)
+    cli::cli_abort("{.arg {exposure_indicator_name}} is not in {.arg {model}}. Specify name of a binary predictor in the {.arg {model}}")
   predict(model,
           type = "response",
           newdata = newdata_same_group_val)
 }
 
 predict_counterfactual_means <- function(model,
-                                         group_indicator_name,
+                                         exposure_indicator_name,
                                          newdata = NULL,
                                          data = NULL) {
   args <- as.list(environment())
@@ -52,7 +52,7 @@ default_estimand_funs <- function(default = c("ate", "rate_ratio")) {
 # data to obtain out-of-sample predictions
 oos_fitted.values_counterfactual <- function(
     data,
-    group_indicator_name,
+    exposure_indicator_name,
     full_model.args_glm,
     cv_variance_folds = 5
 ) {
@@ -61,7 +61,7 @@ oos_fitted.values_counterfactual <- function(
   folds <- rsample::vfold_cv(
     data,
     v = cv_variance_folds,
-    strata = tidyselect::all_of(group_indicator_name)
+    strata = tidyselect::all_of(exposure_indicator_name)
   )
   train_test_folds <- lapply(
     folds$splits,
@@ -69,6 +69,8 @@ oos_fitted.values_counterfactual <- function(
   )
 
   out <- lapply(train_test_folds, function(x) {
+    test_indices <- x$test$rowname
+    x <- lapply(x, function(dat) dplyr::select(dat, -rowname))
     args_glm_copy <- full_model.args_glm
     args_glm_copy$data <- x$train
 
@@ -76,10 +78,10 @@ oos_fitted.values_counterfactual <- function(
 
     preds <- predict_counterfactual_means(
       model = model_train,
-      group_indicator_name = group_indicator_name,
+      exposure_indicator_name = exposure_indicator_name,
       newdata = x$test
     ) %>%
-      dplyr::mutate(rowname = as.numeric(x$test$rowname))
+      dplyr::mutate(rowname = as.numeric(test_indices))
     return(preds)
   }) %>%
     dplyr::bind_rows()
