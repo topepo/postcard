@@ -118,11 +118,3 @@ test_that("Error occurs in `check_family` when family is not valid", {
     regexp = "'family' not recognized")
   })
 })
-
-test_that("Error occurs when response and `~` is missing", {
-  expect_error({
-    glm_data(1+2*x1,
-             x1 = rnorm(10))
-  },
-  regexp = "was not of class")
-})

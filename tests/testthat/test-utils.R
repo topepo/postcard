@@ -72,6 +72,14 @@ test_that("`formula_everything` returns the correct formula object", {
     resp ~ .)
 })
 
+# check_formula
+test_that("`test_formula` works", {
+  expect_s3_class(check_formula("Y ~ 1 + X"), "formula")
+  expect_error(check_formula(2))
+  expect_error(check_formula(1+2*x1),
+               regexp = "was not of class")
+})
+
 # get01args
 test_that("`get01args` returns list of arguments with 0 and 1 in them", {
   ate <- function(psi0, psi1) psi1 - psi0
@@ -95,8 +103,8 @@ cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are miss
   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
   expect_error({
     get01args(argsnotendingwith0and1)
-    },
-    regexp = "need to end in"
+  },
+  regexp = "need to end in"
   )
   missing1 <- function(a0, b) a0 - b
   expect_error({
