@@ -47,7 +47,7 @@ shortcuts to running \code{coef(x$glm)}.
 n <- 100
 exposure_prob <- .5
 dat_binom <- glm_data(
-  1+1.5*X1+2*A,
+  Y ~ 1+1.5*X1+2*A,
   X1 = rnorm(n),
   A = rbinom(n, 1, exposure_prob),
   family = binomial()

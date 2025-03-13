@@ -40,7 +40,7 @@ b2 <- 2
 
 # Simulate data with a non-linear effect
 dat_pois <- glm_data(
-  b0+b1*sin(W)^2+b2*A,
+  Y ~ b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
   A = rbinom(n, 1, 1/2),
   family = poisson(link = "log") # Default value
@@ -126,13 +126,13 @@ b2 <- 2
 W_sim <- runif(n, min = -2, max = 2)
 
 dat_treat <- glm_data(
-  b0+b1*abs(sin(W))+b2*A,
+  Y ~ b0+b1*abs(sin(W))+b2*A,
   W = W_sim,
   A = rbinom (n, 1, 1/2)
 )
 
 dat_notreat <- glm_data(
-  b0+b1*abs(sin(W)),
+  Y ~ b0+b1*abs(sin(W)),
   W = W_sim
 )
 ```

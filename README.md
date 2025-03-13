@@ -51,7 +51,7 @@ b2 <- 2
 
 # Simulate data with a non-linear effect
 dat_treat <- glm_data(
-  b0+b1*sin(W)^2+b2*A,
+  Y ~ b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
   A = rbinom(n, 1, prob = 1/2),
   family = gaussian() # Default value
@@ -161,7 +161,7 @@ well:
 
 ``` r
 dat_notreat <- glm_data(
-  b0+b1*sin(W)^2,
+  Y ~ b0+b1*sin(W)^2,
   W = runif(n, min = -2, max = 2),
   family = gaussian # Default value
 )

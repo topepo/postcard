@@ -4,7 +4,7 @@ test_that("`estimand` method works", {
   exposure_prob <- .5
 
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, exposure_prob),
     family = gaussian()
@@ -38,7 +38,7 @@ test_that("`coef` method works", {
   exposure_prob <- .5
 
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, exposure_prob),
     family = gaussian()
@@ -59,7 +59,7 @@ test_that("`print` method works", {
   exposure_prob <- .5
 
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, exposure_prob),
     family = gaussian()
