@@ -33,9 +33,10 @@ test_that("`rctglm` snapshot tests", {
   expect_snapshot(estimand(ate_wo_cv))
 
   rr <- rctglm(formula = Y ~ .,
-                        group_indicator = A,
-                        data = dat_pois,
-                        family = poisson())
+               exposure_indicator = A,
+               exposure_prob = exposure_prob,
+               data = dat_pois,
+               family = poisson())
   expect_snapshot(estimand(rr))
 })
 
@@ -223,27 +224,27 @@ test_that("`rctglm` provides error if `exposure_prob` is not a numeric between 0
   n <- 100
   exposure_prob <- 0.5
 
-    dat_gaus <- glm_data(
-      1+1.5*X1+2*A,
-      X1 = rnorm(n),
-      A = rbinom(n, 1, exposure_prob),
-      family = gaussian()
-    )
+  dat_gaus <- glm_data(
+    Y ~ 1+1.5*X1+2*A,
+    X1 = rnorm(n),
+    A = rbinom(n, 1, exposure_prob),
+    family = gaussian()
+  )
 
-    expect_error(
-      rctglm(formula = Y ~ .,
+  expect_error(
+    rctglm(formula = Y ~ .,
            exposure_indicator = A,
            exposure_prob = "1/2",
            data = dat_gaus,
            family = gaussian,
            verbose = 0)
-      )
-    expect_error(
-      rctglm(formula = Y ~ .,
-             exposure_indicator = A,
-             exposure_prob = 1.2,
-             data = dat_gaus,
-             family = gaussian,
-             verbose = 0)
-    )
+  )
+  expect_error(
+    rctglm(formula = Y ~ .,
+           exposure_indicator = A,
+           exposure_prob = 1.2,
+           data = dat_gaus,
+           family = gaussian,
+           verbose = 0)
+  )
 })
