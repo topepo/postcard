@@ -2,7 +2,7 @@ test_that("`estimand` method works", {
   withr::local_seed(42)
   n <- 10
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -32,7 +32,7 @@ test_that("`coef` method works", {
   withr::local_seed(42)
   n <- 10
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -50,7 +50,7 @@ test_that("`coef` method works", {
 test_that("`print` method works", {
   n <- 10
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()

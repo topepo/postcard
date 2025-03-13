@@ -4,7 +4,7 @@
       estimand(ate_with_cv)
     Output
         Estimate Std. Error
-      1 1.762089  0.1932432
+      1 1.762089  0.1981473
 
 ---
 
@@ -13,6 +13,14 @@
     Output
         Estimate Std. Error
       1 1.762089  0.1885315
+
+---
+
+    Code
+      estimand(rr)
+    Output
+        Estimate Std. Error
+      1 40.80363   8.430044
 
 # `estimand_fun_derivX` can be left as NULL or specified manually
 

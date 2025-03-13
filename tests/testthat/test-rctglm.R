@@ -2,16 +2,23 @@ test_that("`rctglm` snapshot tests", {
   withr::local_seed(42)
   n <- 100
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
+  )
+  dat_pois <- glm_data(
+    Y ~ 1+1.5*X1+2*A,
+    X1 = rnorm(n),
+    A = rbinom(n, 1, .5),
+    family = poisson()
   )
 
   ate_with_cv <- rctglm(formula = Y ~ .,
                         group_indicator = A,
                         data = dat_gaus,
-                        family = gaussian)
+                        family = gaussian,
+                        cv_variance = TRUE)
   expect_s3_class(ate_with_cv, "rctglm")
   expect_snapshot(estimand(ate_with_cv))
 
@@ -21,13 +28,19 @@ test_that("`rctglm` snapshot tests", {
                       family = gaussian,
                       cv_variance = FALSE)
   expect_snapshot(estimand(ate_wo_cv))
+
+  rr <- rctglm(formula = Y ~ .,
+                        group_indicator = A,
+                        data = dat_pois,
+                        family = poisson())
+  expect_snapshot(estimand(rr))
 })
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
   withr::local_seed(42)
   n <- 100
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -59,7 +72,7 @@ test_that("Different `cv_variance_folds` produces same estimate but different es
   withr::local_seed(42)
   n <- 100
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -92,7 +105,7 @@ test_that("Different `cv_variance_folds` produces same estimate but different es
 test_that("`rctglm` fails when `group_indicator` is non-binary", {
   n <- 100
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -113,7 +126,7 @@ test_that("`rctglm` fails when `group_indicator` is non-binary", {
 test_that("`estimand_fun` argument can be specified as function or character", {
   n <- 100
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
     A = rbinom(n, 1, .5),
     family = gaussian()
@@ -156,7 +169,7 @@ test_that("`estimand_fun_derivX` can be left as NULL or specified manually", {
   n <- 100
   withr::with_seed(42, {
     dat_gaus <- glm_data(
-      1+1.5*X1+2*A,
+      Y ~ 1+1.5*X1+2*A,
       X1 = rnorm(n),
       A = rbinom(n, 1, .5),
       family = gaussian()

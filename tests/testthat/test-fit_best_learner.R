@@ -66,9 +66,8 @@ test_that("`add_learners` returns data.frame with correct information", {
 # get_best_learner
 test_that("`get_best_learner` returns a workflow object", {
   dat <- glm_data(
-    1+2*x1,
-    x1 = rnorm(10),
-    response_name = "y"
+    y ~ 1+2*x1,
+    x1 = rnorm(10)
   )
   cv_folds <- rsample::vfold_cv(dat, v = 2)
   lrnr <- get_best_learner(resamples = cv_folds,
@@ -82,9 +81,8 @@ test_that("`get_best_learner` returns a workflow object", {
 #### Test commented out to avoid running tests for longer than necessary
 # test_that("`get_best_learner` can take in a character formula", {
 #   dat <- glm_data(
-#     1+2*x1,
-#     x1 = rnorm(10),
-#     response_name = "y"
+#     y ~ 1+2*x1,
+#     x1 = rnorm(10)
 #   )
 #   cv_folds <- rsample::vfold_cv(dat, v = 2)
 #   lrnr_chr <- get_best_learner(resamples = cv_folds,
@@ -104,9 +102,8 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
   testthat::local_edition(3)
 
   dat <- glm_data(
-    1+2*x1,
-    x1 = rnorm(10),
-    response_name = "y"
+    y ~ 1+2*x1,
+    x1 = rnorm(10)
   )
   cv_folds <- rsample::vfold_cv(dat, v = 2)
   elapsed_time_pattern <- "\\d+\\.?\\d*m?s"
@@ -122,9 +119,8 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
 # fit_best_learner
 test_that("`fit_best_learner` returns a workflow object", {
   dat <- glm_data(
-    1+2*x1,
-    x1 = rnorm(10),
-    response_name = "y"
+    y ~ 1+2*x1,
+    x1 = rnorm(10)
   )
 
   fit <- fit_best_learner(y ~ ., data = dat, verbose = 0)

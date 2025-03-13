@@ -86,7 +86,7 @@
 #' # Generate some data to showcase example
 #' n <- 100
 #' dat_gaus <- glm_data(
-#'   1+1.5*X1+2*A,
+#'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
 #'   A = rbinom(n, 1, .5),
 #'   family = gaussian()
@@ -103,7 +103,7 @@
 #'
 #' ## Another example with different family and specification of estimand_fun
 #' dat_binom <- glm_data(
-#'   1+1.5*X1+2*A,
+#'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
 #'   A = rbinom(n, 1, .5),
 #'   family = binomial()
@@ -142,6 +142,7 @@ rctglm <- function(formula,
   group_indicator <- rlang::enquo(group_indicator)
   args <- as.list(environment())
   cal <- match.call()
+  formula <- check_formula(formula)
 
   ind_expr <- rlang::quo_get_expr(group_indicator)
   called_within_prognosticscore <- ind_expr == "group_indicator"

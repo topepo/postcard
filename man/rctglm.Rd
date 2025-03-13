@@ -133,7 +133,7 @@ the \code{estimand_fun}.
 # Generate some data to showcase example
 n <- 100
 dat_gaus <- glm_data(
-  1+1.5*X1+2*A,
+  Y ~ 1+1.5*X1+2*A,
   X1 = rnorm(n),
   A = rbinom(n, 1, .5),
   family = gaussian()
@@ -150,7 +150,7 @@ estimand(ate)
 
 ## Another example with different family and specification of estimand_fun
 dat_binom <- glm_data(
-  1+1.5*X1+2*A,
+  Y ~ 1+1.5*X1+2*A,
   X1 = rnorm(n),
   A = rbinom(n, 1, .5),
   family = binomial()
