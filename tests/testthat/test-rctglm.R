@@ -32,12 +32,21 @@ test_that("`rctglm` snapshot tests", {
                       cv_variance = FALSE)
   expect_snapshot(estimand(ate_wo_cv))
 
-  rr <- rctglm(formula = Y ~ .,
+  rr_with_cv <- rctglm(formula = Y ~ .,
                exposure_indicator = A,
                exposure_prob = exposure_prob,
                data = dat_pois,
-               family = poisson())
-  expect_snapshot(estimand(rr))
+               family = poisson(),
+               cv_variance = TRUE)
+  expect_snapshot(estimand(rr_with_cv))
+
+  rr_wo_cv <- rctglm(formula = Y ~ .,
+                       exposure_indicator = A,
+                       exposure_prob = exposure_prob,
+                       data = dat_pois,
+                       family = poisson(),
+                       cv_variance = FALSE)
+  expect_snapshot(estimand(rr_wo_cv))
 })
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
@@ -86,14 +95,14 @@ test_that("Different `cv_variance_folds` produces same estimate but different es
     family = gaussian()
   )
 
-  ate_wo_cv <- rctglm(formula = Y ~ .,
+  ate_with_cv <- rctglm(formula = Y ~ .,
                       exposure_indicator = A,
                       exposure_prob = exposure_prob,
                       data = dat_gaus,
                       family = gaussian,
                       cv_variance = TRUE,
                       cv_variance_folds = 2)
-  ate_wo_cv_difffolds <- rctglm(formula = Y ~ .,
+  ate_with_cv_difffolds <- rctglm(formula = Y ~ .,
                                 exposure_indicator = A,
                                 exposure_prob = exposure_prob,
                                 data = dat_gaus,
@@ -101,13 +110,13 @@ test_that("Different `cv_variance_folds` produces same estimate but different es
                                 cv_variance = TRUE,
                                 cv_variance_folds = 10)
   expect_equal(
-    estimand(ate_wo_cv)$Estimate,
-    estimand(ate_wo_cv_difffolds)$Estimate
+    estimand(ate_with_cv)$Estimate,
+    estimand(ate_with_cv_difffolds)$Estimate
   )
   expect_failure(
     expect_identical(
-      estimand(ate_wo_cv)$`Std. Error`,
-      estimand(ate_wo_cv_difffolds)$`Std. Error`
+      estimand(ate_with_cv)$`Std. Error`,
+      estimand(ate_with_cv_difffolds)$`Std. Error`
     )
   )
 })
@@ -129,7 +138,8 @@ test_that("`rctglm` fails when `exposure_indicator` is non-binary", {
             exposure_indicator = A_fac,
             exposure_prob = exposure_prob,
             data = dat_gaus,
-            family = gaussian)
+            family = gaussian,
+            cv_variance = FALSE)
     },
     regexp = ".*1.*0"
   )
@@ -150,7 +160,8 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                 exposure_prob = exposure_prob,
                 data = dat_gaus,
                 family = gaussian,
-                estimand_fun = "ate")
+                estimand_fun = "ate",
+                cv_variance = FALSE)
   estimand_fun_ate <- gsub("\\s*", "", deparse_fun_body(ate$estimand_fun))
   expect_equal(estimand_fun_ate, "psi1-psi0")
 
@@ -159,7 +170,8 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                exposure_prob = exposure_prob,
                data = dat_gaus,
                family = gaussian,
-               estimand_fun = "rate_ratio")
+               estimand_fun = "rate_ratio",
+               cv_variance = FALSE)
   estimand_fun_rr <- gsub("\\s*", "", deparse_fun_body(rr$estimand_fun))
   expect_equal(estimand_fun_rr, "psi1/psi0")
 
@@ -169,7 +181,8 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                      exposure_prob = exposure_prob,
                      data = dat_gaus,
                      family = gaussian,
-                     estimand_fun = nonsense_estimand_fun)
+                     estimand_fun = nonsense_estimand_fun,
+                     cv_variance = FALSE)
   expect_equal(nonsense$estimand_fun, nonsense_estimand_fun)
 
   # Error when giving character that is not among the defaults
@@ -178,7 +191,8 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                       exposure_prob = exposure_prob,
                       data = dat_gaus,
                       family = gaussian,
-                      estimand_fun = "test"),
+                      estimand_fun = "test",
+                      cv_variance = FALSE),
                regexp = 'should be one of "ate", "rate_ratio"')
 })
 
@@ -203,6 +217,7 @@ test_that("`estimand_fun_derivX` can be left as NULL or specified manually", {
              data = dat_gaus,
              family = gaussian,
              estimand_fun = "ate",
+             cv_variance = FALSE,
              verbose = 1)
     })
   })
@@ -214,7 +229,8 @@ test_that("`estimand_fun_derivX` can be left as NULL or specified manually", {
            family = gaussian,
            estimand_fun = "ate",
            estimand_fun_deriv0 = function(psi1, psi0) -1,
-           estimand_fun_deriv1 = function(psi1, psi0) 1)
+           estimand_fun_deriv1 = function(psi1, psi0) 1,
+           cv_variance = FALSE)
   })
   expect_equal(ate_auto$estimand, ate_man$estimand)
 })
@@ -237,6 +253,7 @@ test_that("`rctglm` provides error if `exposure_prob` is not a numeric between 0
            exposure_prob = "1/2",
            data = dat_gaus,
            family = gaussian,
+           cv_variance = FALSE,
            verbose = 0)
   )
   expect_error(
@@ -245,6 +262,7 @@ test_that("`rctglm` provides error if `exposure_prob` is not a numeric between 0
            exposure_prob = 1.2,
            data = dat_gaus,
            family = gaussian,
+           cv_variance = FALSE,
            verbose = 0)
   )
 })

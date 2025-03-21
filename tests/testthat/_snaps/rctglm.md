@@ -17,17 +17,26 @@
 ---
 
     Code
-      estimand(rr)
+      estimand(rr_with_cv)
     Output
         Estimate Std. Error
       1 40.80363    8.51032
+
+---
+
+    Code
+      estimand(rr_wo_cv)
+    Output
+        Estimate Std. Error
+      1 40.80363    8.55476
 
 # `estimand_fun_derivX` can be left as NULL or specified manually
 
     Code
       ate_auto <- withr::with_seed(42, {
         rctglm(formula = Y ~ ., exposure_indicator = A, exposure_prob = exposure_prob,
-        data = dat_gaus, family = gaussian, estimand_fun = "ate", verbose = 1)
+        data = dat_gaus, family = gaussian, estimand_fun = "ate", cv_variance = FALSE,
+        verbose = 1)
       })
     Message
       
