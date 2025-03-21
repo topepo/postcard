@@ -1,3 +1,8 @@
+# TODO: Add something along the lines of this:
+## This method of inference using plug-in estimation and influence functions for the variance produces a
+## causal estimate of the estimand, as stated by articles XXXX.
+# when article is out
+
 #' Fit GLM and find any estimand (marginal effect) using plug-in estimation with variance estimation using
 #' influence functions
 #'
@@ -43,9 +48,6 @@
 #' used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
 #' using cross validation with number of folds specified by `cv_variance_folds`. The cross validation splits
 #' are performed using stratified sampling with `exposure_indicator` as the `strata` argument in [rsample::vfold_cv].
-#'
-#' This method of inference using plug-in estimation and influence functions for the variance produces a
-#' causal estimate of the estimand, as stated by articles XXXX.
 #'
 #' @section Estimands:
 #' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using

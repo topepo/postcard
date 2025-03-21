@@ -4,9 +4,9 @@
 \name{PostCard-package}
 \alias{PostCard}
 \alias{PostCard-package}
-\title{PostCard: Prognostic covariate adjustment for estimation of estimands}
+\title{PostCard: Estimation of Marginal Effects Using Prognostic Covariate Adjustment}
 \description{
-Convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. The package uses plug-in estimation for robust estimation of the estimand and influence functions for robust estimation of the variance of the estimand.
+Conducting analysis using robust plug-in GLM estimation with influence functions and prognostic covariate adjustment.
 }
 \seealso{
 Useful links:
