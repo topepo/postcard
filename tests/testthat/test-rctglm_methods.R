@@ -14,22 +14,14 @@ test_that("`estimand` method works", {
                 exposure_indicator = A,
                 exposure_prob = exposure_prob,
                 data = dat_gaus,
-                family = gaussian)
+                family = gaussian,
+                cv_variance = FALSE)
 
   est1 <- estimand(ate)
   est2 <- est(ate)
   expect_equal(est1, est2)
   expect_equal(est2, ate$estimand)
   expect_named(est1, c("Estimate", "Std. Error"))
-  expect_snapshot(est1)
-
-  ate_wo_cvvariance <- rctglm(formula = Y ~ .,
-                              exposure_indicator = A,
-                              exposure_prob = exposure_prob,
-                              data = dat_gaus,
-                              family = gaussian,
-                              cv_variance = FALSE)
-  expect_snapshot(estimand(ate_wo_cvvariance))
 })
 
 test_that("`coef` method works", {
@@ -48,7 +40,8 @@ test_that("`coef` method works", {
                 exposure_indicator = A,
                 exposure_prob = exposure_prob,
                 data = dat_gaus,
-                family = gaussian)
+                family = gaussian,
+                cv_variance = FALSE)
 
   expect_equal(coef(ate$glm), coef(ate))
   expect_snapshot(coef(ate))
@@ -69,7 +62,8 @@ test_that("`print` method works", {
                 exposure_indicator = A,
                 exposure_prob = exposure_prob,
                 data = dat_gaus,
-                family = gaussian)
+                family = gaussian,
+                cv_variance = FALSE)
 
   expect_output(print(ate))
 })

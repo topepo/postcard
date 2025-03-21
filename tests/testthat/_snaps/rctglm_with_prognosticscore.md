@@ -4,7 +4,7 @@
       ate <- withr::with_seed(42, {
         rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A,
         exposure_prob = exposure_prob, data = dat_treat, family = gaussian(),
-        estimand_fun = "ate", data_hist = dat_notreat, verbose = 2)
+        estimand_fun = "ate", data_hist = dat_notreat, cv_variance = TRUE, verbose = 2)
       })
     Message
       
@@ -47,14 +47,32 @@
 ---
 
     Code
-      rr_pois
+      rr_pois_wo_cvvariance
     Output
       
       Object of class rctglm_prog 
       
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = poisson(), 
           data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
-          estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
+          estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
+          verbose = 0)
+      
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 58.48
+      Estimand function r: psi1/psi0
+      Estimand (r(psi_1, psi_0)) estimate (SE): 7.327 (0.518)
+
+---
+
+    Code
+      rr_pois_with_cvvariance
+    Output
+      
+      Object of class rctglm_prog 
+      
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = poisson(), 
+          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+          estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
           verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
@@ -65,14 +83,32 @@
 ---
 
     Code
-      rr_nb
+      rr_nb_wo_cvvariance
     Output
       
       Object of class rctglm_prog 
       
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = MASS::negative.binomial(2), 
           data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
-          estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
+          estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
+          verbose = 0)
+      
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 57.7
+      Estimand function r: psi1/psi0
+      Estimand (r(psi_1, psi_0)) estimate (SE): 7.153 (0.5005)
+
+---
+
+    Code
+      rr_nb_with_cvvariance
+    Output
+      
+      Object of class rctglm_prog 
+      
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = MASS::negative.binomial(2), 
+          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+          estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
           verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067

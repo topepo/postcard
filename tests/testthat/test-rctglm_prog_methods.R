@@ -25,7 +25,8 @@ test_that("`rctglm_with_prognosticscore` returns object of correct class", {
     data = dat_treat,
     family = gaussian(),
     estimand_fun = "ate",
-    data_hist = dat_notreat)
+    data_hist = dat_notreat,
+    cv_variance = FALSE)
 
   expect_equal(ate$prognostic_info, prog(ate))
   expect_snapshot(prog(ate),

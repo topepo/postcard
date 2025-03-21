@@ -7,7 +7,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
   b2 <- 2
   W1 <- runif(n, min = -2, max = 2)
   exposure_prob <- .5
-  
+
   dat_treat <- glm_data(
     Y ~ b0+b1*abs(sin(W1))+b2*A,
     W1 = W1,
@@ -29,6 +29,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
+        cv_variance = TRUE,
         verbose = 2)
     })
   },
@@ -70,7 +71,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
     family = poisson()
   )
 
-  rr_pois <- withr::with_seed(42, {
+  rr_pois_wo_cvvariance <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
       formula = Y ~ .,
       exposure_indicator = A,
@@ -79,11 +80,26 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = poisson(),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      cv_variance = FALSE,
       verbose = 0)
   })
-  expect_snapshot(rr_pois)
+  expect_snapshot(rr_pois_wo_cvvariance)
 
-  rr_nb <- withr::with_seed(42, {
+  rr_pois_with_cvvariance <- withr::with_seed(42, {
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      exposure_indicator = A,
+      exposure_prob = exposure_prob,
+      data = dat_treat_pois,
+      family = poisson(),
+      estimand_fun = "rate_ratio",
+      data_hist = dat_notreat_pois,
+      cv_variance = TRUE,
+      verbose = 0)
+  })
+  expect_snapshot(rr_pois_with_cvvariance)
+
+  rr_nb_wo_cvvariance <- withr::with_seed(42, {
     rctglm_with_prognosticscore(
       formula = Y ~ .,
       exposure_indicator = A,
@@ -92,9 +108,24 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = MASS::negative.binomial(2),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      cv_variance = FALSE,
       verbose = 0)
   })
-  expect_snapshot(rr_nb)
+  expect_snapshot(rr_nb_wo_cvvariance)
+
+  rr_nb_with_cvvariance <- withr::with_seed(42, {
+    rctglm_with_prognosticscore(
+      formula = Y ~ .,
+      exposure_indicator = A,
+      exposure_prob = exposure_prob,
+      data = dat_treat_pois,
+      family = MASS::negative.binomial(2),
+      estimand_fun = "rate_ratio",
+      data_hist = dat_notreat_pois,
+      cv_variance = TRUE,
+      verbose = 0)
+  })
+  expect_snapshot(rr_nb_with_cvvariance)
 })
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
@@ -184,6 +215,7 @@ test_that("`prog_formula` manual specification consistent with default behavior"
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
+        cv_variance = FALSE,
         verbose = 2)
     })
 
@@ -196,6 +228,7 @@ test_that("`prog_formula` manual specification consistent with default behavior"
       family = gaussian(),
       estimand_fun = "ate",
       data_hist = dat_notreat,
+      cv_variance = FALSE,
       prog_formula = "Y ~ W1")
   })
 
