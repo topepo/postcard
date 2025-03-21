@@ -1,15 +1,18 @@
 test_that("`estimand` method works", {
   withr::local_seed(42)
   n <- 10
+  exposure_prob <- .5
+
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
-    A = rbinom(n, 1, .5),
+    A = rbinom(n, 1, exposure_prob),
     family = gaussian()
   )
 
   ate <- rctglm(formula = Y ~ .,
-                group_indicator = A,
+                exposure_indicator = A,
+                exposure_prob = exposure_prob,
                 data = dat_gaus,
                 family = gaussian)
 
@@ -19,20 +22,31 @@ test_that("`estimand` method works", {
   expect_equal(est2, ate$estimand)
   expect_named(est1, c("Estimate", "Std. Error"))
   expect_snapshot(est1)
+
+  ate_wo_cvvariance <- rctglm(formula = Y ~ .,
+                              exposure_indicator = A,
+                              exposure_prob = exposure_prob,
+                              data = dat_gaus,
+                              family = gaussian,
+                              cv_variance = FALSE)
+  expect_snapshot(estimand(ate_wo_cvvariance))
 })
 
 test_that("`coef` method works", {
   withr::local_seed(42)
   n <- 10
+  exposure_prob <- .5
+
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
-    A = rbinom(n, 1, .5),
+    A = rbinom(n, 1, exposure_prob),
     family = gaussian()
   )
 
   ate <- rctglm(formula = Y ~ .,
-                group_indicator = A,
+                exposure_indicator = A,
+                exposure_prob = exposure_prob,
                 data = dat_gaus,
                 family = gaussian)
 
@@ -42,15 +56,18 @@ test_that("`coef` method works", {
 
 test_that("`print` method works", {
   n <- 10
+  exposure_prob <- .5
+
   dat_gaus <- glm_data(
-    1+1.5*X1+2*A,
+    Y ~ 1+1.5*X1+2*A,
     X1 = rnorm(n),
-    A = rbinom(n, 1, .5),
+    A = rbinom(n, 1, exposure_prob),
     family = gaussian()
   )
 
   ate <- rctglm(formula = Y ~ .,
-                group_indicator = A,
+                exposure_indicator = A,
+                exposure_prob = exposure_prob,
                 data = dat_gaus,
                 family = gaussian)
 

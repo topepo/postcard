@@ -11,6 +11,8 @@
 #' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
 #' model on the historical data `data_hist`. Default models the response (assumed same as in
 #' `formula`) using all columns in the `data_hist` data
+#' @param cv_prog_folds a `numeric` with the number of cross-validation folds used when fitting and
+#' evaluating models
 #'
 #' @details
 #' More details on prognostic models and scores being predictions of counterfactual means
@@ -42,21 +44,23 @@
 #' b1 <- 1.5
 #' b2 <- 2
 #' W1 <- runif(n, min = -2, max = 2)
+#' exposure_prob <- .5
 #'
 #' dat_treat <- glm_data(
-#'   b0+b1*abs(sin(W1))+b2*A,
+#'   Y ~ b0+b1*abs(sin(W1))+b2*A,
 #'   W1 = W1,
-#'   A = rbinom (n, 1, .5)
+#'   A = rbinom (n, 1, exposure_prob)
 #' )
 #'
 #' dat_notreat <- glm_data(
-#'   b0+b1*abs(sin(W1)),
+#'   Y ~ b0+b1*abs(sin(W1)),
 #'   W1 = W1
 #' )
 #'
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
-#'   group_indicator = A,
+#'   exposure_indicator = A,
+#'   exposure_prob = exposure_prob,
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
@@ -68,20 +72,22 @@ rctglm_with_prognosticscore <- function(
     formula,
     family,
     data,
-    group_indicator,
-    group_allocation_prob = NULL,
+    exposure_indicator,
+    exposure_prob = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+    cv_variance = TRUE,
+    cv_variance_folds = 10,
     ...,
     data_hist,
     prog_formula = NULL,
-    cv_folds = 5,
+    cv_prog_folds = 5,
     learners = default_learners(),
     verbose = options::opt("verbose")) {
 
   call <- match.call()
 
-  group_indicator <- rlang::enquo(group_indicator)
+  exposure_indicator <- rlang::enquo(exposure_indicator)
   named_args <- as.list(environment())
   extra_glm_args <- list(...)
 
@@ -110,29 +116,31 @@ rctglm_with_prognosticscore <- function(
 
   lrnr_fit <- fit_best_learner(formula = prog_formula,
                                data = data_hist,
-                               cv_folds = cv_folds,
+                               cv_folds = cv_prog_folds,
                                learners = learners,
                                verbose = verbose)
 
   lrnr_pred <- predict(lrnr_fit, data) %>%
     dplyr::pull(.data$.pred)
   data %<>%
-    dplyr::mutate(prog = lrnr_pred)
+    dplyr::mutate(link_prog = family$linkfun(lrnr_pred))
 
   if (verbose >= 2)
     cli::cli_alert_info("Investigate trained learners and fitted model in {.var prognostic_info} list element")
 
-  formula_with_prognosticscore <- paste0(formula_to_str(formula), " + prog")
+  formula_with_prognosticscore <- paste0(formula_to_str(formula), " + link_prog")
 
   rctglm_with_prognosticscore <- rctglm(
     formula = formula_with_prognosticscore,
     family = family,
     data = data,
-    group_indicator = group_indicator,
-    group_allocation_prob = group_allocation_prob,
+    exposure_indicator = exposure_indicator,
+    exposure_prob = exposure_prob,
     estimand_fun = estimand_fun,
     estimand_fun_deriv0 = estimand_fun_deriv0,
     estimand_fun_deriv1 = estimand_fun_deriv1,
+    cv_variance = cv_variance,
+    cv_variance_folds = cv_variance_folds,
     verbose = verbose,
     ...
   )
@@ -142,7 +150,7 @@ rctglm_with_prognosticscore <- function(
       formula = prog_formula,
       model_fit = lrnr_fit,
       learners = learners,
-      cv_folds = cv_folds,
+      cv_folds = cv_prog_folds,
       data = data_hist
     ))
 

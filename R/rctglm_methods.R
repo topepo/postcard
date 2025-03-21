@@ -25,16 +25,18 @@
 #' @examples
 #' # Generate some data to showcase example
 #' n <- 100
+#' exposure_prob <- .5
 #' dat_binom <- glm_data(
-#'   1+1.5*X1+2*A,
+#'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
-#'   A = rbinom(n, 1, .5),
+#'   A = rbinom(n, 1, exposure_prob),
 #'   family = binomial()
 #' )
 #'
 #' # Fit the model
 #' ate <- rctglm(formula = Y ~ .,
-#'               group_indicator = A,
+#'               exposure_indicator = A,
+#'               exposure_prob = exposure_prob,
 #'               data = dat_binom,
 #'               family = binomial,
 #'               estimand_fun = "ate")
@@ -77,11 +79,11 @@ print.rctglm <- function(x,
   cat("Call:  ",
       paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   cat("Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: ",
-      format(x$means_counterfactual$psi0, digits = digits),
+      format(x$means_counterfactual["psi0"], digits = digits),
       "\n",
       sep = "")
   cat("Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: ",
-      format(x$means_counterfactual$psi1, digits = digits),
+      format(x$means_counterfactual["psi1"], digits = digits),
       "\n",
       sep = "")
   print_estimand_info(x,

@@ -40,9 +40,9 @@ b2 <- 2
 
 # Simulate data with a non-linear effect
 dat_pois <- glm_data(
-  b0+b1*sin(W)^2+b2*A,
+  Y ~ b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
-  A = rbinom(n, 1, .5),
+  A = rbinom(n, 1, 1/2),
   family = poisson(link = "log") # Default value
 )
 ```
@@ -58,7 +58,8 @@ Built in is the ATE and rate ratio, which can be specified with character string
 ```{r rate-ratio-run-show}
 rate_ratio <- rctglm(
   formula = Y ~ A + W,
-  group_indicator = A,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
   data = dat_pois,
   family = "poisson",
   estimand_fun = "rate_ratio")
@@ -78,13 +79,20 @@ nonsense_estimand_fun <- function(psi1, psi0) {
 
 nonsense_estimand <- rctglm(
   formula = Y ~ A * W,
-  group_indicator = A,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
   data = dat_pois,
   family = poisson(),
   estimand_fun = nonsense_estimand_fun,
   verbose = 0)
 nonsense_estimand
 ```
+
+### Variance estimation using cross validation
+
+The variance is estimated as the variance of the influence function of the marginal effect. During the calculation of this function, counterfactual prediction are made for all observations, using a GLM to predict their outcome in case they were in group 0 and 1, respectively. 
+
+`cv_variance` is an argument in `rctglm` and `rctglm_with_prognosticscore` that enables obtaining these counterfactual predictions as out-of-sample (OOS) prediction by using cross validation. Using cross validation for the variance estimation is the default behavior in the package.
 
 ### Prognostic covariate adjustment
 
@@ -118,13 +126,13 @@ b2 <- 2
 W_sim <- runif(n, min = -2, max = 2)
 
 dat_treat <- glm_data(
-  b0+b1*abs(sin(W))+b2*A,
+  Y ~ b0+b1*abs(sin(W))+b2*A,
   W = W_sim,
-  A = rbinom (n, 1, .5)
+  A = rbinom (n, 1, 1/2)
 )
 
 dat_notreat <- glm_data(
-  b0+b1*abs(sin(W)),
+  Y ~ b0+b1*abs(sin(W)),
   W = W_sim
 )
 ```
@@ -152,7 +160,8 @@ learners <- list(
 
 model_own_learners <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
-  group_indicator = A,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
   data = dat_treat,
   family = gaussian(),
   data_hist = dat_notreat,

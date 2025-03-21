@@ -8,15 +8,17 @@ rctglm_with_prognosticscore(
   formula,
   family,
   data,
-  group_indicator,
-  group_allocation_prob = NULL,
+  exposure_indicator,
+  exposure_prob = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
+  cv_variance = TRUE,
+  cv_variance_folds = 10,
   ...,
   data_hist,
   prog_formula = NULL,
-  cv_folds = 5,
+  cv_prog_folds = 5,
   learners = default_learners(),
   verbose = options::opt("verbose")
 )
@@ -39,14 +41,15 @@ given under ‘Details’ in the \link{glm} documentation.}
     variables are taken from \code{environment(formula)},
     typically the environment from which \code{glm} is called.}
 
-\item{group_indicator}{(name of) the \emph{binary} variable in \code{data} that
+\item{exposure_indicator}{(name of) the \emph{binary} variable in \code{data} that
 identifies randomisation groups. The variable is required to be binary to
 make the "orientation" of the \code{estimand_fun} clear.}
 
-\item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
+\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
+"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
-\item{estimand_fun}{a \code{function} with arguments \code{psi0} and \code{psi1} specifying
+\item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
 more details in the "Estimand" section of this documentation.}
@@ -57,6 +60,12 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{estimand_fun_deriv1}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi1}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
 
+\item{cv_variance}{a \code{logical} determining whether to estimate the variance
+using cross-validation (see details of \link{rctglm}).}
+
+\item{cv_variance_folds}{a \code{numeric} with the number of folds to use for cross
+validation if \code{cv_variance} is \code{TRUE}.}
+
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}}
 
 \item{data_hist}{a \code{data.frame} with historical data on which to fit a prognostic model}
@@ -65,7 +74,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 model on the historical data \code{data_hist}. Default models the response (assumed same as in
 \code{formula}) using all columns in the \code{data_hist} data}
 
-\item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
+\item{cv_prog_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
 \item{learners}{a \code{list} of \code{tidymodels}}
@@ -113,21 +122,23 @@ b0 <- 1
 b1 <- 1.5
 b2 <- 2
 W1 <- runif(n, min = -2, max = 2)
+exposure_prob <- .5
 
 dat_treat <- glm_data(
-  b0+b1*abs(sin(W1))+b2*A,
+  Y ~ b0+b1*abs(sin(W1))+b2*A,
   W1 = W1,
-  A = rbinom (n, 1, .5)
+  A = rbinom (n, 1, exposure_prob)
 )
 
 dat_notreat <- glm_data(
-  b0+b1*abs(sin(W1)),
+  Y ~ b0+b1*abs(sin(W1)),
   W1 = W1
 )
 
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
-  group_indicator = A,
+  exposure_indicator = A,
+  exposure_prob = exposure_prob,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",

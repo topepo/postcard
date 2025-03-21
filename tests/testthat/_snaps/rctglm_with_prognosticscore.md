@@ -1,9 +1,10 @@
-# `rctglm_with_prognosticscore` returns object of correct class
+# `rctglm_with_prognosticscore` snapshot tests
 
     Code
       ate <- withr::with_seed(42, {
-        rctglm_with_prognosticscore(formula = Y ~ ., group_indicator = A, data = dat_treat,
-        family = gaussian(), estimand_fun = "ate", data_hist = dat_notreat, verbose = 2)
+        rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A,
+        exposure_prob = exposure_prob, data = dat_treat, family = gaussian(),
+        estimand_fun = "ate", data_hist = dat_notreat, verbose = 2)
       })
     Message
       
@@ -24,7 +25,6 @@
       v 3 of 3 tuning:     mod_gbt ()
       i Model with lowest RMSE: mod_gbt
       i Investigate trained learners and fitted model in `prognostic_info` list element
-      i Setting the group allocation probability `group_allocation_prob` as the mean of column `A` in data: 0.56
       
       -- Symbolic differentiation of estimand function --
       
@@ -38,17 +38,45 @@
 ---
 
     Code
-      ate
+      ate_wo_cvvariance <- withr::with_seed(42, {
+        rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A,
+        exposure_prob = exposure_prob, data = dat_treat, family = gaussian(),
+        estimand_fun = "ate", data_hist = dat_notreat, cv_variance = FALSE, verbose = 0)
+      })
+
+---
+
+    Code
+      rr_pois
     Output
       
       Object of class rctglm_prog 
       
-      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = gaussian(), 
-          data = dat_treat, group_indicator = A, estimand_fun = "ate", 
-          data_hist = dat_notreat, verbose = 2)
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = poisson(), 
+          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+          estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
+          verbose = 0)
       
-      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.017
-      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 3.975
-      Estimand function r: psi1 - psi0
-      Estimand (r(psi_1, psi_0)) estimate (SE): 1.957 (0.1977)
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 58.48
+      Estimand function r: psi1/psi0
+      Estimand (r(psi_1, psi_0)) estimate (SE): 7.327 (0.5271)
+
+---
+
+    Code
+      rr_nb
+    Output
+      
+      Object of class rctglm_prog 
+      
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = MASS::negative.binomial(2), 
+          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+          estimand_fun = "rate_ratio", data_hist = dat_notreat_pois, 
+          verbose = 0)
+      
+      Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067
+      Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 57.7
+      Estimand function r: psi1/psi0
+      Estimand (r(psi_1, psi_0)) estimate (SE): 7.153 (0.5114)
 
