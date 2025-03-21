@@ -2,6 +2,7 @@
 % Please edit documentation in R/power.R
 \name{power_gs}
 \alias{power_gs}
+\alias{variance_bound_gs}
 \title{Guenther-Schouten Power Approximation}
 \usage{
 power_gs(
@@ -14,6 +15,8 @@ power_gs(
   margin = 0,
   alpha = 0.05
 )
+
+variance_bound_gs(formula, data, inflation = 1.25, deflation = 1)
 }
 \arguments{
 \item{n}{Number of participants in total. From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n} and the control group is \eqn{n1=(1/(1+r))n}.}
@@ -31,6 +34,13 @@ power_gs(
 \item{margin}{Superiority margin (for non-inferiority margin, a negative value can be provided).}
 
 \item{alpha}{Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.}
+
+\item{formula}{an object of class "formula" (or one that can be coerced to that class):
+a symbolic description of the model}
+
+\item{data}{the data used to estimate the variance bound}
+
+\item{deflation}{}
 }
 \value{
 a \code{numeric} with power approximation based on the Guenther-Schouten approximation
@@ -69,4 +79,10 @@ power_gs(R2 = 0.8)
 # variance of Y(w) of 4, an assumed effect size of 1.5 and a margin of 1
 power_gs(n = 400, r = 2/3, sigma = sqrt(4), ate = 1.5, margin = 1)
 
+# Generate a negative binomial response
+nb <- glm_data(Y ~ 1+2*x1-x2,
+                x1 = rnorm(10),
+                x2 = rgamma(10, shape = 2),
+                family = MASS::negative.binomial(2))
+variance_bound_gs(Y ~ x1 + x2, nb)
 }

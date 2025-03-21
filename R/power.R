@@ -179,30 +179,22 @@ var_update_rho_R2 <- function(var, rho, R2) {
   return(new_var)
 }
 
-#' Title
+#' @rdname power_gs
 #'
+#' @param formula an object of class "formula" (or one that can be coerced to that class):
+#' a symbolic description of the model
 #' @param data the data used to estimate the variance bound
-#' @param response the response variable in the data for which
-#' @param ...
 #' @param inflation
 #' @param deflation
 #'
-#' @details
-#' See article Zimmermann, G., Kieser, M., & Bathke, A. C. (2019). Sample size
-#' calculation and blinded recalculation for analysis of covariance models with
-#' multiple random covariates. Journal of Biopharmaceutical Statistics, 30(1),
-#' 143–159. https://doi.org/10.1080/10543406.2019.1632871
-#'
-#' @returns
-#' @export
-#'
 #' @examples
 #' # Generate a negative binomial response
-#' nb <- glm_data(1+2*x1-x2,
+#' nb <- glm_data(Y ~ 1+2*x1-x2,
 #'                 x1 = rnorm(10),
 #'                 x2 = rgamma(10, shape = 2),
 #'                 family = MASS::negative.binomial(2))
-#' variance_bound_gs(nb, response_name = "Y")
+#' variance_bound_gs(Y ~ x1 + x2, nb)
+#' @export
 variance_bound_gs <- function(formula, data, inflation = 1.25, deflation = 1) {
   if(missing(data)) data <- environment(formula)
   mf <- match.call(expand.dots = FALSE)
