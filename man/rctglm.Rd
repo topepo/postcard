@@ -110,9 +110,6 @@ If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for ea
 used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
 using cross validation with number of folds specified by \code{cv_variance_folds}. The cross validation splits
 are performed using stratified sampling with \code{exposure_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
-
-This method of inference using plug-in estimation and influence functions for the variance produces a
-causal estimate of the estimand, as stated by articles XXXX.
 }
 \section{Estimands}{
 
