@@ -1,7 +1,7 @@
 #' Power and sample size estimation
 #'
 #' @description
-#' `variance_bound_ancova` provides a convenient function for estimating a
+#' `variance_ancova` provides a convenient function for estimating a
 #' variance bound to use for power and sample size approximation.
 #'
 #' @rdname power
@@ -19,13 +19,13 @@
 #' below `1` to obtain a more conservative estimate of the coefficient of determination.
 #'
 #' @return
-#' All functions return a `numeric`. `variance_bound_ancova` returns a `numeric` with
+#' All functions return a `numeric`. `variance_ancova` returns a `numeric` with
 #' a variance bound estimated from data to used for power estimation and sample size
 #' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with
 #' the power or sample size approximation.
 #'
 #' @export
-variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
+variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
   if(missing(data)) data <- environment(formula)
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "subset", "weights", "na.action",
@@ -71,7 +71,7 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n}
 #' and the control group is \eqn{n1=(1/(1+r))n}.
 #' @param r               a `numeric` allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation `r=1`.
-#' @param variance_bound  a `numeric` variance bound to use for the approximation. See more details
+#' @param variance  a `numeric` variance bound to use for the approximation. See more details
 #' in documentation sections of each power approximating function.
 #' @param ate             a `numeric` minimum effect size that we should be able to detect.
 #' @param margin          a `numeric` superiority margin (for non-inferiority margin, a negative value can be provided).
@@ -90,16 +90,16 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #'
 #' - `ate`: \eqn{\beta_1-\beta_0}
 #' - `margin`: \eqn{\Delta_s}
-#' - `variance_bound`: \eqn{\widehat{\sigma}^2(1-\widehat{R}^2)}
+#' - `variance`: \eqn{\widehat{\sigma}^2(1-\widehat{R}^2)}
 #'
-#' ## Finding the `variance_bound` to use for approximation
+#' ## Finding the `variance` to use for approximation
 #'
-#' The `variance_bound_ancova` function estimates \eqn{\sigma^2(1-R^2)} in data and
-#' returns it as a `numeric` that can be passed directly as the `variance_bound`
+#' The `variance_ancova` function estimates \eqn{\sigma^2(1-R^2)} in data and
+#' returns it as a `numeric` that can be passed directly as the `variance`
 #' in `power_gs`. Corresponds to estimating the power from using an `lm` with
-#' the same `formula` as specified in `variance_bound_ancova`.
+#' the same `formula` as specified in `variance_ancova`.
 #'
-#' The user can estimate the `variance_bound` any way they see fit.
+#' The user can estimate the `variance` any way they see fit.
 #'
 #' @section Guenther-Schouten power approximation:
 #' The estimation formula in the case of an ANCOVA model with multiple covariate adjustement is (see description for reference):
@@ -126,24 +126,24 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #'
 #' # Approximate the power using no adjustment covariates
 #' vb_nocov <- var(dat_gaus$Y)
-#' power_gs(n = 200, variance_bound = vb_nocov, ate = 1)
+#' power_gs(n = 200, variance = vb_nocov, ate = 1)
 #'
 #' # Approximate the power with a model adjusting for both variables in the
 #' # data generating process
 #'
 #' ## First estimate the variance bound sigma^2 * (1-R^2)
-#' vb_cov <- variance_bound_ancova(Y ~ X1 + X2 + A, dat_gaus)
+#' vb_cov <- variance_ancova(Y ~ X1 + X2 + A, dat_gaus)
 #' ## Then estimate the power using this variance bound
-#' power_gs(n = 100, variance_bound = vb_cov, ate = 1.8, margin = 1, r = 2)
+#' power_gs(n = 100, variance = vb_cov, ate = 1.8, margin = 1, r = 2)
 #'
 #' # Approximate the sample size needed to obtain 90% power with same model as
 #' # above
 #' samplesize_gs(
-#'   variance_bound = vb_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
+#'   variance = vb_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
 #' )
 #'
 #' @export
-power_gs <- function(variance_bound,
+power_gs <- function(variance,
                      ate,
                      n,
                      r = 1,
@@ -153,7 +153,7 @@ power_gs <- function(variance_bound,
   power <- stats::pnorm(
     sqrt(
       r/(1 + r)^2 *
-        (ate - margin)^2/variance_bound *
+        (ate - margin)^2/variance *
         (n - stats::qnorm(1 - alpha)^2/2)
     ) - stats::qnorm(1 - alpha)
   )
@@ -165,14 +165,14 @@ power_gs <- function(variance_bound,
 #'
 #' @param power a `numeric` giving the desired power when calculating the sample size
 
-samplesize_gs <- function(variance_bound,
+samplesize_gs <- function(variance,
                           ate,
                           r = 1,
                           margin = 0,
                           power = 0.9,
                           alpha = 0.025) {
   samplesize <- (1 + r)^2 / r *
-    (stats::qnorm(1 - alpha) + stats::qnorm(power))^2 * variance_bound /
+    (stats::qnorm(1 - alpha) + stats::qnorm(power))^2 * variance /
     (ate - margin)^2 +
     stats::qnorm(1 - alpha)^2/2
   return(samplesize)
@@ -228,14 +228,14 @@ samplesize_gs <- function(variance_bound,
 #'
 #' @examples
 #' # No adjustment covariates
-#' power_nc(n = 200, variance_bound = vb_nocov, df = 199, ate = 1)
+#' power_nc(n = 200, variance = vb_nocov, df = 199, ate = 1)
 #'
 #' # Adjusting for all covariates in data generating process
 #' power_nc(
-#'   n = 200, variance_bound = vb_cov, df = 196, ate = 1.8, margin = 1, r = 2
+#'   n = 200, variance = vb_cov, df = 196, ate = 1.8, margin = 1, r = 2
 #' )
 #'
-power_nc <- function(variance_bound,
+power_nc <- function(variance,
                      df,
                      ate,
                      n,
@@ -243,7 +243,7 @@ power_nc <- function(variance_bound,
                      margin = 0,
                      alpha = 0.025){
 
-  nc <- sqrt(r/(1 + r)^2*(n)) * (ate - margin)/sqrt(variance_bound)
+  nc <- sqrt(r/(1 + r)^2*(n)) * (ate - margin)/sqrt(variance)
   power <- 1 - stats::pt(q = stats::qt(1 - alpha, df = df), df = df, ncp = nc)
   return(power)
 }
