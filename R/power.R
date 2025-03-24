@@ -2,7 +2,7 @@
 #'
 #' @description
 #' `variance_bound_ancova` provides a convenient function for estimating a
-#' variance bound to use for power approximation.
+#' variance bound to use for power and sample size approximation.
 #'
 #' @rdname power
 #'
@@ -20,8 +20,9 @@
 #'
 #' @return
 #' All functions return a `numeric`. `variance_bound_ancova` returns a `numeric` with
-#' a variance bound estimated from data to used for power estimation in `power_gs`.
-#' `power_xx` functions return a `numeric` with the power approximation
+#' a variance bound estimated from data to used for power estimation and sample size
+#' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with
+#' the power or sample size approximation.
 #'
 #' @export
 variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
@@ -59,11 +60,12 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' @rdname power
 #'
 #' @description
-#' The function `power_gs` calculates the Guenther-Schouten power approximation for ANOVA or ANCOVA.
+#' The `power_gs` and `samplesize_gs` functions calculate the Guenther-Schouten
+#' power approximation for ANOVA or ANCOVA.
 #' The approximation is based in (Guenther WC. Sample Size Formulas for Normal Theory T Tests.
 #' The American Statistician. 1981;35(4):243–244) and (Schouten HJA. Sample size formula with
 #' a continuous outcome for unequal group sizes and unequal variances. Statistics in Medicine.
-#' 1999;18(1):87–91).
+#' 1999;18(1):87–91). See more in section after `Value`.
 #'
 #' @param n               a `numeric` with number of participants in total.
 #' From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n}
@@ -71,9 +73,11 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' @param r               a `numeric` allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation `r=1`.
 #' @param variance_bound  a `numeric` variance bound to use for the approximation. See more details
 #' in documentation sections of each power approximating function.
-#' @param ate             Minimum effect size that we should be able to detect.
-#' @param margin          Superiority margin (for non-inferiority margin, a negative value can be provided).
-#' @param alpha           Significance level. Due to regulatory guidelines when using a one-sided test, half the specified significance level is used. Thus, for standard alpha = .05, a significance level of 0.025 is used.
+#' @param ate             a `numeric` minimum effect size that we should be able to detect.
+#' @param margin          a `numeric` superiority margin (for non-inferiority margin, a negative value can be provided).
+#' @param alpha           a `numeric` significance level. Due to regulatory guidelines when
+#' using a one-sided test, half the specified significance level is used.
+#' Thus, for standard significance level of 5%, the default is `alpha = 0.025`.
 #'
 #' @details
 #'
@@ -101,7 +105,7 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' The estimation formula in the case of an ANCOVA model with multiple covariate adjustement is (see description for reference):
 #'
 #' \deqn{
-#' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha/2}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha/2})^2}{2}
+#' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
 #' }
 #'
 #' where \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
@@ -113,23 +117,30 @@ variance_bound_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' In the univariate case \eqn{R^2} is replaced by \eqn{\rho^2}
 #'
 #' @examples
-#' # Generate a negative binomial response to use as an example
-#' nb <- glm_data(Y ~ 1+2*x1-x2,
-#'                 x1 = rnorm(100),
-#'                 x2 = rgamma(100, shape = 2),
-#'                 family = MASS::negative.binomial(2))
+#' # Generate a data set to use as an example
+#' dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
+#'                 X1 = rnorm(100),
+#'                 X2 = rgamma(100, shape = 2),
+#'                 A = rbinom(100, size = 1, prob = 0.5),
+#'                 family = gaussian())
 #'
 #' # Approximate the power using no adjustment covariates
-#' vb_nocov <- var(nb$Y)
+#' vb_nocov <- var(dat_gaus$Y)
 #' power_gs(n = 200, variance_bound = vb_nocov, ate = 1)
 #'
 #' # Approximate the power with a model adjusting for both variables in the
 #' # data generating process
 #'
 #' ## First estimate the variance bound sigma^2 * (1-R^2)
-#' vb_cov <- variance_bound_ancova(Y ~ x1 + x2, nb)
+#' vb_cov <- variance_bound_ancova(Y ~ X1 + X2 + A, dat_gaus)
 #' ## Then estimate the power using this variance bound
 #' power_gs(n = 100, variance_bound = vb_cov, ate = 1.8, margin = 1, r = 2)
+#'
+#' # Approximate the sample size needed to obtain 90% power with same model as
+#' # above
+#' samplesize_gs(
+#'   variance_bound = vb_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
+#' )
 #'
 #' @export
 power_gs <- function(variance_bound,
@@ -137,14 +148,14 @@ power_gs <- function(variance_bound,
                      n,
                      r = 1,
                      margin = 0,
-                     alpha = 0.05) {
+                     alpha = 0.025) {
 
   power <- stats::pnorm(
     sqrt(
       r/(1 + r)^2 *
         (ate - margin)^2/variance_bound *
-        (n - stats::qnorm(1 - alpha/2)^2/2)
-    ) - stats::qnorm(1 - alpha/2)
+        (n - stats::qnorm(1 - alpha)^2/2)
+    ) - stats::qnorm(1 - alpha)
   )
   return(power)
 }
@@ -159,11 +170,11 @@ samplesize_gs <- function(variance_bound,
                           r = 1,
                           margin = 0,
                           power = 0.9,
-                          alpha = 0.05) {
-  samplesize <- r/(1 + r)^2 *
-    (stats::qnorm(1 - alpha/2) + stats::qnorm(1 - power)) * variance_bound /
+                          alpha = 0.025) {
+  samplesize <- (1 + r)^2 / r *
+    (stats::qnorm(1 - alpha) + stats::qnorm(power))^2 * variance_bound /
     (ate - margin)^2 +
-    stats::qnorm(1 - alpha/2)^2/2
+    stats::qnorm(1 - alpha)^2/2
   return(samplesize)
 }
 
@@ -173,7 +184,7 @@ samplesize_gs <- function(variance_bound,
 #' The function `power_nc` calculates the power for ANOVA or ANCOVA based on the
 #' non-centrality parameter and the exact t-distributions.
 #'
-#' @param n.adj Number of adjustment covariates. Used for calculating the degrees of freedom.
+#' @param df a `numeric` degrees of freedom to use in the t-distribution.
 #'
 #' @section Power approximation using non-centrality parameter:
 #' The prospective power estimations are based on (Kieser M. Methods and Applications of Sample Size Calculation and Recalculation in Clinical Trials. Springer; 2020).
@@ -183,7 +194,7 @@ samplesize_gs <- function(variance_bound,
 #'
 #' where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha/2)\right).}
+#' \deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha)\right).}
 #'
 #' The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 #'
@@ -191,7 +202,7 @@ samplesize_gs <- function(variance_bound,
 #'
 #' such that the power can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha/2)\right).}
+#' \deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha)\right).}
 #'
 #' The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 #'
@@ -209,47 +220,32 @@ samplesize_gs <- function(variance_bound,
 #' (Zimmermann G, Kieser M, Bathke AC. Sample Size Calculation and Blinded Recalculation for Analysis of Covariance Models with Multiple Random Covariates. Journal of Biopharmaceutical Statistics. 2020;30(1):143–159.) to approximate
 #' the non-centrality parameter as in the univariate case where \eqn{\rho^2} is replaced by \eqn{R^2}.
 #'
-#' Then the power for ANCOVA with `n.adj` adjustment covariates can be estimated as
+#' Then the power for ANCOVA with `d` degrees of freedom can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,n - 2 - n.adj,nc}\left(F_{t, n - 2 - n.adj,0), 0}^{-1}(1-\alpha/2)\right).}
+#' \deqn{1-\beta = 1 - F_{t,d,nc}\left(F_{t, d,0), 0}^{-1}(1-\alpha)\right).}
 #'
 #' @export
 #'
 #' @examples
-#' # Approximate the power for an ANCOVA with a single adjustment covariate
-#' power_nc(rho = 0.7)
+#' # No adjustment covariates
+#' power_nc(n = 200, variance_bound = vb_nocov, df = 199, ate = 1)
 #'
-#' #' # Approximate power for an ANCOVA with several adjustment covariates
-#' power_nc(R2 = 0.8, n.adj = 3)
-#'
-#' # Approximate the power for an ANOVA with 2:1 randomisation, an assumed
-#' # variance of Y(w) of 4, an assumed effect size of 3 and a margin of 1
-#' power_nc(n = 400, r = 2/3, sigma = sqrt(4), ate = 1.5, margin = 1)
+#' # Adjusting for all covariates in data generating process
+#' power_nc(
+#'   n = 200, variance_bound = vb_cov, df = 196, ate = 1.8, margin = 1, r = 2
+#' )
 #'
 power_nc <- function(variance_bound,
-                     n.adj,
+                     df,
                      ate,
                      n,
                      r = 1,
                      margin = 0,
-                     alpha = 0.05){
+                     alpha = 0.025){
 
   nc <- sqrt(r/(1 + r)^2*(n)) * (ate - margin)/sqrt(variance_bound)
-  df <- n - 2 - n.adj
-  power <- 1 - stats::pt(q = stats::qt(1 - alpha/2, n - 2), df = df, ncp = nc)
+  power <- 1 - stats::pt(q = stats::qt(1 - alpha, df = df), df = df, ncp = nc)
   return(power)
-}
-
-#' @rdname power
-
-samplesize_nc <- function(variance_bound,
-                          n.adj,
-                          ate,
-                          r = 1,
-                          margin = 0,
-                          power = 0.9,
-                          alpha = 0.05) {
-
 }
 
 error_if_both_rho_R2_given <- function(rho, R2) {
