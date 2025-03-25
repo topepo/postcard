@@ -252,19 +252,3 @@ power_nc <- function(variance,
   power <- 1 - stats::pt(q = stats::qt(1 - alpha, df = df), df = df, ncp = nc)
   return(power)
 }
-
-error_if_both_rho_R2_given <- function(rho, R2) {
-  if (!is.null(rho) & !is.null(R2))
-    cli::cli_abort("Specify either {.arg rho} or {.arg R2}. If you adjust by multiple covariates use {.arg R2} otherwise use {.arg rho}")
-  return(invisible())
-}
-
-var_update_rho_R2 <- function(var, rho, R2) {
-  if (!is.null(rho) & is.null(R2))
-    new_var <- var*(1 - rho^2)
-  if (is.null(rho) & !is.null(R2))
-    new_var <- var*(1 - R2)
-  return(new_var)
-}
-
-
