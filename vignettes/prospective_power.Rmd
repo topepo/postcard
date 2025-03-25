@@ -2,7 +2,7 @@
 title: "Prospective Power Estimation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{case_study}
+  %\VignetteIndexEntry{prospective_power}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
