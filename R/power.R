@@ -1,10 +1,42 @@
 #' Power and sample size estimation for linear models
 #'
+#' @name power_and_ss
+#'
+#' @details
+#'
+#' This details section provides information about relation between arguments to
+#' functions and the formulas described in sections below for each power
+#' approximation formula.
+#'
+#' Note that all entities that carry the same name as an argument and in the formula
+#' will not be mentioned below, as they are obviously linked (n, r, alpha)
+#'
+#' - `ate`: \eqn{\beta_1-\beta_0}
+#' - `margin`: \eqn{\Delta_s}
+#' - `variance`: \eqn{\widehat{\sigma}^2(1-\widehat{R}^2)}
+#'
+#' ## Finding the `variance` to use for approximation
+#'
+#' The `variance_ancova` function estimates \eqn{\sigma^2(1-R^2)} in data and
+#' returns it as a `numeric` that can be passed directly as the `variance`
+#' in `power_gs`. Corresponds to estimating the power from using an `lm` with
+#' the same `formula` as specified in `variance_ancova`.
+#'
+#' The user can estimate the `variance` any way they see fit.
+#'
+#' @return
+#' All functions return a `numeric`. `variance_ancova` returns a `numeric` with
+#' a variance estimated from data to used for power estimation and sample size
+#' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with
+#' the power or sample size approximation.
+#'
+NULL
+
+#' @rdname power_and_ss
+#'
 #' @description
 #' `variance_ancova` provides a convenient function for estimating a
 #' variance to use for power and sample size approximation.
-#'
-#' @rdname power_and_ss
 #'
 #' @inheritParams stats::model.frame
 #' @param formula an object of class "formula" (or one that can be coerced to that class):
@@ -18,12 +50,6 @@
 #' Default is `1` which means the estimate of \eqn{R^2} is unchanged. Use values
 #' below `1` to obtain a more conservative estimate of the coefficient of determination.
 #' See details about how \eqn{R^2} related to the estimation.
-#'
-#' @return
-#' All functions return a `numeric`. `variance_ancova` returns a `numeric` with
-#' a variance estimated from data to used for power estimation and sample size
-#' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with
-#' the power or sample size approximation.
 #'
 #' @export
 variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
@@ -84,28 +110,6 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' @param alpha           a `numeric` significance level. Due to regulatory guidelines when
 #' using a one-sided test, half the specified significance level is used.
 #' Thus, for standard significance level of 5%, the default is `alpha = 0.025`.
-#'
-#' @details
-#'
-#' This details section provides information about relation between arguments to
-#' functions and the formulas described in sections below for each power
-#' approximation formula.
-#'
-#' Note that all entities that carry the same name as an argument and in the formula
-#' will not be mentioned below, as they are obviously linked (n, r, alpha)
-#'
-#' - `ate`: \eqn{\beta_1-\beta_0}
-#' - `margin`: \eqn{\Delta_s}
-#' - `variance`: \eqn{\widehat{\sigma}^2(1-\widehat{R}^2)}
-#'
-#' ## Finding the `variance` to use for approximation
-#'
-#' The `variance_ancova` function estimates \eqn{\sigma^2(1-R^2)} in data and
-#' returns it as a `numeric` that can be passed directly as the `variance`
-#' in `power_gs`. Corresponds to estimating the power from using an `lm` with
-#' the same `formula` as specified in `variance_ancova`.
-#'
-#' The user can estimate the `variance` any way they see fit.
 #'
 #' @section Guenther-Schouten power approximation:
 #' The estimation formula in the case of an ANCOVA model with multiple covariate adjustement is (see description for reference):
