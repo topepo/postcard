@@ -1,4 +1,4 @@
-#' Power and sample size estimation
+#' Power and sample size estimation for linear models
 #'
 #' @description
 #' `variance_ancova` provides a convenient function for estimating a
@@ -170,7 +170,8 @@ power_gs <- function(variance,
 #' @rdname power_and_ss
 #'
 #' @param power a `numeric` giving the desired power when calculating the sample size
-
+#'
+#' @export
 samplesize_gs <- function(variance,
                           ate,
                           r = 1,
