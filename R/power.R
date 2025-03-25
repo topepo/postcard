@@ -4,7 +4,7 @@
 #' `variance_ancova` provides a convenient function for estimating a
 #' variance to use for power and sample size approximation.
 #'
-#' @rdname power
+#' @rdname power_and_ss
 #'
 #' @inheritParams stats::model.frame
 #' @param formula an object of class "formula" (or one that can be coerced to that class):
@@ -63,7 +63,7 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
   return(var_bound)
 }
 
-#' @rdname power
+#' @rdname power_and_ss
 #'
 #' @description
 #' The `power_gs` and `samplesize_gs` functions calculate the Guenther-Schouten
@@ -167,7 +167,7 @@ power_gs <- function(variance,
 }
 
 
-#' @rdname power
+#' @rdname power_and_ss
 #'
 #' @param power a `numeric` giving the desired power when calculating the sample size
 
@@ -184,7 +184,7 @@ samplesize_gs <- function(variance,
   return(samplesize)
 }
 
-#' @rdname power
+#' @rdname power_and_ss
 #'
 #' @description
 #' The function `power_nc` calculates the power for ANOVA or ANCOVA based on the
