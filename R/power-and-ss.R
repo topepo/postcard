@@ -1,6 +1,6 @@
 #' Power and sample size estimation for linear models
 #'
-#' @name power_and_ss
+#' @name power-and-ss
 #'
 #' @details
 #'
@@ -32,7 +32,7 @@
 #'
 NULL
 
-#' @rdname power_and_ss
+#' @rdname power-and-ss
 #'
 #' @description
 #' `variance_ancova` provides a convenient function for estimating a
@@ -89,7 +89,7 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
   return(var_bound)
 }
 
-#' @rdname power_and_ss
+#' @rdname power-and-ss
 #'
 #' @description
 #' The `power_gs` and `samplesize_gs` functions calculate the Guenther-Schouten
@@ -171,7 +171,7 @@ power_gs <- function(variance,
 }
 
 
-#' @rdname power_and_ss
+#' @rdname power-and-ss
 #'
 #' @param power a `numeric` giving the desired power when calculating the sample size
 #'
@@ -189,7 +189,7 @@ samplesize_gs <- function(variance,
   return(samplesize)
 }
 
-#' @rdname power_and_ss
+#' @rdname power-and-ss
 #'
 #' @description
 #' The function `power_nc` calculates the power for ANOVA or ANCOVA based on the
