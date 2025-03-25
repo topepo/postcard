@@ -5,7 +5,7 @@
 \alias{power_gs}
 \alias{samplesize_gs}
 \alias{power_nc}
-\title{Power and sample size estimation}
+\title{Power and sample size estimation for linear models}
 \usage{
 variance_ancova(formula, data, inflation = 1, deflation = 1)
 
