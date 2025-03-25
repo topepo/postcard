@@ -19,7 +19,7 @@ power_nc(variance, df, ate, n, r = 1, margin = 0, alpha = 0.025)
 \item{formula}{an object of class "formula" (or one that can be coerced to that class):
 a symbolic description used in \code{\link[stats:model.frame]{stats::model.frame()}} to create a \code{data.frame} with
 response and covariates. This data.frame is used to estimate the \eqn{R^2}, which is
-then used to find the variance bound. See more in details.}
+then used to find the variance. See more in details.}
 
 \item{data}{a data frame, list or environment (or object
     coercible by \code{\link{as.data.frame}} to a data frame),
@@ -32,9 +32,10 @@ to obtain a more conservative estimate of the marginal response variance.}
 
 \item{deflation}{a \code{numeric} to multiply the \eqn{R^2} by.
 Default is \code{1} which means the estimate of \eqn{R^2} is unchanged. Use values
-below \code{1} to obtain a more conservative estimate of the coefficient of determination.}
+below \code{1} to obtain a more conservative estimate of the coefficient of determination.
+See details about how \eqn{R^2} related to the estimation.}
 
-\item{variance}{a \code{numeric} variance bound to use for the approximation. See more details
+\item{variance}{a \code{numeric} variance to use for the approximation. See more details
 in documentation sections of each power approximating function.}
 
 \item{ate}{a \code{numeric} minimum effect size that we should be able to detect.}
@@ -57,23 +58,25 @@ Thus, for standard significance level of 5\%, the default is \code{alpha = 0.025
 }
 \value{
 All functions return a \code{numeric}. \code{variance_ancova} returns a \code{numeric} with
-a variance bound estimated from data to used for power estimation and sample size
+a variance estimated from data to used for power estimation and sample size
 estimation. \code{power_xx} and \code{samplesize_xx} functions return a \code{numeric} with
 the power or sample size approximation.
 }
 \description{
 \code{variance_ancova} provides a convenient function for estimating a
-variance bound to use for power and sample size approximation.
+variance to use for power and sample size approximation.
 
 The \code{power_gs} and \code{samplesize_gs} functions calculate the Guenther-Schouten
 power approximation for ANOVA or ANCOVA.
 The approximation is based in (Guenther WC. Sample Size Formulas for Normal Theory T Tests.
 The American Statistician. 1981;35(4):243–244) and (Schouten HJA. Sample size formula with
 a continuous outcome for unequal group sizes and unequal variances. Statistics in Medicine.
-1999;18(1):87–91). See more in section after \code{Value}.
+1999;18(1):87–91).
 
 The function \code{power_nc} calculates the power for ANOVA or ANCOVA based on the
 non-centrality parameter and the exact t-distributions.
+
+See more details about each funtion in \code{Details} and in sections after \code{Value}.
 }
 \details{
 This details section provides information about relation between arguments to
@@ -163,29 +166,26 @@ dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
                 family = gaussian())
 
 # Approximate the power using no adjustment covariates
-vb_nocov <- var(dat_gaus$Y)
-power_gs(n = 200, variance = vb_nocov, ate = 1)
+va_nocov <- var(dat_gaus$Y)
+power_gs(n = 200, variance = va_nocov, ate = 1)
 
 # Approximate the power with a model adjusting for both variables in the
 # data generating process
 
-## First estimate the variance bound sigma^2 * (1-R^2)
-vb_cov <- variance_ancova(Y ~ X1 + X2 + A, dat_gaus)
-## Then estimate the power using this variance bound
-power_gs(n = 100, variance = vb_cov, ate = 1.8, margin = 1, r = 2)
+## First estimate the variance sigma^2 * (1-R^2)
+va_cov <- variance_ancova(Y ~ X1 + X2 + A, dat_gaus)
+## Then estimate the power using this variance
+power_gs(n = 100, variance = va_cov, ate = 1.8, margin = 1, r = 2)
 
 # Approximate the sample size needed to obtain 90\% power with same model as
 # above
 samplesize_gs(
-  variance = vb_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
+  variance = va_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
 )
 
 # No adjustment covariates
-power_nc(n = 200, variance = vb_nocov, df = 199, ate = 1)
-
+power_nc(n = 200, variance = va_nocov, df = 199, ate = 1)
 # Adjusting for all covariates in data generating process
-power_nc(
-  n = 200, variance = vb_cov, df = 196, ate = 1.8, margin = 1, r = 2
-)
+power_nc(n = 200, variance = va_cov, df = 196, ate = 1.8, margin = 1, r = 2)
 
 }

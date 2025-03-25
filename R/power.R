@@ -2,7 +2,7 @@
 #'
 #' @description
 #' `variance_ancova` provides a convenient function for estimating a
-#' variance bound to use for power and sample size approximation.
+#' variance to use for power and sample size approximation.
 #'
 #' @rdname power
 #'
@@ -10,17 +10,18 @@
 #' @param formula an object of class "formula" (or one that can be coerced to that class):
 #' a symbolic description used in [stats::model.frame()] to create a `data.frame` with
 #' response and covariates. This data.frame is used to estimate the \eqn{R^2}, which is
-#' then used to find the variance bound. See more in details.
+#' then used to find the variance. See more in details.
 #' @param inflation a `numeric` to multiply the marginal variance of the response by.
 #' Default is `1` which estimates the variance directly from data. Use values above `1`
 #' to obtain a more conservative estimate of the marginal response variance.
 #' @param deflation a `numeric` to multiply the \eqn{R^2} by.
 #' Default is `1` which means the estimate of \eqn{R^2} is unchanged. Use values
 #' below `1` to obtain a more conservative estimate of the coefficient of determination.
+#' See details about how \eqn{R^2} related to the estimation.
 #'
 #' @return
 #' All functions return a `numeric`. `variance_ancova` returns a `numeric` with
-#' a variance bound estimated from data to used for power estimation and sample size
+#' a variance estimated from data to used for power estimation and sample size
 #' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with
 #' the power or sample size approximation.
 #'
@@ -42,10 +43,15 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
   var_Y_inf <- var_Y * inflation
 
   mt <- attr(mf, "terms")
-  X <- model.matrix(mt, mf)[, -1]
+  X <- model.matrix(mt, mf)
+  X_has_intercept <- attr(mt, "intercept")
+  if (X_has_intercept)
+    X <- X[, -1]
+  if (ncol(as.matrix(X)) == 0)
+    return(var_Y_inf)
 
   Sigma_X.I <- X %>%
-    cov() %>%
+    var() %>%
     chol() %>%
     chol2inv()
   sigma_XY <- cov(X, Y)
@@ -65,13 +71,13 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' The approximation is based in (Guenther WC. Sample Size Formulas for Normal Theory T Tests.
 #' The American Statistician. 1981;35(4):243–244) and (Schouten HJA. Sample size formula with
 #' a continuous outcome for unequal group sizes and unequal variances. Statistics in Medicine.
-#' 1999;18(1):87–91). See more in section after `Value`.
+#' 1999;18(1):87–91).
 #'
 #' @param n               a `numeric` with number of participants in total.
 #' From this number of participants in the treatment group is \eqn{n1=(r/(1+r))n}
 #' and the control group is \eqn{n1=(1/(1+r))n}.
 #' @param r               a `numeric` allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation `r=1`.
-#' @param variance  a `numeric` variance bound to use for the approximation. See more details
+#' @param variance  a `numeric` variance to use for the approximation. See more details
 #' in documentation sections of each power approximating function.
 #' @param ate             a `numeric` minimum effect size that we should be able to detect.
 #' @param margin          a `numeric` superiority margin (for non-inferiority margin, a negative value can be provided).
@@ -125,21 +131,21 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #'                 family = gaussian())
 #'
 #' # Approximate the power using no adjustment covariates
-#' vb_nocov <- var(dat_gaus$Y)
-#' power_gs(n = 200, variance = vb_nocov, ate = 1)
+#' va_nocov <- var(dat_gaus$Y)
+#' power_gs(n = 200, variance = va_nocov, ate = 1)
 #'
 #' # Approximate the power with a model adjusting for both variables in the
 #' # data generating process
 #'
-#' ## First estimate the variance bound sigma^2 * (1-R^2)
-#' vb_cov <- variance_ancova(Y ~ X1 + X2 + A, dat_gaus)
-#' ## Then estimate the power using this variance bound
-#' power_gs(n = 100, variance = vb_cov, ate = 1.8, margin = 1, r = 2)
+#' ## First estimate the variance sigma^2 * (1-R^2)
+#' va_cov <- variance_ancova(Y ~ X1 + X2 + A, dat_gaus)
+#' ## Then estimate the power using this variance
+#' power_gs(n = 100, variance = va_cov, ate = 1.8, margin = 1, r = 2)
 #'
 #' # Approximate the sample size needed to obtain 90% power with same model as
 #' # above
 #' samplesize_gs(
-#'   variance = vb_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
+#'   variance = va_cov, ate = 1.8, power = 0.9, margin = 1, r = 2
 #' )
 #'
 #' @export
@@ -183,6 +189,8 @@ samplesize_gs <- function(variance,
 #' @description
 #' The function `power_nc` calculates the power for ANOVA or ANCOVA based on the
 #' non-centrality parameter and the exact t-distributions.
+#'
+#' See more details about each funtion in `Details` and in sections after `Value`.
 #'
 #' @param df a `numeric` degrees of freedom to use in the t-distribution.
 #'
@@ -228,12 +236,9 @@ samplesize_gs <- function(variance,
 #'
 #' @examples
 #' # No adjustment covariates
-#' power_nc(n = 200, variance = vb_nocov, df = 199, ate = 1)
-#'
+#' power_nc(n = 200, variance = va_nocov, df = 199, ate = 1)
 #' # Adjusting for all covariates in data generating process
-#' power_nc(
-#'   n = 200, variance = vb_cov, df = 196, ate = 1.8, margin = 1, r = 2
-#' )
+#' power_nc(n = 200, variance = va_cov, df = 196, ate = 1.8, margin = 1, r = 2)
 #'
 power_nc <- function(variance,
                      df,
