@@ -1,28 +1,35 @@
-# `power_gs` works
+# snapshot tests
 
     Code
-      power_gs(rho = 0.7)
+      va1
     Output
-      [1] 0.8369041
+      [1] 0.8476228
 
 ---
 
     Code
-      power_gs(R2 = 0.8)
+      va2
     Output
-      [1] 0.9969063
-
-# `power_nc` works
-
-    Code
-      power_nc(rho = 0.7)
-    Output
-      [1] 0.8367532
+      [1] 0.8523504
 
 ---
 
     Code
-      power_nc(R2 = 0.8, n.adj = 4)
+      va3
     Output
-      [1] 0.9968863
+      [1] 5.46521
+
+---
+
+    Code
+      pgs
+    Output
+      [1] 0.9132159
+
+---
+
+    Code
+      ssgs2
+    Output
+      [1] 134.7229
 

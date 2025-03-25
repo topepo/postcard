@@ -29,6 +29,7 @@ Imports:
     xgboost,
     yardstick
 Suggests: 
+    gggrid,
     knitr,
     LiblineaR,
     MASS,

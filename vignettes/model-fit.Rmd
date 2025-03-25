@@ -1,8 +1,8 @@
 ---
-title: "More details on usage of package"
+title: "Controlling behavior of model fitting functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{More details on usage of package}
+  %\VignetteIndexEntry{Controlling behavior of model fitting functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,6 +19,10 @@ library(PostCard)
 library(magrittr)
 withr::local_seed(1395878)
 ```
+
+For introductory examples on how to use the package, see the [README file](../README.md).
+
+In this vignette, we will explain how to alter the default behavior of the model fitting functions `rctglm()` and `rctglm_with_prognosticscore()`.
 
 ## Controlling verbosity
 

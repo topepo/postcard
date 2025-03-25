@@ -1,0 +1,184 @@
+---
+title: "Prospective Power Estimation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{prospective_power}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+  knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  )
+```
+  
+```{r setup}
+library(PostCard)
+```
+
+The functions described in the help page `powerss()` provide utilities for prospective power calculations using linear models. In this vignette, we will conduct sample size calculations by constructing power curves using a **standard ANCOVA method** implemented in the package and compare this to using prognostic covariate adjustment.
+
+In usual cases of wanting to conduct sample size/power analyses prospectively, data of the new exposure is not available at the time of the analysis. What we can do is use historical data of the comparator group to estimate a variance and adjust this according to beliefs we might have about data from the novel group.
+
+## Data
+
+As described above, data is not available at the time of a prospective power analysis. To showcase a common use case, we here simulate historical data, which we use to estimate the variance of the response adjusted by the coefficient of determination with the function `variance_ancova()`.
+
+> To compare power curves between a "standard" ANCOVA model and one using prognostic covariate adjustment, we divide the historical data into a training and test part, so we can fit a prognostic model to the training data and use the resulting model to predict prognostic scores in the test data.
+
+```{r}
+# Generate some data
+n <- 1000
+b0 <- 1
+b1 <- 1.5
+b2 <- 1.2
+b3 <- 2
+b4 <- 1.6
+
+data_train <- glm_data(
+  Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
+  X1 = runif(n, min = -2, max = 2),
+  X2 = rnorm(n, mean = 2, sd = 2),
+  X3 = rbinom(n, 1, 0.5)
+)
+
+data_test <- glm_data(
+  Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
+  X1 = runif(n, min = -2, max = 2),
+  X2 = rnorm(n, mean = 2, sd = 2),
+  X3 = rbinom(n, 1, 0.5)
+)
+```
+
+## Fitting a prognostic model
+
+Using the training part of the historical data, we fit a prognostic model using the `fit_best_learner()` function. This fits a discrete super learner and returns it as a trained workflow, we can use for prediction to construct our prognostic scores.
+
+```{r}
+lrnr <- fit_best_learner(
+  data = data_train,
+  formula = Y ~ .,
+  cv_folds = 10,
+  verbose = 0
+)
+
+data_test <- dplyr::bind_cols(data_test, predict(lrnr, data_test))
+```
+
+## Estimating the variance used for power approximation
+
+We use the function `variance_ancova` to estimate the entity $\sigma^2(1-R^2)$ in case of a "standard" ANCOVA model adjusting for covariates in data, and in case of an ANCOVA utilising **prognostic covariate adjustment** by adjusting for the prognostic score as a covariate.
+
+```{r}
+var_bound_ancova <- variance_ancova(Y ~ X1 + X2 + X3, data = data_test)
+var_bound_prog <- variance_ancova(Y ~ X1 + X2 + X3 + .pred, data = data_test)
+```
+
+## Creating a plot of power curves
+
+In order to see how the estimated power behaves as a function of the total sample size, we iterate the `power_gs` function for a number of different sample sizes and save the results using both the estimated variance with and without prognostic covariate adjustment.
+
+> Note we here just use the `power_gs()` function, but `power_nc()` is also available and works exactly the same except it needs an additional mandatory argument `df` with degrees of freedom for the t-distribution.
+
+```{r}
+n_from <- 10
+n_to <- 400
+
+iterate_power <- function(variance) {
+  power_ancova <- sapply(n_from:n_to, FUN = function(n) power_gs(
+    n = n,
+    variance = variance,
+    r = 1, ate = .8, margin = 0
+  )
+  )
+  data.frame(n = n_from:n_to, power = power_ancova)
+}
+
+data_power <- dplyr::bind_rows(
+  iterate_power(var_bound_ancova) %>% 
+    dplyr::mutate(model = "ancova"),
+  iterate_power(var_bound_prog) %>% 
+    dplyr::mutate(model = "prog")
+)
+```
+
+We create a plot of the estimated power across values of sample sizes for the two different models, mark a desired power of 90% as a horizontal line and create vertical lines with labels that show the sample size needed to obtain 90% power with each model.
+
+> Note if we were just interested in finding the sample size needed for 90% power, simply running `samplesize_gs()` as we do below would be enough.
+
+```{r}
+desired_power <- 0.9
+
+n_ancova <- samplesize_gs(
+  variance = var_bound_ancova,
+  power = desired_power,
+  r = 1, ate = .8, margin = 0
+)
+n_prog <- samplesize_gs(
+  variance = var_bound_prog,
+  power = desired_power,
+  r = 1, ate = .8, margin = 0
+)
+
+colors <- c(ancova = "darkorange1", prog = "dodgerblue4")
+label_fun <- function(data, coords) {
+  grid::textGrob(
+    data$label,
+    x = grid::unit(coords$x, "npc") + grid::unit(5, "mm"),
+    y = grid::unit(coords$y, "npc") - grid::unit(5, "mm"),
+    hjust = 0,
+    gp = grid::gpar(col = data$label_col)
+  )
+}
+
+data_power %>%
+  ggplot2::ggplot(ggplot2::aes(x = n, y = power)) +
+  ggplot2::geom_line(ggplot2::aes(color = model), linewidth = 1.2, alpha = 0.8,
+                     show.legend = FALSE) +
+  ggplot2::geom_hline(
+    yintercept = desired_power,
+    color = "grey40",
+    linetype = "dashed"
+  ) +
+  ggplot2::geom_line(
+    data = data.frame(x = n_ancova, y = c(0, desired_power)),
+    ggplot2::aes(x = x, y = y),
+    linetype = "dashed",
+    color = colors["ancova"]
+  ) +
+  gggrid::grid_panel(label_fun,
+    ggplot2::aes(x = x, y = y,
+                 label = paste0("ANCOVA: ", ceiling(n_ancova)),
+                 label_col = colors["ancova"]),
+    data = data.frame(x = n_ancova, y = desired_power)
+  ) + 
+  ggplot2::geom_line(
+    data = data.frame(x = n_prog, y = c(0, desired_power)),
+    ggplot2::aes(x = x, y = y),
+    linetype = "dashed",
+    color = colors["prog"]
+  ) +
+  gggrid::grid_panel(label_fun,
+    ggplot2::aes(x = x, y = y,
+                 label = paste0("ANCOVA with prognostic score: ", ceiling(n_prog)),
+                 label_col = colors["prog"]),
+    data = data.frame(x = n_prog, y = desired_power)
+  ) + 
+  ggplot2::scale_color_manual(
+    name = "",
+    values = colors) +
+  ggplot2::scale_y_continuous(
+    breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+    labels = function(x) paste0(x*100, "%")
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(
+    face = "bold",
+    size = 16
+  )) +
+  ggplot2::labs(x = "Total sample size", y = "Power",
+                title = "Guenther Schouten approximation of power")
+```
+
