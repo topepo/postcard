@@ -95,7 +95,7 @@ print_estimand_info <- function(x,
                                 digits = max(3L, getOption("digits") - 3L),
                                 ...) {
   cat("Estimand function r: ",
-      deparse_fun_body(x$estimand_fun),
+      deparse_fun_body(x$estimand_funs$f),
       "\n",
       sep = "")
   cat("Estimand (r(psi_1, psi_0)) estimate (SE): ",
