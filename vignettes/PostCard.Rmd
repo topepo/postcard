@@ -1,6 +1,5 @@
 ---
-title: "PostCard"
-subtitle: "Estimation of Marginal Effects Using Prognostic Covariate Adjustment"
+title: "Introduction to PostCard"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{PostCard}
