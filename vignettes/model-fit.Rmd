@@ -21,13 +21,13 @@ withr::local_seed(1395878)
 withr::local_options(list(PostCard.verbose = 0))
 ```
 
-For introductory examples on how to use the package, see the [README file](../README.md).
+For introductory examples on how to use the package, see `vignette("PostCard")`.
 
 In this vignette, we will explain how to alter the default behavior of the model fitting functions `rctglm()` and `rctglm_with_prognosticscore()`.
 
 ### Generating some data to run examples
 
-As in the [README](https://github.com/NNpackages/PostCard#README) examples, we simulate data using the `glm_data()` function from the package.
+As in `vignette("PostCard")`, we simulate data using the `glm_data()` function from the package.
 
 ```{r dat-sim}
 n <- 1000
