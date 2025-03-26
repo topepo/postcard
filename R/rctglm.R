@@ -53,6 +53,8 @@
 #' using cross validation with number of folds specified by `cv_variance_folds`. The cross validation splits
 #' are performed using stratified sampling with `exposure_indicator` as the `strata` argument in [rsample::vfold_cv].
 #'
+#' Read more in `vignette("model-fit")`.
+#'
 #' @section Estimands:
 #' As noted in the description, `psi0` and `psi1` are the counterfactual means found by prediction using
 #' a fitted GLM in the binary groups defined by `exposure_indicator`.
@@ -60,33 +62,33 @@
 #' Default estimand functions can be specified via `"ate"` (which uses the function
 #' `function(psi1, psi0) psi1-psi0`) and `"rate_ratio"` (which uses the function
 #' `function(psi1, psi0) psi1/psi0`). See more information on specifying the `estimand_fun`
-#' in section
-#' [Specifying any estimand](https://nnpackages.github.io/PostCard/articles/more-details.html#specifying-any-estimand)
-#' in the vignette `vignette("more-details")`.
+#' in `vignette("model-fit")`.
 #'
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
 #' @return `rctglm` returns an object of class inheriting from `"rctglm"`.
 #'
-#' The function [estimand] (or short-hand version [est]) can be used to extract
-#' a `data.frame` with an estimated value and standard error of the estimand.
-#'
-#' A method for the generic [coef] has been added for `rctglm`
-#' (i.e., [coef.rctglm]), which uses the method `coef.glm` to extract coefficient
-#' information from the underlying `glm` fit in the procedure.
-#'
 #' An object of class `rctglm` is a list containing the following components:
-#' -   `estimand`: A `data.frame` with plug-in estimate of estimand, standard
+#' \itemize{
+#'    \item **`estimand`**: A `data.frame` with plug-in estimate of estimand, standard
 #' error (SE) estimate and variance estimate of estimand
-#' -   `estimand_fun`: The `function` used to obtain an estimate of the estimand
-#' from counterfactual means
-#' -   `means_counterfactual`: A `data.frame` with counterfactual means `psi0` and `psi1`
-#' -   `fitted.values_counterfactual`: A `data.frame` with counterfactual mean
-#' values, obtained by transforming the linear predictors for each group
-#' by the inverse of the link function.
-#' -   `glm`: A `glm` object returned from running [stats::glm] within the procedure
-#' -   `call`: The matched `call`
+#'    \item `estimand_funs`: A `list` with
+#'    \itemize{
+#'      \item `f`: The `estimand_fun` used to obtain an estimate of the estimand from counterfactual means
+#'      \item `d0`: The derivative with respect to `psi0`
+#'      \item `d1`: The derivative with respect to `psi1`
+#'    }
+#'    \item `means_counterfactual`: A `data.frame` with counterfactual means `psi0` and `psi1`
+#'    \item `fitted.values_counterfactual`: A `data.frame` with counterfactual mean
+#'    values, obtained by transforming the linear predictors for each group
+#'    by the inverse of the link function.
+#'    \item `glm`: A `glm` object returned from running [stats::glm] within the procedure
+#'    \item `call`: The matched `call`
+#'  }
+#'
+#' See how to extract information using methods in [rctglm_methods].
+#'
 #' @export
 #'
 #' @examples
@@ -138,8 +140,8 @@
 rctglm <- function(formula,
                    exposure_indicator,
                    exposure_prob,
-                   family,
                    data,
+                   family = gaussian,
                    estimand_fun = "ate",
                    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
                    cv_variance = FALSE,
@@ -154,7 +156,9 @@ rctglm <- function(formula,
   exposure_indicator <- rlang::enquo(exposure_indicator)
   args <- as.list(environment())
   cal <- match.call()
+
   formula <- check_formula(formula)
+  family <- check_family(family)
 
   ind_expr <- rlang::quo_get_expr(exposure_indicator)
   called_within_prognosticscore <- ind_expr == "exposure_indicator"
@@ -253,7 +257,11 @@ rctglm <- function(formula,
 
   out <- list(
     estimand = data_estimand,
-    estimand_fun = estimand_fun,
+    estimand_funs = list(
+      f = estimand_fun,
+      d0 = estimand_fun_deriv0,
+      d1 = estimand_fun_deriv1
+    ),
     means_counterfactual = full_model_means_counterfactual,
     fitted.values_counterfactual = full_model_fitted.values_counterfactual,
     glm = model,

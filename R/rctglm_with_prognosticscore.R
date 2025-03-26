@@ -21,10 +21,8 @@
 #' @return `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
 #' which inherits from [rctglm].
 #'
-#' Due to inheritance, methods described in the **Value** section of [rctglm] and
-#' [rctglm_methods] also work for extracting information from this object.
-#'
-#' An `rctglm_prog` object is a list with the same components as an [rctglm] object,
+#' An `rctglm_prog` object is a list with the same components as an [rctglm] object
+#' (see the **`Value`** section of [rctglm] for a breakdown of the structure),
 #' but with an additional list element of:
 #' - `prognostic_info`: List with information about the fitted prognostic model
 #' on historical data. It has components:
@@ -70,10 +68,10 @@
 #' estimand(ate)
 rctglm_with_prognosticscore <- function(
     formula,
-    family,
-    data,
     exposure_indicator,
-    exposure_prob = NULL,
+    exposure_prob,
+    data,
+    family = gaussian,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     cv_variance = FALSE,
@@ -92,6 +90,7 @@ rctglm_with_prognosticscore <- function(
   extra_glm_args <- list(...)
 
   formula <- check_formula(formula)
+  family <- check_family(family)
 
   if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   if (is.null(prog_formula)) {

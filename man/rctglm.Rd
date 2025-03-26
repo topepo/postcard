@@ -9,8 +9,8 @@ rctglm(
   formula,
   exposure_indicator,
   exposure_prob,
-  family,
   data,
+  family = gaussian,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -33,17 +33,17 @@ make the "orientation" of the \code{estimand_fun} clear.}
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
+\item{data}{an optional data frame, list or environment (or object coercible
+by as.data.frame to a data frame) containing the variables in the model. If
+not found in data, the variables are taken from environment(formula), typically
+the environment from which the function is called.}
+
 \item{family}{a description of the error distribution and link
     function to be used in the model.  For \code{glm} this can be a
     character string naming a family function, a family function or the
     result of a call to a family function.  For \code{glm.fit} only the
     third option is supported.  (See \code{\link[stats]{family}} for details of
     family functions.)}
-
-\item{data}{an optional data frame, list or environment (or object coercible
-by as.data.frame to a data frame) containing the variables in the model. If
-not found in data, the variables are taken from environment(formula), typically
-the environment from which the function is called.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
@@ -71,19 +71,16 @@ execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or
 \value{
 \code{rctglm} returns an object of class inheriting from \code{"rctglm"}.
 
-The function \link{estimand} (or short-hand version \link{est}) can be used to extract
-a \code{data.frame} with an estimated value and standard error of the estimand.
-
-A method for the generic \link{coef} has been added for \code{rctglm}
-(i.e., \link{coef.rctglm}), which uses the method \code{coef.glm} to extract coefficient
-information from the underlying \code{glm} fit in the procedure.
-
 An object of class \code{rctglm} is a list containing the following components:
 \itemize{
-\item \code{estimand}: A \code{data.frame} with plug-in estimate of estimand, standard
+\item \strong{\code{estimand}}: A \code{data.frame} with plug-in estimate of estimand, standard
 error (SE) estimate and variance estimate of estimand
-\item \code{estimand_fun}: The \code{function} used to obtain an estimate of the estimand
-from counterfactual means
+\item \code{estimand_funs}: A \code{list} with
+\itemize{
+\item \code{f}: The \code{estimand_fun} used to obtain an estimate of the estimand from counterfactual means
+\item \code{d0}: The derivative with respect to \code{psi0}
+\item \code{d1}: The derivative with respect to \code{psi1}
+}
 \item \code{means_counterfactual}: A \code{data.frame} with counterfactual means \code{psi0} and \code{psi1}
 \item \code{fitted.values_counterfactual}: A \code{data.frame} with counterfactual mean
 values, obtained by transforming the linear predictors for each group
@@ -91,6 +88,8 @@ by the inverse of the link function.
 \item \code{glm}: A \code{glm} object returned from running \link[stats:glm]{stats::glm} within the procedure
 \item \code{call}: The matched \code{call}
 }
+
+See how to extract information using methods in \link{rctglm_methods}.
 }
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
@@ -109,6 +108,8 @@ If \code{cv_variance} is \code{TRUE}, then the counterfactual predictions for ea
 used to calculate the value of the influence function) is obtained as out-of-sample (OOS) predictions
 using cross validation with number of folds specified by \code{cv_variance_folds}. The cross validation splits
 are performed using stratified sampling with \code{exposure_indicator} as the \code{strata} argument in \link[rsample:vfold_cv]{rsample::vfold_cv}.
+
+Read more in \code{vignette("model-fit")}.
 }
 \section{Estimands}{
 
@@ -118,9 +119,7 @@ a fitted GLM in the binary groups defined by \code{exposure_indicator}.
 Default estimand functions can be specified via \code{"ate"} (which uses the function
 \code{function(psi1, psi0) psi1-psi0}) and \code{"rate_ratio"} (which uses the function
 \code{function(psi1, psi0) psi1/psi0}). See more information on specifying the \code{estimand_fun}
-in section
-\href{https://nnpackages.github.io/PostCard/articles/more-details.html#specifying-any-estimand}{Specifying any estimand}
-in the vignette \code{vignette("more-details")}.
+in \code{vignette("model-fit")}.
 
 As a default, the \code{Deriv} package is used to perform symbolic differentiation to find the derivatives of
 the \code{estimand_fun}.
