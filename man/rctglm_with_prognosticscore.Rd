@@ -6,10 +6,10 @@
 \usage{
 rctglm_with_prognosticscore(
   formula,
-  family,
-  data,
   exposure_indicator,
-  exposure_prob = NULL,
+  exposure_prob,
+  data,
+  family = gaussian,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -28,18 +28,6 @@ rctglm_with_prognosticscore(
 a symbolic description of the model to be fitted. The details of model specification are
 given under ‘Details’ in the \link{glm} documentation.}
 
-\item{family}{a description of the error distribution and link
-    function to be used in the model.  For \code{glm} this can be a
-    character string naming a family function, a family function or the
-    result of a call to a family function.  For \code{glm.fit} only the
-    third option is supported.  (See \code{\link[stats]{family}} for details of
-    family functions.)}
-
-\item{data}{an optional data frame, list or environment (or object coercible
-by as.data.frame to a data frame) containing the variables in the model. If
-not found in data, the variables are taken from environment(formula), typically
-the environment from which the function is called.}
-
 \item{exposure_indicator}{(name of) the \emph{binary} variable in \code{data} that
 identifies randomisation groups. The variable is required to be binary to
 make the "orientation" of the \code{estimand_fun} clear.}
@@ -47,6 +35,18 @@ make the "orientation" of the \code{estimand_fun} clear.}
 \item{exposure_prob}{a \code{numeric} with the probabiliy of being in
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
+
+\item{data}{an optional data frame, list or environment (or object coercible
+by as.data.frame to a data frame) containing the variables in the model. If
+not found in data, the variables are taken from environment(formula), typically
+the environment from which the function is called.}
+
+\item{family}{a description of the error distribution and link
+    function to be used in the model.  For \code{glm} this can be a
+    character string naming a family function, a family function or the
+    result of a call to a family function.  For \code{glm.fit} only the
+    third option is supported.  (See \code{\link[stats]{family}} for details of
+    family functions.)}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
@@ -86,10 +86,8 @@ execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or
 \code{rctglm_with_prognosticscore} returns an object of class \code{rctglm_prog},
 which inherits from \link{rctglm}.
 
-Due to inheritance, methods described in the \strong{Value} section of \link{rctglm} and
-\link{rctglm_methods} also work for extracting information from this object.
-
-An \code{rctglm_prog} object is a list with the same components as an \link{rctglm} object,
+An \code{rctglm_prog} object is a list with the same components as an \link{rctglm} object
+(see the \strong{\code{Value}} section of \link{rctglm} for a breakdown of the structure),
 but with an additional list element of:
 \itemize{
 \item \code{prognostic_info}: List with information about the fitted prognostic model

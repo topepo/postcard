@@ -13,14 +13,12 @@
 #' @param ... additional arguments passed to methods
 #'
 #' @details
-#' `estimand` and short-hand form `est` are methods for extracting the estimated
-#' estimand value as well as the standard error (SE) and variance of the estimand.
-#' These functions are a shortcut to extract the list element `estimand`
-#' of an `rctglm` class object.
+#' The function [estimand] (or short-hand version [est]) can be used to extract
+#' a `data.frame` with an estimated value and standard error of the estimand.
 #'
-#' `coef` just use the corresponding `glm` methods on the `glm`
-#' fit contained within the `rctglm` object. Thus, this function is a
-#' shortcuts to running `coef(x$glm)`.
+#' A method for the generic [coef] has been added for `rctglm`
+#' (i.e., [coef.rctglm]), which uses the method `coef.glm` to extract coefficient
+#' information from the underlying `glm` fit in the procedure.
 #'
 #' @examples
 #' # Generate some data to showcase example
@@ -97,7 +95,7 @@ print_estimand_info <- function(x,
                                 digits = max(3L, getOption("digits") - 3L),
                                 ...) {
   cat("Estimand function r: ",
-      deparse_fun_body(x$estimand_fun),
+      deparse_fun_body(x$estimand_funs$f),
       "\n",
       sep = "")
   cat("Estimand (r(psi_1, psi_0)) estimate (SE): ",

@@ -72,6 +72,17 @@ test_that("`formula_everything` returns the correct formula object", {
     resp ~ .)
 })
 
+# formula_to_str
+test_that("`formula_to_str` returns character of length 1", {
+  formula_str <- formula_to_str(Y ~ A + X)
+  expect_equal(formula_str, "Y ~ A + X")
+
+  formula_str2 <- formula_to_str(Y ~ A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8 + A9 +
+                                 A10 + A11 + A12 + A13 + A14 + A15 + A16 + A17)
+  expect_length(formula_str2, 1)
+  expect_equal(formula_str2, paste0("Y ~ ", paste("A", 1:17, sep = "", collapse = " + ")))
+})
+
 # check_formula
 test_that("`test_formula` works", {
   expect_s3_class(check_formula("Y ~ 1 + X"), "formula")

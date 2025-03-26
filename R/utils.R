@@ -35,11 +35,7 @@ check_formula <- function(formula) {
 }
 
 formula_to_str <- function(formula) {
-  deparse(formula)
-}
-
-formula_to_str2 <- function(formula) {
-  rlang::as_label(rlang::enquo(formula))
+  deparse1(formula)
 }
 
 # Extract response from formula to

@@ -52,8 +52,8 @@
       
       Object of class rctglm_prog 
       
-      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = poisson(), 
-          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
+          exposure_prob = exposure_prob, data = dat_treat_pois, family = poisson(), 
           estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
           verbose = 0)
       
@@ -70,8 +70,8 @@
       
       Object of class rctglm_prog 
       
-      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = poisson(), 
-          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
+          exposure_prob = exposure_prob, data = dat_treat_pois, family = poisson(), 
           estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
           verbose = 0)
       
@@ -88,8 +88,8 @@
       
       Object of class rctglm_prog 
       
-      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = MASS::negative.binomial(2), 
-          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
+          exposure_prob = exposure_prob, data = dat_treat_pois, family = MASS::negative.binomial(2), 
           estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
           verbose = 0)
       
@@ -106,8 +106,8 @@
       
       Object of class rctglm_prog 
       
-      Call:  rctglm_with_prognosticscore(formula = Y ~ ., family = MASS::negative.binomial(2), 
-          data = dat_treat_pois, exposure_indicator = A, exposure_prob = exposure_prob, 
+      Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
+          exposure_prob = exposure_prob, data = dat_treat_pois, family = MASS::negative.binomial(2), 
           estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
           verbose = 0)
       

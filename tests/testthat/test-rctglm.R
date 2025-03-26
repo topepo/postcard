@@ -162,7 +162,7 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                 family = gaussian,
                 estimand_fun = "ate",
                 cv_variance = FALSE)
-  estimand_fun_ate <- gsub("\\s*", "", deparse_fun_body(ate$estimand_fun))
+  estimand_fun_ate <- gsub("\\s*", "", deparse_fun_body(ate$estimand_funs$f))
   expect_equal(estimand_fun_ate, "psi1-psi0")
 
   rr <- rctglm(formula = Y ~ .,
@@ -172,7 +172,7 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                family = gaussian,
                estimand_fun = "rate_ratio",
                cv_variance = FALSE)
-  estimand_fun_rr <- gsub("\\s*", "", deparse_fun_body(rr$estimand_fun))
+  estimand_fun_rr <- gsub("\\s*", "", deparse_fun_body(rr$estimand_funs$f))
   expect_equal(estimand_fun_rr, "psi1/psi0")
 
   nonsense_estimand_fun <- function(psi1, psi0) (psi1^2 - sqrt(psi0)) / 2^psi0
@@ -183,7 +183,7 @@ test_that("`estimand_fun` argument can be specified as function or character", {
                      family = gaussian,
                      estimand_fun = nonsense_estimand_fun,
                      cv_variance = FALSE)
-  expect_equal(nonsense$estimand_fun, nonsense_estimand_fun)
+  expect_equal(nonsense$estimand_funs$f, nonsense_estimand_fun)
 
   # Error when giving character that is not among the defaults
   expect_error(rctglm(formula = Y ~ .,
