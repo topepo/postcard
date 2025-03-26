@@ -18,21 +18,14 @@ knitr::opts_chunk$set(
 library(PostCard)
 library(magrittr)
 withr::local_seed(1395878)
+withr::local_options(list(PostCard.verbose = 0))
 ```
 
 For introductory examples on how to use the package, see the [README file](../README.md).
 
 In this vignette, we will explain how to alter the default behavior of the model fitting functions `rctglm()` and `rctglm_with_prognosticscore()`.
 
-## Controlling verbosity
-
-See package level options documentation in `options()`, giving information on how to change package behavior through options and environmental variables. Only option is `verbose`, which controls the amount of information printed to the console.
-
-As a default, `verbose = 2`, meaning various information printed throughout the algorithm. Change to `verbose = 1` for a little less information or `verbose = 0` for no information
-
-> Throughout the examples in this vignette, it will be visible what kind of information is printed to the user.
-
-## Plug-in estimation of marginal effects and variance estimation using influence functions
+### Generating some data to run examples
 
 As in the [README](https://github.com/NNpackages/PostCard#README) examples, we simulate data using the `glm_data()` function from the package.
 
@@ -42,20 +35,89 @@ b0 <- 1
 b1 <- 3
 b2 <- 2
 
-# Simulate data with a non-linear effect
+dat_gaus <- glm_data(
+  Y ~ b0+b1*sin(W)^2+b2*A,
+  W = runif(n, min = -2, max = 2),
+  A = rbinom(n, 1, prob = 1/2)
+)
+
+dat_gaus_hist <- glm_data(
+  Y ~ b0+b1*sin(W)^2,
+  W = runif(n, min = -2, max = 2)
+)
+
 dat_pois <- glm_data(
   Y ~ b0+b1*sin(W)^2+b2*A,
   W = runif(n, min = -2, max = 2),
   A = rbinom(n, 1, 1/2),
-  family = poisson(link = "log") # Default value
+  family = poisson(link = "log")
 )
 ```
 
-### Changing the estimand
+## Controlling verbosity
 
-The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is the average treatment effect (ATE). However, it's possible to specify any estimand.
+See package level options documentation in `options()`, giving information on how to change package behavior through options and environmental variables. Only option is `verbose`, which controls the amount of information printed to the console.
 
-#### Built-in estimands - average treatment effect and rate ratio
+As a default, `verbose = 2`, meaning various information printed throughout the algorithm. Change to `verbose = 1` for a little less information or `verbose = 0` for no information.
+
+Below we showcase the information that is printed with different specifications of verbosity.
+
+```{r}
+ # Default amount of printing
+ate <- rctglm(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  verbose = 2)
+ate_prog <- rctglm_with_prognosticscore(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  data_hist = dat_gaus_hist,
+  verbose = 2)
+# At little less printing
+ate <- rctglm(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  verbose = 1)
+ate_prog <- rctglm_with_prognosticscore(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  data_hist = dat_gaus_hist,
+  verbose = 1)
+# No printing
+ate <- rctglm(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  verbose = 0)
+ate_prog <- rctglm_with_prognosticscore(
+  formula = Y ~ A + W,
+  exposure_indicator = A,
+  exposure_prob = 1/2,
+  data = dat_gaus,
+  data_hist = dat_gaus_hist,
+  verbose = 0)
+```
+
+> Verbosity is suppressed in the rest of the vignette by setting option `PostCard.verbose` to `0`.
+
+## Specifying the estimand
+
+The default `estimand_fun` in `rctglm()` and `rctglm_with_prognosticscore()` is the average treatment effect (ATE).
+
+However, it's possible to specify any estimand by giving any function with 2 named arguments, `psi0` and `psi1`. Note that in addition to `estimand_fun`, the functions also take arguments `estimand_fun_deriv0` and `estimand_fun_deriv1`, which is the derivative with respect to `psi0` and `psi1`, respectively. As a default, these are `NULL`, which means symbolic differentiation is performed on the `estimand_fun` to derive them automatically.
+
+> Note that when `verbose > 0`, information is printed to the console about the results of the symbolic differentiation. We run the below code with `verbose = 1` though otherwise muted in this vignette to showcase this.
+
+### Built-in estimands - average treatment effect and rate ratio
 
 Built in is the ATE and rate ratio, which can be specified with character strings. As is apparent from the documentation of `rctglm()` and `rctglm_with_prognosticscore()`, the default of `estimand_fun` is `"ate"`, and similarly the user can specify `estimand_fun = "rate_ratio"` to use the estimand function `psi1 / psi0` as seen below:
 
@@ -66,15 +128,14 @@ rate_ratio <- rctglm(
   exposure_prob = 1/2,
   data = dat_pois,
   family = "poisson",
-  estimand_fun = "rate_ratio")
-rate_ratio
+  estimand_fun = "rate_ratio",
+  verbose = 1)
+rate_ratio$estimand_funs
 ```
 
-#### Specifying any estimand
+### Specifying any estimand
 
-It's possible to specify any function with 2 named arguments, `psi0` and `psi1`, as your estimand function `estimand_fun`. Below is an example showing that any estimand function can be specified.
-
-> Note that information is printed to the console about the automatic differentiation being performed on the `estimand_fun`, which are used for the calculation of the influence function of the marginal effect.
+Below is an example showing the specification of a custom defined function with arguments `psi0` and `psi1`.
 
 ```{r nonsense-run-show}
 nonsense_estimand_fun <- function(psi1, psi0) {
@@ -88,60 +149,41 @@ nonsense_estimand <- rctglm(
   data = dat_pois,
   family = poisson(),
   estimand_fun = nonsense_estimand_fun,
-  verbose = 0)
-nonsense_estimand
+  verbose = 1)
+nonsense_estimand$estimand_funs
 ```
 
-### Variance estimation using cross validation
+## Variance estimation using cross validation
 
-The variance is estimated as the variance of the influence function of the marginal effect. During the calculation of this function, counterfactual prediction are made for all observations, using a GLM to predict their outcome in case they were in group 0 and 1, respectively. 
+The variance is estimated as the variance of the influence function of the marginal effect. During the calculation of this function, counterfactual predictions are made for all observations, using a GLM to predict their outcome in case they were in exposure group 0 and 1, respectively. 
 
-`cv_variance` is an argument in `rctglm` and `rctglm_with_prognosticscore` that enables obtaining these counterfactual predictions as out-of-sample (OOS) prediction by using cross validation. Using cross validation for the variance estimation is the default behavior in the package.
+`cv_variance` is an argument in `rctglm()` and `rctglm_with_prognosticscore()` that enables obtaining these counterfactual predictions as out-of-sample (OOS) prediction by using cross validation.
 
-### Prognostic covariate adjustment
+## Prognostic covariate adjustment
 
 The `rctglm_with_prognosticscore()` uses the function `fit_best_learner()` to fit a prognostic model to the historical data, `data_hist`. Thereafter, the model is used to predict prognostic scores for all observations in `data` before using these scores as a covariate when performing plug-in etimation in a GLM using `rctglm`.
 
-The default behavior of `fit_best_learner()` and subsequently `rctglm_with_prognosticscore()` is to fit a discrete super learner (discrete to avoid overfitting) by finding the model with the lowest RMSE among a linear regression, Multivariate adaptive regression spline (MARS) and boosted trees.
+The behavior of `fit_best_learner()` and subsequently fitting the prognostic model on `data_hist` in `rctglm_with_prognosticscore()` is to fit a discrete super learner (discrete to avoid overfitting) by finding the model with the lowest RMSE among a list of models. The algorithm uses a default of 5 folds for cross validation (`cv_prog_folds`) and if no formula is given for the prognostic model (`prog_formula`), the function attempts to model a response with the same name as given in the `formula` using an intercept and main effect from all variables in `data_hist`.
 
-The algorithm uses a default of 5 folds for cross validation and tries to construct the formula used for the prognostic model as modelling the response with a design matrix containing an intercept and main effect from all variables in the historical data, `data_hist`.
+### Specifying learners
 
-#### Specifying learners
+`fit_best_learner` has a list of default models to use for fitting the discrete super learner, which can be seen in the section below. However, it's easy for the user to specify a list of other learners to train the discrete super learner. The package utilises the framework of [tidymodels](https://www.tidymodels.org/), and it can be seen below how the list of models can look like.
 
-It's easy for the user to specify other learners to train in order to fit the discrete super learner. The package utilises the framework of [tidymodels](https://www.tidymodels.org/). All the user needs to do is specify a list of models.
+#### Default learners
 
-##### Code used for default learners
+Below we show the code of the unexported `default_learners` function, which creates a list of default learners that are used in `fit_best_learner()` and `rctglm_with_prognosticscore()`. 
 
-To illustrate, below is the code of the unexported function `default_learners` which creates a list of the default learners:
+> The body of the function thus represents a valid way of specifying the `learners` argument.
+
 ```{r default-learners-show}
 PostCard:::default_learners
 ```
 
-##### Creating own list of learners
+#### Creating own list of learners
 
-> We first simulate some data to run the example
+A listing of models is available at [the tidymodels website](https://www.tidymodels.org/find/parsnip/), and the user can specify a list of any of those models as the `learners` argument.
 
-```{r dat-hist-sim}
-# Generate some data
-n <- 1000
-b0 <- 1
-b1 <- 1.5
-b2 <- 2
-W_sim <- runif(n, min = -2, max = 2)
-
-dat_treat <- glm_data(
-  Y ~ b0+b1*abs(sin(W))+b2*A,
-  W = W_sim,
-  A = rbinom (n, 1, 1/2)
-)
-
-dat_notreat <- glm_data(
-  Y ~ b0+b1*abs(sin(W)),
-  W = W_sim
-)
-```
-
-A listing of models is available at [the tidymodels website](https://www.tidymodels.org/find/parsnip/), and the user can specify a list of any of those models along with specified values of parameters to the `learners` argument.
+Below is an example of fitting the prognostic model as a discrete super learner with the best RMSE among a *random forest* and *linear support vector machines* model.
 
 ```{r fit-own-learners}
 learners <- list(
@@ -149,16 +191,23 @@ learners <- list(
     model = parsnip::rand_forest(
       mode = "regression",
       trees = 500,
-      min_n = 5
+      min_n = parsnip::tune("min_n")
     ) %>% 
-      parsnip::set_engine("ranger")
+      parsnip::set_engine("ranger"),
+    grid = data.frame(
+      min_n = 1:10
+    )
   ),
   svm.linear = list(
     model = parsnip::svm_linear(
       mode = "regression",
-      cost = 1,
-      margin = 0.1) %>% 
-    parsnip::set_engine("LiblineaR")
+      cost = parsnip::tune("cost"),
+      margin = parsnip::tune("margin")) %>% 
+      parsnip::set_engine("LiblineaR"),
+    grid = data.frame(
+      cost = 1:5,
+      margin = seq(0.1, 0.5, 0.1)
+    )
   )
 )
 
@@ -166,24 +215,27 @@ model_own_learners <- rctglm_with_prognosticscore(
   formula = Y ~ A * W,
   exposure_indicator = A,
   exposure_prob = 1/2,
-  data = dat_treat,
-  family = gaussian(),
-  data_hist = dat_notreat,
+  data = dat_gaus,
+  data_hist = dat_gaus_hist,
   learners = learners)
 ```
 
-#### Investigating the prognostic model
+### Inspecting the prognostic model
 
-It's possible to view information regarding the fit of the prognostic model in the `rctglm` class object that `rctglm_with_prognosticscore()` returns by looking at the list element `prognostic_info`.
+It's possible to view information regarding the fit of the prognostic model in the `rctglm_prog` class object that `rctglm_with_prognosticscore()` returns by looking at the list element `prognostic_info`. A shorthand way of doing this is using the method `prog()`.
 
 Inside this list element are elements
 
+- `formula`: The formula used when fitting models in `fit_best_learner()`
 - `model_fit`: The result of `fit_best_learner()`
 - `learners`: The list of learners used
 - `cv_folds`: The number of folds used for cross validation
+- `data`: The data given as `data_hist`, which the prognostic model is fitted upon
+
+> Note that we change the value of data to only show the first rows to not take up too much space when printing in the vignette.
 
 ```{r prognostic-info-show}
-model_own_learners$prognostic_info
+prog_info <- prog(model_own_learners)
+prog_info$data <- head(prog_info$data)
+prog_info
 ```
-
-
