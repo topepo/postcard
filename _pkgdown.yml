@@ -38,6 +38,3 @@ reference:
 - title: Package level options
   contents:
   - options
-
-development:
-  mode: auto
