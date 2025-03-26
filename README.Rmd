@@ -20,8 +20,11 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/NNpackages/PostCard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/PostCard)
 <!-- badges: end -->
 
-PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised clinical trials. At the time of writing, the package features convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. Let $\Psi_a=\E[Y(a)]$ be the population mean outcome under treatment $a=0, 1$, sometimes referred to as *counterfactual means*. We are interested in marginal effects, which are causal effects of the form $r(\Psi_1, \Psi_0)$. The package uses plug-in estimation for robust estimation of a marginal effect estimand and (CV) influence functions for robust estimation of the variance of the estimand (Rosenblum, M. and M. J. van der Laan, 2010: Simple, efficient estimators of treatment effects in randomized trials using generalized linear models to leverage baseline variables. The International Journal of Biostatistics, 6, no. 1).
+PostCard provides tools for accurately estimating marginal effects using GLMs, including increasing precision using prognostic covariate adjustment (see introductory examples below, more details in `rctglm()` and )
 
+**Marginal effects** are causal effects of the form $r(\Psi_1, \Psi_0)$, where $\Psi_a=\mathbb{E}[Y(a)]$ are population mean outcomes under exposure $a=0, 1$, respectively. These are sometimes referred to as *counterfactual means*.
+
+The package uses **plug-in estimation for robust estimation of any marginal effect estimand** as well as **influence functions for robust estimation of the variance of the estimand** (Rosenblum, M. and M. J. van der Laan, 2010: Simple, efficient estimators of treatment effects in randomized trials using generalized linear models to leverage baseline variables. The International Journal of Biostatistics, 6, no. 1).
 
 ## Installation
 
@@ -37,6 +40,8 @@ library(PostCard)
 withr::local_seed(1395878)
 withr::local_options(list(PostCard.verbose = 0))
 ```
+
+# Plug-in estimation of marginal effects and variance estimation using influence functions
 
 ## Simulating data for exploratory analyses
 
@@ -57,7 +62,7 @@ dat_treat <- glm_data(
 )
 ```
 
-## Plug-in estimation of marginal effects and variance estimation using influence functions
+
 
 ### Fitting `rctglm()` without prognostic covariate adjustment
 
@@ -73,7 +78,7 @@ The interface of `rctglm()` is similar to that of the `stats::glm()` function bu
 
 Thus, we can estimate the ATE by simply writing the below:
 
-> Note that as a default, information about the algorithm is printed in the console, but here we suppress this behavior. See more in `vignette("more-details")`.
+> Note that as a default, `verbose = 2`, meaning that information about the algorithm is printed to the console. However, here we suppress this behavior. See more in `vignette("model-fit")`.
 
 ```{r noprog-run}
 ate <- rctglm(formula = Y ~ A * W,
@@ -88,24 +93,11 @@ This creates an `rctglm` object which prints as
 ate
 ```
 
-### Structure of `rctglm` and methods for extracting entities
-
-The `print` method for the `rctglm` class specifies the way to print such an object as seen above. Behind the S3 class of `rctglm` it is a list with 
-
--   Estimand related information
-    -   A `data.frame` of plug-in estimate of estimand, standard error (SE) estimate and variance estimate of estimand
-        -   Accessible through `ate$estimand` or using methods `estimand(ate)` and `est(ate)`
-    -   Counterfactual predictions (for each observation) and counterfactual means for both groups
-        -   Accessible through `ate$counterfactual_mean<0/1>` and `ate$counterfactual_pred<0/1>`
--   Information on the underlying `glm` fit
-    -   Entire `glm` object available through `ate$glm`
-    -   Method `coef` uses the corresponding method on the `glm` object contained within `rctglm`
+The structure of such an `rctglm` object is broken down in the **`Value`** section of the documentation in `rctglm()`.
     
-Thus, methods available are:
+Methods available are `estimand` (or the shorthand `est`) which prints a `data.frame` with and estimate of the estimand and its standard error. A method for `coef` is also available to extract coefficients from the underlying `glm` fit.
 ```{r}
-# "estimate" also available as alternative to just "est"
 est(ate)
-coef(ate)
 ```
 
 See more info in the documentation page `rctglm_methods()`.
@@ -157,10 +149,4 @@ It's evident that in this case where there is a non-linear relationship between 
 
 #### Investigating the prognostic model
 
-Information on the prognostic model is available in the list element `prognostic_info` of the resulting object. This contains
-
--   The fitted prognostic model as a `workflow`
-    -   Accessible through `ate$prognostic_info$model_fit` or with method `prog_model(ate)`
--   A list of the learners used for fitting the model using `fit_best_learner()`
-    -   Accessible through `ate$prognostic_info$learners`
--   The number of folds used for cross validation (`cv_prog_folds`) and the historical data used for fitting the model
+Information on the prognostic model is available in the list element `prognostic_info`, which the method `prog()` can be used to extract. A breakdown of what this list includes, see the **`Value`** section of the `rctglm_with_prognosticscore()` documentation.

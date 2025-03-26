@@ -10,19 +10,22 @@
 coverage](https://codecov.io/gh/NNpackages/PostCard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/PostCard)
 <!-- badges: end -->
 
-PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised
-clinical trials. At the time of writing, the package features convenient
-functions for conducting analysis using prognostic covariate adjustment
-for GLMs. Let $\Psi_a=\E[Y(a)]$ be the population mean outcome under
-treatment $a=0, 1$, sometimes referred to as *counterfactual means*. We
-are interested in marginal effects, which are causal effects of the form
-$r(\Psi_1, \Psi_0)$. The package uses plug-in estimation for robust
-estimation of a marginal effect estimand and (CV) influence functions
-for robust estimation of the variance of the estimand (Rosenblum, M. and
-M. J. van der Laan, 2010: Simple, efficient estimators of treatment
-effects in randomized trials using generalized linear models to leverage
-baseline variables. The International Journal of Biostatistics, 6, no.
-1).
+PostCard provides tools for accurately estimating marginal effects using
+GLMs, including increasing precision using prognostic covariate
+adjustment (see introductory examples below, more details in `rctglm()`
+and )
+
+**Marginal effects** are causal effects of the form $r(\Psi_1, \Psi_0)$,
+where $\Psi_a=\mathbb{E}[Y(a)]$ are population mean outcomes under
+exposure $a=0, 1$, respectively. These are sometimes referred to as
+*counterfactual means*.
+
+The package uses **plug-in estimation for robust estimation of any
+marginal effect estimand** as well as **influence functions for robust
+estimation of the variance of the estimand** (Rosenblum, M. and M. J.
+van der Laan, 2010: Simple, efficient estimators of treatment effects in
+randomized trials using generalized linear models to leverage baseline
+variables. The International Journal of Biostatistics, 6, no. 1).
 
 ## Installation
 
@@ -41,6 +44,8 @@ library(PostCard)
 withr::local_seed(1395878)
 withr::local_options(list(PostCard.verbose = 0))
 ```
+
+# Plug-in estimation of marginal effects and variance estimation using influence functions
 
 ## Simulating data for exploratory analyses
 
@@ -65,8 +70,6 @@ dat_treat <- glm_data(
 )
 ```
 
-## Plug-in estimation of marginal effects and variance estimation using influence functions
-
 ### Fitting `rctglm()` without prognostic covariate adjustment
 
 The `rctglm()` function estimates any specified estimand using plug-in
@@ -87,9 +90,9 @@ function but with an added mandatory specification of
 
 Thus, we can estimate the ATE by simply writing the below:
 
-> Note that as a default, information about the algorithm is printed in
-> the console, but here we suppress this behavior. See more in
-> `vignette("more-details")`.
+> Note that as a default, `verbose = 2`, meaning that information about
+> the algorithm is printed to the console. However, here we suppress
+> this behavior. See more in `vignette("model-fit")`.
 
 ``` r
 ate <- rctglm(formula = Y ~ A * W,
@@ -107,44 +110,27 @@ ate
 #> Object of class rctglm 
 #> 
 #> Call:  rctglm(formula = Y ~ A * W, exposure_indicator = A, exposure_prob = 1/2, 
-#>     family = "gaussian", data = dat_treat)
+#>     data = dat_treat, family = "gaussian")
 #> 
 #> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.776
 #> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.867
-#> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09229)
+#> Warning in body(fun): argument is not a function
+#> Estimand function r: NULL
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 2.091 (0.09209)
 ```
 
-### Structure of `rctglm` and methods for extracting entities
+The structure of such an `rctglm` object is broken down in the
+**`Value`** section of the documentation in `rctglm()`.
 
-The `print` method for the `rctglm` class specifies the way to print
-such an object as seen above. Behind the S3 class of `rctglm` it is a
-list with
-
-- Estimand related information
-  - A `data.frame` of plug-in estimate of estimand, standard error (SE)
-    estimate and variance estimate of estimand
-    - Accessible through `ate$estimand` or using methods `estimand(ate)`
-      and `est(ate)`
-  - Counterfactual predictions (for each observation) and counterfactual
-    means for both groups
-    - Accessible through `ate$counterfactual_mean<0/1>` and
-      `ate$counterfactual_pred<0/1>`
-- Information on the underlying `glm` fit
-  - Entire `glm` object available through `ate$glm`
-  - Method `coef` uses the corresponding method on the `glm` object
-    contained within `rctglm`
-
-Thus, methods available are:
+Methods available are `estimand` (or the shorthand `est`) which prints a
+`data.frame` with and estimate of the estimand and its standard error. A
+method for `coef` is also available to extract coefficients from the
+underlying `glm` fit.
 
 ``` r
-# "estimate" also available as alternative to just "est"
 est(ate)
 #>   Estimate Std. Error
-#> 1 2.091095 0.09229488
-coef(ate)
-#> (Intercept)           A           W         A:W 
-#>  2.77585401  2.09122279  0.02364106  0.04961895
+#> 1 2.091095 0.09209306
 ```
 
 See more info in the documentation page `rctglm_methods()`.
@@ -204,14 +190,15 @@ ate_prog
 #> 
 #> Object of class rctglm_prog 
 #> 
-#> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, family = gaussian(link = "identity"), 
-#>     data = dat_treat, exposure_indicator = A, exposure_prob = 1/2, 
+#> Call:  rctglm_with_prognosticscore(formula = Y ~ A * W, exposure_indicator = A, 
+#>     exposure_prob = 1/2, data = dat_treat, family = gaussian(link = "identity"), 
 #>     data_hist = dat_notreat)
 #> 
-#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.824
-#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.822
-#> Estimand function r: psi1 - psi0
-#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.999 (0.06393)
+#> Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 2.827
+#> Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 4.821
+#> Warning in body(fun): argument is not a function
+#> Estimand function r: NULL
+#> Estimand (r(psi_1, psi_0)) estimate (SE): 1.994 (0.06405)
 ```
 
 It’s evident that in this case where there is a non-linear relationship
@@ -222,13 +209,6 @@ approximation by quite a bit.
 #### Investigating the prognostic model
 
 Information on the prognostic model is available in the list element
-`prognostic_info` of the resulting object. This contains
-
-- The fitted prognostic model as a `workflow`
-  - Accessible through `ate$prognostic_info$model_fit` or with method
-    `prog_model(ate)`
-- A list of the learners used for fitting the model using
-  `fit_best_learner()`
-  - Accessible through `ate$prognostic_info$learners`
-- The number of folds used for cross validation (`cv_prog_folds`) and
-  the historical data used for fitting the model
+`prognostic_info`, which the method `prog()` can be used to extract. A
+breakdown of what this list includes, see the **`Value`** section of the
+`rctglm_with_prognosticscore()` documentation.
