@@ -183,25 +183,13 @@ rctglm <- function(formula,
   # }
 
   if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
-
   if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
-    args01 <- get01args(fun = estimand_fun)
-
-    if (verbose >= 1) cli::cli_h2("Symbolic differentiation of estimand function")
-    if (is.null(estimand_fun_deriv0)) {
-      estimand_fun_deriv0 <- print_symbolic_differentiation(
-        arg = args01[["arg0"]],
-        fun = estimand_fun,
-        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv0}\n",
-        verbose = verbose)
-    }
-    if (is.null(estimand_fun_deriv1)) {
-      estimand_fun_deriv1 <- print_symbolic_differentiation(
-        arg = args01[["arg1"]],
-        fun = estimand_fun,
-        add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv1}\n",
-        verbose = verbose)
-    }
+    derivs <- deriv_estimand_fun(
+      fun = estimand_fun, d0 = estimand_fun_deriv0, d1 = estimand_fun_deriv1,
+      verbose = verbose
+    )
+    estimand_fun_deriv0 <- derivs$d0
+    estimand_fun_deriv1 <- derivs$d1
   }
 
   args_glm <- c(args[names(args) %in% names(formals(glm))], list(...))
