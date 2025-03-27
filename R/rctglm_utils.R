@@ -102,3 +102,25 @@ extract_train_test <- function(x) {
   test_data <- x$data[out_id, ]
   return(list(train = train_data, test = test_data))
 }
+
+# Symbolic differentiation of estimand_fun
+deriv_estimand_fun <- function(fun, d0 = NULL, d1 = NULL, verbose = options::opt("verbose")) {
+  args01 <- get01args(fun = fun)
+
+  if (verbose >= 1) cli::cli_h2("Symbolic differentiation of estimand function")
+  if (is.null(d0)) {
+    d0 <- print_symbolic_differentiation(
+      arg = args01[["arg0"]],
+      fun = fun,
+      add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv0}\n",
+      verbose = verbose)
+  }
+  if (is.null(d1)) {
+    d1 <- print_symbolic_differentiation(
+      arg = args01[["arg1"]],
+      fun = fun,
+      add_string = "Alternatively, specify the derivative through the argument {.var estimand_fun_deriv1}\n",
+      verbose = verbose)
+  }
+  return(list(d0 = d0, d1 = d1))
+}
