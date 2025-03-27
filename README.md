@@ -52,7 +52,7 @@ Additionally, implementations of sample size/power approximation
 formulas are available, enabling retrospective power analyses to be
 performed using the package. Functionalities are available at the help
 page `powerss()`, introductory examples in `vignette("PostCard")` and
-more details in `vignette("retrospective-power")`.
+more details in `vignette("prospective-power")`.
 
 ## Installation
 
