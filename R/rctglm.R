@@ -156,41 +156,17 @@ rctglm <- function(formula,
   exposure_indicator <- rlang::enquo(exposure_indicator)
   args <- as.list(environment())
   cal <- match.call()
-
   formula <- check_formula(formula)
   family <- check_family(family)
-
-  ind_expr <- rlang::quo_get_expr(exposure_indicator)
-  called_within_prognosticscore <- ind_expr == "exposure_indicator"
-  if (called_within_prognosticscore) {
-    exposure_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(exposure_indicator)))
-  } else {
-    exposure_indicator_name <- as.character(ind_expr)
-  }
-
-  group_vals <- dplyr::pull(data, tidyselect::all_of(exposure_indicator_name))
-  group_vals_unique <- unique(group_vals)
-  if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var exposure_indicator} column can only have 1's and 0's")
-
-  exposure_prob_is_num <- inherits(exposure_prob, "numeric")
-  exposure_in_range <- exposure_prob > 0 & exposure_prob < 1
-  if (!exposure_prob_is_num | !exposure_in_range)
-    cli::cli_abort("`exposure_prob` needs to be a probability, i.e. a numeric between 0 and 1")
-  # if (is.null(exposure_prob)) {
-  #   exposure_prob <- mean(group_vals)
-  #   if (verbose >= 1)
-  #     cli::cli_alert_info("Setting the group allocation probability {.var exposure_prob} as the mean of column {.var {exposure_indicator_name}} in data: {exposure_prob}")
-  # }
-
-  if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
-  if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
-    derivs <- deriv_estimand_fun(
-      fun = estimand_fun, d0 = estimand_fun_deriv0, d1 = estimand_fun_deriv1,
-      verbose = verbose
-    )
-    estimand_fun_deriv0 <- derivs$d0
-    estimand_fun_deriv1 <- derivs$d1
-  }
+  exposure_indicator_name <- get_indicator_name(exposure_indicator)
+  check_exposure_indicator(data = data, exposure_indicator_name = exposure_indicator_name)
+  check_exposure_prob(exposure_prob = exposure_prob)
+  estimand_funs <- estimand_fun_setdefault_findderivs(
+    estimand_fun = estimand_fun,
+    estimand_fun_deriv0 = estimand_fun_deriv0,
+    estimand_fun_deriv1 = estimand_fun_deriv1,
+    verbose = verbose
+  )
 
   args_glm <- c(args[names(args) %in% names(formals(glm))], list(...))
   model <- do.call(glm, args = args_glm)
@@ -207,7 +183,7 @@ rctglm <- function(formula,
   full_model_means_counterfactual0 <- as.numeric(full_model_means_counterfactual["psi0"])
   full_model_means_counterfactual1 <- as.numeric(full_model_means_counterfactual["psi1"])
 
-  estimate_estimand <- estimand_fun(
+  estimate_estimand <- estimand_funs$f(
     psi1 = full_model_means_counterfactual1,
     psi0 = full_model_means_counterfactual0
   )
@@ -233,8 +209,8 @@ rctglm <- function(formula,
     counterfactual_pred1 = preds_for_variance$psi1,
     counterfactual_mean0 = full_model_means_counterfactual0,
     counterfactual_mean1 = full_model_means_counterfactual1,
-    estimand_fun_deriv0 = estimand_fun_deriv0,
-    estimand_fun_deriv1 = estimand_fun_deriv1)
+    estimand_fun_deriv0 = estimand_funs$d0,
+    estimand_fun_deriv1 = estimand_funs$d1)
 
   var_estimand <- as.numeric(var(if_marginaleffect_val))
   se_estimand <- sqrt(var_estimand/nrow(data))
@@ -245,11 +221,7 @@ rctglm <- function(formula,
 
   out <- list(
     estimand = data_estimand,
-    estimand_funs = list(
-      f = estimand_fun,
-      d0 = estimand_fun_deriv0,
-      d1 = estimand_fun_deriv1
-    ),
+    estimand_funs = estimand_funs,
     means_counterfactual = full_model_means_counterfactual,
     fitted.values_counterfactual = full_model_fitted.values_counterfactual,
     glm = model,

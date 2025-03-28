@@ -103,6 +103,31 @@ extract_train_test <- function(x) {
   return(list(train = train_data, test = test_data))
 }
 
+get_indicator_name <- function(exposure_indicator) {
+  ind_expr <- rlang::quo_get_expr(exposure_indicator)
+  called_within_prognosticscore <- ind_expr == "exposure_indicator"
+  if (called_within_prognosticscore) {
+    exposure_indicator_name <- as.character(rlang::quo_get_expr(rlang::eval_tidy(exposure_indicator)))
+  } else {
+    exposure_indicator_name <- as.character(ind_expr)
+  }
+}
+
+check_exposure_indicator <- function(data, exposure_indicator_name) {
+  group_vals <- dplyr::pull(data, tidyselect::all_of(exposure_indicator_name))
+  group_vals_unique <- unique(group_vals)
+  if (!all(c(0,1) %in% group_vals)) cli::cli_abort("{.var exposure_indicator} column can only have 1's and 0's")
+  return(invisible())
+}
+
+check_exposure_prob <- function(exposure_prob) {
+  exposure_prob_is_num <- inherits(exposure_prob, "numeric")
+  exposure_in_range <- exposure_prob > 0 & exposure_prob < 1
+  if (!exposure_prob_is_num | !exposure_in_range)
+    cli::cli_abort("`exposure_prob` needs to be a probability, i.e. a numeric between 0 and 1")
+  return(invisible())
+}
+
 # Symbolic differentiation of estimand_fun
 deriv_estimand_fun <- function(fun, d0 = NULL, d1 = NULL, verbose = options::opt("verbose")) {
   args01 <- get01args(fun = fun)
@@ -123,4 +148,24 @@ deriv_estimand_fun <- function(fun, d0 = NULL, d1 = NULL, verbose = options::opt
       verbose = verbose)
   }
   return(list(d0 = d0, d1 = d1))
+}
+
+estimand_fun_setdefault_findderivs <- function(
+    estimand_fun, estimand_fun_deriv0, estimand_fun_deriv1, verbose = options::opt("verbose")
+) {
+  if (is.character(estimand_fun)) estimand_fun <- default_estimand_funs(estimand_fun)
+  if (is.null(estimand_fun_deriv0) | is.null(estimand_fun_deriv1)) {
+    derivs <- deriv_estimand_fun(
+      fun = estimand_fun, d0 = estimand_fun_deriv0, d1 = estimand_fun_deriv1,
+      verbose = verbose
+    )
+    estimand_fun_deriv0 <- derivs$d0
+    estimand_fun_deriv1 <- derivs$d1
+  }
+  out <- list(
+    f = estimand_fun,
+    d0 = estimand_fun_deriv0,
+    d1 = estimand_fun_deriv1
+  )
+  return(out)
 }
