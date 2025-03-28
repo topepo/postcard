@@ -1,8 +1,8 @@
 ---
-title: "Introduction to PostCard"
+title: "Introduction to postcard"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{PostCard}
+  %\VignetteIndexEntry{postcard}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 Setup-chunk to load the package, set a seed and turn off verbosity for the rendering of the vignette.
 
 ```{r setup, message = FALSE}
-library(PostCard)
+library(postcard)
 withr::local_seed(1395878)
-withr::local_options(list(PostCard.verbose = 0))
+withr::local_options(list(postcard.verbose = 0))
 ```
 
 # Plug-in estimation of marginal effects and variance estimation using influence functions

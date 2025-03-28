@@ -147,7 +147,7 @@ test_that("`print_symbolic_differentiation` returns the result of Deriv", {
 })
 
 cli::test_that_cli("`print_symbolic_differentiation` provides message", {
-  withr::local_options(PostCard.verbose = 1)
+  withr::local_options(postcard.verbose = 1)
   ate <- function(psi0, psi1) psi1 - psi0
   # Note we are using the transform argument to remove printing of
   # the environment which changes between each run

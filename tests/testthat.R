@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(PostCard)
+library(postcard)
 
-test_check("PostCard")
+test_check("postcard")

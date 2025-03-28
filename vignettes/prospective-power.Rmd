@@ -2,7 +2,7 @@
 title: "Prospective Power Estimation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{prospective_power}
+  %\VignetteIndexEntry{Prospective Power Estimation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,7 +15,7 @@ vignette: >
 ```
   
 ```{r setup}
-library(PostCard)
+library(postcard)
 ```
 
 The functions described in the help page `powerss()` provide utilities for prospective power calculations using linear models. In this vignette, we will conduct sample size calculations by constructing power curves using a **standard ANCOVA method** implemented in the package and compare this to using prognostic covariate adjustment.
