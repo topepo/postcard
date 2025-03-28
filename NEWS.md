@@ -1,4 +1,4 @@
-# PostCard 0.2.1.9000 (development version)
+# postcard 0.2.1.9000 (development version)
 
 Major overhaul of package. Still focuses on analysing data with the use of
 prognostic scores, but takes a more general approach that allows any
@@ -13,7 +13,7 @@ The package provides novel methods for:
 * `rctglm_with_prognosticscore`: Do the above, but leveraging historical data
   to increase precision with prognostic scores.
 
-# PostCard 0.2.1
+# postcard 0.2.1
 
 ## Features
 
@@ -26,7 +26,7 @@ The package provides novel methods for:
     models the outcome with a linear model is now a wrapper of
     the new - more general - `simulate_collection`.
 
-# PostCard 0.2.0
+# postcard 0.2.0
 
 ## Features
 
@@ -53,7 +53,7 @@ The package provides novel methods for:
 
 * Added a few tests
 
-# PostCard 0.1.0
+# postcard 0.1.0
 
 Initial package created from local files. Package contains functionalities to
 create simulation study for a specific purpose related to an article.

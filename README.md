@@ -1,23 +1,23 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# PostCard
+# postcard
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NNpackages/PostCard/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/NNpackages/postcard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NNpackages/postcard/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/NNpackages/PostCard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/PostCard)
+coverage](https://codecov.io/gh/NNpackages/postcard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/postcard)
 <!-- badges: end -->
 
-PostCard provides tools for accurately estimating marginal effects using
+postcard provides tools for accurately estimating marginal effects using
 plug-in estimation with GLMs, including increasing precision using
 prognostic covariate adjustment.
 
 ### Estimating marginal effects
 
 `rctglm()` is used to estimate marginal effects. See introductory
-examples of its usage in `vignette("PostCard")` and more details in
+examples of its usage in `vignette("postcard")` and more details in
 `vignette("model-fit")`.
 
 *Marginal effects* are causal effects of the form $r(\Psi_1, \Psi_0)$,
@@ -35,7 +35,7 @@ of Biostatistics, 6, no. 1).
 
 `rctglm_with_prognosticscore()` is used to estimate marginal effects
 including the use of prognostic covariate adjustment. See introductory
-examples of its usage in `vignette("PostCard")` and more details in
+examples of its usage in `vignette("postcard")` and more details in
 `vignette("model-fit")`.
 
 *Prognostic covariate adjustment* involves training a *prognostic model*
@@ -51,13 +51,13 @@ ones in the comparator group). This prediction, which is called the
 Additionally, implementations of sample size/power approximation
 formulas are available, enabling retrospective power analyses to be
 performed using the package. Functionalities are available at the help
-page `powerss()`, introductory examples in `vignette("PostCard")` and
+page `powerss()`, introductory examples in `vignette("postcard")` and
 more details in `vignette("prospective-power")`.
 
 ## Installation
 
-You can install the development version of PostCard from GitHub with:
+You can install the development version of postcard from GitHub with:
 
 ``` r
-pak::pak("NNpackages/PostCard")
+pak::pak("NNpackages/postcard")
 ```

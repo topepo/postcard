@@ -29,7 +29,7 @@ evaluating models}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
-execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
+execution (Defaults to \code{2}, overwritable using option 'postcard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \value{
 a trained \code{workflow}

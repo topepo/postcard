@@ -2,23 +2,23 @@
 % Please edit documentation in R/zzz.R
 \name{options}
 \alias{options}
-\title{PostCard Options}
+\title{postcard Options}
 \arguments{
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
-execution (Defaults to \code{2}, overwritable using option 'PostCard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
+execution (Defaults to \code{2}, overwritable using option 'postcard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 }
 \description{
 Internally used, package-specific options. All options will prioritize R options() values, and fall back to environment variables if undefined. If neither the option nor the environment variable is set, a default value is used.
 }
 \section{Checking Option Values}{
 
-Option values specific to \code{PostCard} can be
+Option values specific to \code{postcard} can be
 accessed by passing the package name to \code{env}.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{options::opts(env = "PostCard")
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options::opts(env = "postcard")
 
-options::opt(x, default, env = "PostCard")
+options::opt(x, default, env = "postcard")
 }\if{html}{\out{</div>}}
 }
 
@@ -29,7 +29,7 @@ options::opt(x, default, env = "PostCard")
 \code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
 execution\item{default: }{\preformatted{2}}
-\item{option: }{PostCard.verbose}
+\item{option: }{postcard.verbose}
 \item{envvar: }{R_POSTCARD_VERBOSE (evaluated if possible, raw string otherwise)}
 }}
 

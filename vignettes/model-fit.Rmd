@@ -15,19 +15,19 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, message = FALSE}
-library(PostCard)
+library(postcard)
 library(magrittr)
 withr::local_seed(1395878)
-withr::local_options(list(PostCard.verbose = 0))
+withr::local_options(list(postcard.verbose = 0))
 ```
 
-For introductory examples on how to use the package, see `vignette("PostCard")`.
+For introductory examples on how to use the package, see `vignette("postcard")`.
 
 In this vignette, we will explain how to alter the default behavior of the model fitting functions `rctglm()` and `rctglm_with_prognosticscore()`.
 
 ### Generating some data to run examples
 
-As in `vignette("PostCard")`, we simulate data using the `glm_data()` function from the package.
+As in `vignette("postcard")`, we simulate data using the `glm_data()` function from the package.
 
 ```{r dat-sim}
 n <- 1000
@@ -107,7 +107,7 @@ ate_prog <- rctglm_with_prognosticscore(
   verbose = 0)
 ```
 
-> Verbosity is suppressed in the rest of the vignette by setting option `PostCard.verbose` to `0`.
+> Verbosity is suppressed in the rest of the vignette by setting option `postcard.verbose` to `0`.
 
 ## Specifying the estimand
 
@@ -176,7 +176,7 @@ Below we show the code of the unexported `default_learners` function, which crea
 > The body of the function thus represents a valid way of specifying the `learners` argument.
 
 ```{r default-learners-show}
-PostCard:::default_learners
+postcard:::default_learners
 ```
 
 #### Creating own list of learners

@@ -3,6 +3,6 @@
 # withr::defer(options(op), teardown_env())
 
 withr::local_options(
-  list(PostCard.verbose = 0),
+  list(postcard.verbose = 0),
   .local_envir = teardown_env()
 )
