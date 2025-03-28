@@ -26,29 +26,30 @@ In usual cases of wanting to conduct sample size/power analyses prospectively, d
 
 As described above, data is not available at the time of a prospective power analysis. To showcase a common use case, we here simulate historical data, which we use to estimate the variance of the response adjusted by the coefficient of determination with the function `variance_ancova()`.
 
-> To compare power curves between a "standard" ANCOVA model and one using prognostic covariate adjustment, we divide the historical data into a training and test part, so we can fit a prognostic model to the training data and use the resulting model to predict prognostic scores in the test data.
+> To compare power curves between a "standard" ANCOVA model and one using prognostic covariate adjustment, we simulate historical data, so we can fit a prognostic model to the training data and use the resulting model to predict prognostic scores in the test data.
 
 ```{r}
 # Generate some data
-n <- 1000
+n_train <- 2000
+n_test <- 200
 b0 <- 1
 b1 <- 1.6
 b2 <- 1.4
 b3 <- 2
-b4 <- 1.2
+b4 <- 0.8
 
 data_train <- glm_data(
   Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
-  X1 = runif(n, min = -2, max = 2),
-  X2 = rnorm(n, mean = 2, sd = 2),
-  X3 = rbinom(n, 1, 0.5)
+  X1 = runif(n_train, min = -2, max = 2),
+  X2 = rnorm(n_train, mean = 2, sd = 2),
+  X3 = rbinom(n_train, 1, 0.5)
 )
 
 data_test <- glm_data(
   Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
-  X1 = runif(n, min = -2, max = 2),
-  X2 = rnorm(n, mean = 2, sd = 2),
-  X3 = rbinom(n, 1, 0.5)
+  X1 = runif(n_test, min = -2, max = 2),
+  X2 = rnorm(n_test, mean = 2, sd = 2),
+  X3 = rbinom(n_test, 1, 0.5)
 )
 ```
 
@@ -85,7 +86,7 @@ In order to see how the estimated power behaves as a function of the total sampl
 ```{r}
 desired_power <- 0.9
 n_from <- 10
-n_to <- 300
+n_to <- 250
 
 iterate_power <- function(variance) {
   power_ancova <- sapply(n_from:n_to, FUN = function(n) power_gs(
@@ -138,7 +139,7 @@ show_npower <- function(data, coords) {
   label <- grid::textGrob(
     label = paste0(data$model_label, ": ", ceiling(data$x)),
     x = grid::unit(coords$x, "npc") + grid::unit(5, "mm"),
-    y = grid::unit(coords$y, "npc") - grid::unit(5, "mm"),
+    y = grid::unit(0.4, "npc") + data$group * grid::unit(1, "cm") ,
     hjust = 0,
     gp = grid::gpar(col = data$colour)
   )
