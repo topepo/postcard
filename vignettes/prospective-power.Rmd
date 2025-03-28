@@ -136,11 +136,16 @@ show_npower <- function(data, coords) {
       lty = "dashed",
       col = data$colour
     ))
+  group <- unique(data$group)
+  if (group == 1) 
+    y_pos <- grid::unit(coords$y, "npc") - grid::unit(2, "mm")
+  else 
+    y_pos <- grid::unit(0.55, "npc")
   label <- grid::textGrob(
     label = paste0(data$model_label, ": ", ceiling(data$x)),
-    x = grid::unit(coords$x, "npc") + grid::unit(5, "mm"),
-    y = grid::unit(0.4, "npc") + data$group * grid::unit(1, "cm") ,
-    hjust = 0,
+    x = grid::unit(coords$x, "npc") + grid::unit(2, "mm"),
+    y = y_pos,
+    just = c(0, 1),
     gp = grid::gpar(col = data$colour)
   )
   grid::grobTree(line, label)
