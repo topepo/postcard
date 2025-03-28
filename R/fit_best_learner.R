@@ -109,7 +109,7 @@ get_best_learner <- function(
     verbose = options::opt("verbose")
 ) {
 
-  if (is.character(formula)) formula <- formula(formula)
+  formula <- check_formula(formula)
 
   wfs <- add_learners(preproc = list(mod = formula),
                       learners = learners)

@@ -63,13 +63,13 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
   mf[[1L]] <- quote(stats::model.frame)
   mf <- eval(mf, parent.frame())
 
-  Y <- model.response(mf)
+  Y <- stats::model.response(mf)
   var_Y <- Y %>%
     var()
   var_Y_inf <- var_Y * inflation
 
   mt <- attr(mf, "terms")
-  X <- model.matrix(mt, mf)
+  X <- stats::model.matrix(mt, mf)
   X_has_intercept <- attr(mt, "intercept")
   if (X_has_intercept)
     X <- X[, -1]
