@@ -257,3 +257,54 @@ power_nc <- function(variance,
   power <- 1 - stats::pt(q = stats::qt(1 - alpha, df = df), df = df, ncp = nc)
   return(power)
 }
+
+#' Power approximation robust to model misspecification
+#'
+#' @inheritParams rctglm
+#' @param response
+#' @param predictions
+#' @param target_effect
+#' @param inv_estimand_fun (optional) a `function` with arguments `psi0` and
+#' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
+#' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
+#' If left as `NULL`, the inverse will be found automatically
+#' @param tolerance passed to [all.equal] when comparing calculated `target_effect`
+#' from derivations and given `target_effect`.
+#' @param ... arguments passed to `[stats::uniroot]`, which is used to find the
+#' inverse of `estimand_fun`, when `inv_estimand_fun` is `NULL`.
+#'
+#' @returns a `numeric` with the estimated power.
+#' @export
+#'
+#' @examples
+power_general <- function(
+    response,
+    predictions,
+    target_effect,
+    estimand_fun = "ate",
+    estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
+    inv_estimand_fun = NULL,
+    tolerance = sqrt(.Machine$double.eps),
+    verbose = options::opt("verbose"),
+    ...
+) {
+
+  estimand_funs <- estimand_fun_setdefault_findderivs(
+    estimand_fun = estimand_fun,
+    estimand_fun_deriv0 = estimand_fun_deriv0,
+    estimand_fun_deriv1 = estimand_fun_deriv1,
+    verbose = verbose
+  )
+  estimand_fun <- estimand_funs$f
+  estimand_fun_deriv0 <- estimand_funs$d0
+  estimand_fun_deriv1 <- estimand_funs$d1
+
+  psi0 <- mean(response)
+  psi1 <- derive_check_psi1(
+    psi0 = psi0,
+    target_effect = target_effect,
+    estimand_fun = estimand_fun,
+    inv_estimand_fun = inv_estimand_fun,
+    tolerance = tolerance
+  )
+}
