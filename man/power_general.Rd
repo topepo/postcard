@@ -73,7 +73,7 @@ Power approximation robust to model misspecification
 n <- 100
 exposure_prob <- .5
 
-dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
+dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A+1.6*A*X2,
                 X1 = rnorm(n),
                 X2 = rgamma(n, shape = 2),
                 A = rbinom(n, size = 1, prob = exposure_prob),
