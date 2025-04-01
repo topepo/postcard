@@ -258,13 +258,21 @@ power_nc <- function(variance,
   return(power)
 }
 
-#' Power approximation robust to model misspecification
+#' Power approximation for estimating marginal effects in GLMs
+#'
+#' The functions implements the algorithm for power estimation described in
+#' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
+#' by Højbjerre-Frandsen et. al (2025). See a bit more context in details.
 #'
 #' @inheritParams rctglm
 #' @inheritParams powerss
 #' @param response the response variable from comparator participants
 #' @param predictions predictions of the response
 #' @param target_effect a `numeric` minimum effect size that we should be able to detect.
+#' @param var1 a `numeric` variance of the potential outcome corresponding to group 1.
+#' See more in details.
+#' @param kappa1_squared a `numeric` mean-squared error from predicting potential
+#' outcome corresponding to group 1. See more in details.
 #' @param inv_estimand_fun (optional) a `function` with arguments `psi0` and
 #' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
 #' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
@@ -275,6 +283,46 @@ power_nc <- function(variance,
 #' inverse of `estimand_fun`, when `inv_estimand_fun` is `NULL`.
 #'
 #' @returns a `numeric` with the estimated power.
+#'
+#' @details
+#' The reference in the description shows in its "Prospective power" section a
+#' derivation of a variance bound
+#' \deqn{
+#' v_\infty^{\uparrow 2} = r_0'^{\, 2}\sigma_0^2+
+#' r_1'^{\, 2}\sigma_1^2+
+#' \pi_0\pi_1\left(\frac{|r_0'|\kappa_0}{\pi_0} +
+#' \frac{|r_1'|\kappa_1}{\pi_1} \right)^2
+#' }
+#'
+#' where \eqn{r_a'} is the derivative of the `estimand_fun` with respect to
+#' `psia`, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
+#' group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
+#' and \eqn{\kappa_a} is the expected mean-squared error when predicting the
+#' potential outcome corresponding to group \eqn{a}.
+#'
+#' The variance bound is then used for calculating a lower bound of the power using
+#' the distributions corresponding to the null and alternative hypotheses
+#' \eqn{\mathcal{H}_0: \hat{\Psi} \sim F_0 = \mathcal{N}(\Delta ,v_\infty^{\uparrow 2} / n)}
+#' and
+#' \eqn{\mathcal{H}_1: \hat{\Psi} \sim F_1 = \mathcal{N}(\Psi,v_\infty^{\uparrow 2} / n)}.
+#' See more details in the reference.
+#'
+#' ## Relating arguments to formulas
+#' - `response`: Used to obtain both \eqn{\sigma_0^2} (by taking the sample
+#' variance of the response) and \eqn{\kappa_0}.
+#' - `predictions`: Used when calculating the MSE \eqn{\kappa_0}.
+#' - `var1`: \eqn{\sigma_1^2}. As a default, chosen to be the same as
+#' \eqn{\sigma_0^2}. Can specify differently through this argument fx. by
+#'    - Inflating or deflating the value of \eqn{\sigma_0^2} by a scalar according
+#' to prior beliefs
+#'    - If historical data is available for group 1, an estimate of the variance
+#' from that data can be provided here.
+#' - `kappa1_squared`: \eqn{\kappa_1}. Same as for `var1`, default is to assume
+#' the same value as `kappa0_squared`, which is found by using the `response`
+#' and `predictions` vectors. Adjust the value according to prior beliefs if
+#' relevant.
+#' - `target_effect`: \eqn{\Psi}.
+#' - `exposure_prob`: \eqn{\pi_1}
 #'
 #' @examples
 #' # Generate a data set to use as an example

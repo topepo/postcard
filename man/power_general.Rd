@@ -2,7 +2,7 @@
 % Please edit documentation in R/powerss.R
 \name{power_general}
 \alias{power_general}
-\title{Power approximation robust to model misspecification}
+\title{Power approximation for estimating marginal effects in GLMs}
 \usage{
 power_general(
   response,
@@ -32,10 +32,16 @@ power_general(
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
+\item{var1}{a \code{numeric} variance of the potential outcome corresponding to group 1.
+See more in details.}
+
+\item{kappa1_squared}{a \code{numeric} mean-squared error from predicting potential
+outcome corresponding to group 1. See more in details.}
+
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
-more details in the "Estimand" section of this documentation.}
+more details in the "Estimand" section of \link{rctglm}.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -66,7 +72,53 @@ inverse of \code{estimand_fun}, when \code{inv_estimand_fun} is \code{NULL}.}
 a \code{numeric} with the estimated power.
 }
 \description{
-Power approximation robust to model misspecification
+The functions implements the algorithm for power estimation described in
+\href{https://arxiv.org/abs/2503.22284}{Powering RCTs for marginal effects with GLMs using prognostic score adjustment}
+by Højbjerre-Frandsen et. al (2025). See a bit more context in details.
+}
+\details{
+The reference in the description shows in its "Prospective power" section a
+derivation of a variance bound
+\deqn{
+v_\infty^{\uparrow 2} = r_0'^{\, 2}\sigma_0^2+
+r_1'^{\, 2}\sigma_1^2+
+\pi_0\pi_1\left(\frac{|r_0'|\kappa_0}{\pi_0} +
+\frac{|r_1'|\kappa_1}{\pi_1} \right)^2
+}
+
+where \eqn{r_a'} is the derivative of the \code{estimand_fun} with respect to
+\code{psia}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
+group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
+and \eqn{\kappa_a} is the expected mean-squared error when predicting the
+potential outcome corresponding to group \eqn{a}.
+
+The variance bound is then used for calculating a lower bound of the power using
+the distributions corresponding to the null and alternative hypotheses
+\eqn{\mathcal{H}_0: \hat{\Psi} \sim F_0 = \mathcal{N}(\Delta ,v_\infty^{\uparrow 2} / n)}
+and
+\eqn{\mathcal{H}_1: \hat{\Psi} \sim F_1 = \mathcal{N}(\Psi,v_\infty^{\uparrow 2} / n)}.
+See more details in the reference.
+\subsection{Relating arguments to formulas}{
+\itemize{
+\item \code{response}: Used to obtain both \eqn{\sigma_0^2} (by taking the sample
+variance of the response) and \eqn{\kappa_0}.
+\item \code{predictions}: Used when calculating the MSE \eqn{\kappa_0}.
+\item \code{var1}: \eqn{\sigma_1^2}. As a default, chosen to be the same as
+\eqn{\sigma_0^2}. Can specify differently through this argument fx. by
+\itemize{
+\item Inflating or deflating the value of \eqn{\sigma_0^2} by a scalar according
+to prior beliefs
+\item If historical data is available for group 1, an estimate of the variance
+from that data can be provided here.
+}
+\item \code{kappa1_squared}: \eqn{\kappa_1}. Same as for \code{var1}, default is to assume
+the same value as \code{kappa0_squared}, which is found by using the \code{response}
+and \code{predictions} vectors. Adjust the value according to prior beliefs if
+relevant.
+\item \code{target_effect}: \eqn{\Psi}.
+\item \code{exposure_prob}: \eqn{\pi_1}
+}
+}
 }
 \examples{
 # Generate a data set to use as an example
