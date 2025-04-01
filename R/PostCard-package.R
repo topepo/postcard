@@ -7,6 +7,7 @@
 #' @importFrom rlang .data
 #' @importFrom rlang :=
 #' @importFrom stats coef
+#' @importFrom stats cov
 #' @importFrom stats formula
 #' @importFrom stats gaussian
 #' @importFrom stats glm

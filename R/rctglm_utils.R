@@ -70,7 +70,7 @@ oos_fitted.values_counterfactual <- function(
 
   out <- lapply(train_test_folds, function(x) {
     test_indices <- x$test$rowname
-    x <- lapply(x, function(dat) dplyr::select(dat, -rowname))
+    x <- lapply(x, function(dat) dplyr::select(dat, -.data$rowname))
     args_glm_copy <- full_model.args_glm
     args_glm_copy$data <- x$train
 
