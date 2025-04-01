@@ -1,3 +1,32 @@
+# Check if lower_upper default of -1e3 and 1e3 gives an error and if so set
+# lower to be positive
+check_lower_upper <- function(f, f_arg, lower = NULL, upper = NULL,
+                              default_lu_times, default_lu_scale = 1e4,
+                              ...) {
+  lower_upper_notgiven <- is.null(lower) || is.null(upper)
+  if (lower_upper_notgiven) {
+    onegiven <- !is.null(lower) || !is.null(upper)
+    if (onegiven)
+      cli::cli_abort("You have specified `lower` or `upper` but not the other. Please specify both or none to get the default.")
+
+    lu_range <- (1 + default_lu_times) * default_lu_scale
+    lower <- -lu_range
+    upper <- lu_range
+
+    inv_f <- inverse(f, lower = lower, upper = upper, ...)
+    lower_upper_bad <- tryCatch(
+      inv_f(f_arg),
+      error = function(e) TRUE,
+      warning = function(w) TRUE
+    )
+
+    if (lower_upper_bad)
+      lower <- 1 / lu_range
+  }
+
+  list(lower = lower, upper = upper)
+}
+
 # Find inverse function using uniroot
 inverse <- function(f, lower, upper, ...){
   function(y){
@@ -6,37 +35,14 @@ inverse <- function(f, lower, upper, ...){
 }
 
 # Check lower and upper, find the inverse and evaluate it
-inverse_val <- function(f, f_arg, lower = NULL, upper = NULL, ...){
+inverse_val <- function(
+    f, f_arg, lower = NULL, upper = NULL,
+    ...){
   args <- c(as.list(environment()), list(...))
   lower_upper <- do.call(check_lower_upper, args)
   inverse <- do.call(inverse, c(list(f = f), lower_upper))
 
   return(inverse(f_arg))
-}
-
-# Check if lower_upper default of -1e3 and 1e3 gives an error and if so set
-# lower to be positive
-check_lower_upper <- function(f, f_arg, lower = NULL, upper = NULL, ...) {
-  lower_upper_notgiven <- is.null(lower) || is.null(upper)
-  if (lower_upper_notgiven) {
-    onegiven <- !is.null(lower) || !is.null(upper)
-    if (onegiven)
-      cli::cli_abort("You have specified `lower` or `upper` but not the other. Please specify both or none to get the default.")
-
-    lower <- -1e3
-    upper <- 1e3
-  }
-  inv_f <- inverse(f, lower = lower, upper = upper, ...)
-  lower_upper_bad <- tryCatch(
-    inv_f(f_arg),
-    error = function(e) TRUE,
-    warning = function(w) TRUE
-  )
-
-  if (lower_upper_bad)
-    lower <- 0.01
-
-  list(lower = lower, upper = upper)
 }
 
 # Derive psi1 from psi0 and a target_effect using the inverse of the estimand_fun
@@ -58,7 +64,7 @@ derive_check_psi1 <- function(
 
     psi1 <- do.call(
       inverse_val,
-      c(list(f = estimand_fun1, f_arg = target_effect),
+      c(list(f = estimand_fun1, f_arg = target_effect, default_lu_times = psi0),
         args_to_uniroot)
     )
   }
@@ -66,7 +72,6 @@ derive_check_psi1 <- function(
   calc_target_effect <- estimand_fun(psi0 = psi0, psi1 = psi1)
   diff_target_effect <- calc_target_effect - target_effect
   psi1_correct <- all.equal(diff_target_effect, 0, tolerance = tolerance)
-  browser()
   if (!psi1_correct) {
     bullets <- c(
       "The inverse of the estimand fun `inv_estimand_fun` did not
