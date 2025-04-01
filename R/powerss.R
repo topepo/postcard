@@ -261,9 +261,10 @@ power_nc <- function(variance,
 #' Power approximation robust to model misspecification
 #'
 #' @inheritParams rctglm
-#' @param response
-#' @param predictions
-#' @param target_effect
+#' @inheritParams powerss
+#' @param response the response variable from comparator participants
+#' @param predictions predictions of the response
+#' @param target_effect a `numeric` minimum effect size that we should be able to detect.
 #' @param inv_estimand_fun (optional) a `function` with arguments `psi0` and
 #' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
 #' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
@@ -274,7 +275,6 @@ power_nc <- function(variance,
 #' inverse of `estimand_fun`, when `inv_estimand_fun` is `NULL`.
 #'
 #' @returns a `numeric` with the estimated power.
-#' @export
 #'
 #' @examples
 #' # Generate a data set to use as an example
@@ -287,23 +287,51 @@ power_nc <- function(variance,
 #'                 A = rbinom(n, size = 1, prob = exposure_prob),
 #'                 family = gaussian())
 #'
-#' pred_model <- glm(Y ~ X1 + X2 + A, data = dat_gaus)
-#' preds <- predict(pred_model, newdata = dat_gaus, type = "response")
+#' # Obtain out-of-sample (OOS) prediction using glm model
+#' gaus1 <- dat_gaus[1:(n/2), ]
+#' gaus2 <- dat_gaus[(n/2+1):n, ]
 #'
+#' glm1 <- glm(Y ~ X1 + X2 + A, data = gaus1)
+#' glm2 <- glm(Y ~ X1 + X2 + A, data = gaus2)
+#' preds_glm1 <- predict(glm2, newdata = gaus1, type = "response")
+#' preds_glm2 <- predict(glm1, newdata = gaus2, type = "response")
+#' preds_glm <- c(preds_glm1, preds_glm2)
+#'
+#' # Obtain power
 #' power_general(
 #'   response = dat_gaus$Y,
-#'   predictions = preds,
+#'   predictions = preds_glm,
 #'   target_effect = 2,
 #'   exposure_prob = exposure_prob
 #' )
+#'
+#' # Get OOS predictions using discrete super learner fitted by fit_best_learner
+#' lrnr1 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus1)
+#' lrnr2 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus2)
+#' preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
+#' preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
+#' preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
+#'
+#' # Estimate the power
+#' power_general(
+#'   response = dat_gaus$Y,
+#'   predictions = preds_lrnr,
+#'   target_effect = 2,
+#'   exposure_prob = exposure_prob
+#' )
+#'
+#' @export
 power_general <- function(
     response,
     predictions,
     target_effect,
     exposure_prob,
+    var1 = NULL,
+    kappa1_squared = NULL,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     inv_estimand_fun = NULL,
+    alpha = 0.025,
     tolerance = sqrt(.Machine$double.eps),
     verbose = options::opt("verbose"),
     ...
@@ -323,9 +351,6 @@ power_general <- function(
     verbose = verbose
   )
   estimand_fun <- estimand_funs$f
-  d0_val <- estimand_funs$d0(psi1 = psi1, psi0 = psi0)
-  d1_val <- estimand_funs$d1(psi1 = psi1, psi0 = psi0)
-
   psi0 <- mean(response)
   psi1 <- derive_check_psi1(
     psi0 = psi0,
@@ -334,16 +359,37 @@ power_general <- function(
     inv_estimand_fun = inv_estimand_fun,
     tolerance = tolerance
   )
+  d0_val <- estimand_funs$d0(psi1 = psi1, psi0 = psi0)
+  d1_val <- estimand_funs$d1(psi1 = psi1, psi0 = psi0)
 
-  var_Y0 = var(response)
-  var_Y1 = var_Y0
+  var0 <- var(response)
+  if (is.null(var1))
+    var1 <- var0
 
   kappa0_squared <- 1/n_resp * sum((response - predictions)^2)
-  kappa1_squared <- kappa0_squared
+  if (is.null(kappa1_squared))
+    kappa1_squared <- kappa0_squared
 
-  v_bound <- d0_val^2 * var_Y0 + d1_val^2 * var_Y1 +
-    exposure_prob * (1 - exposure_prob) *
-    ((abs(d0_val) * sqrt(kappa0_squared) / (1 - exposure_prob) +
-        abs(d1_val) * sqrt(kappa1_squared) / exposure_prob)^2)
-  return(v_bound)
+  v_bound <- var_bound_general(var1 = var1, var0 = var0,
+                    d0 = d0_val, d1 = d1_val,
+                    kappa0_squared = kappa0_squared,
+                    kappa1_squared = kappa1_squared,
+                    exposure_prob = exposure_prob)
+
+  estimand_nodiff <- estimand_fun(1,1)
+  sd <- sqrt(v_bound / n_resp)
+  f0 <- qnorm(1 - alpha, mean = estimand_nodiff, sd = sd)
+  f1 <- pnorm(f0, mean = target_effect, sd = sd)
+  1 - f1
+}
+
+var_bound_general <- function(
+    var1, var0,
+    d0, d1,
+    kappa0_squared, kappa1_squared,
+    exposure_prob) {
+  d0^2 * var0 + d1^2 * var1 +
+    (1 - exposure_prob) * exposure_prob *
+    ((abs(d0) * sqrt(kappa0_squared) / (1 - exposure_prob) +
+        abs(d1) * sqrt(kappa1_squared) / exposure_prob)^2)
 }

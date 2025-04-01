@@ -9,16 +9,25 @@ power_general(
   predictions,
   target_effect,
   exposure_prob,
+  var1 = NULL,
+  kappa1_squared = NULL,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   inv_estimand_fun = NULL,
+  alpha = 0.025,
   tolerance = sqrt(.Machine$double.eps),
   verbose = options::opt("verbose"),
   ...
 )
 }
 \arguments{
+\item{response}{the response variable from comparator participants}
+
+\item{predictions}{predictions of the response}
+
+\item{target_effect}{a \code{numeric} minimum effect size that we should be able to detect.}
+
 \item{exposure_prob}{a \code{numeric} with the probabiliy of being in
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
@@ -38,6 +47,10 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \code{target_effect}, so \code{estimand_fun(psi1 = y, psi0 = x) = z} and
 \code{inv_estimand_fun(psi0 = x, target_effect = z) = y} for all x, y, z.
 If left as \code{NULL}, the inverse will be found automatically}
+
+\item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
+using a one-sided test, half the specified significance level is used.
+Thus, for standard significance level of 5\%, the default is \code{alpha = 0.025}.}
 
 \item{tolerance}{passed to \link{all.equal} when comparing calculated \code{target_effect}
 from derivations and given \code{target_effect}.}
@@ -66,13 +79,37 @@ dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
                 A = rbinom(n, size = 1, prob = exposure_prob),
                 family = gaussian())
 
-pred_model <- glm(Y ~ X1 + X2 + A, data = dat_gaus)
-preds <- predict(pred_model, newdata = dat_gaus, type = "response")
+# Obtain out-of-sample (OOS) prediction using glm model
+gaus1 <- dat_gaus[1:(n/2), ]
+gaus2 <- dat_gaus[(n/2+1):n, ]
 
+glm1 <- glm(Y ~ X1 + X2 + A, data = gaus1)
+glm2 <- glm(Y ~ X1 + X2 + A, data = gaus2)
+preds_glm1 <- predict(glm2, newdata = gaus1, type = "response")
+preds_glm2 <- predict(glm1, newdata = gaus2, type = "response")
+preds_glm <- c(preds_glm1, preds_glm2)
+
+# Obtain power
 power_general(
   response = dat_gaus$Y,
-  predictions = preds,
+  predictions = preds_glm,
   target_effect = 2,
   exposure_prob = exposure_prob
 )
+
+# Get OOS predictions using discrete super learner fitted by fit_best_learner
+lrnr1 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus1)
+lrnr2 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus2)
+preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
+preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
+preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
+
+# Estimate the power
+power_general(
+  response = dat_gaus$Y,
+  predictions = preds_lrnr,
+  target_effect = 2,
+  exposure_prob = exposure_prob
+)
+
 }
