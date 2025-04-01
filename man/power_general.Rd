@@ -8,6 +8,7 @@ power_general(
   response,
   predictions,
   target_effect,
+  exposure_prob,
   estimand_fun = "ate",
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
@@ -18,6 +19,10 @@ power_general(
 )
 }
 \arguments{
+\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
+"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
+As a default, the ratio of 1's in data is used.}
+
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
@@ -45,11 +50,29 @@ execution (Defaults to \code{2}, overwritable using option 'postcard.verbose' or
 inverse of \code{estimand_fun}, when \code{inv_estimand_fun} is \code{NULL}.}
 }
 \value{
-All functions return a \code{numeric}. \code{variance_ancova} returns a \code{numeric} with
-a variance estimated from data to used for power estimation and sample size
-estimation. \code{power_xx} and \code{samplesize_xx} functions return a \code{numeric} with
-the power or sample size approximation.
+a \code{numeric} with the estimated power.
 }
 \description{
 Power approximation robust to model misspecification
+}
+\examples{
+# Generate a data set to use as an example
+n <- 100
+exposure_prob <- .5
+
+dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
+                X1 = rnorm(n),
+                X2 = rgamma(n, shape = 2),
+                A = rbinom(n, size = 1, prob = exposure_prob),
+                family = gaussian())
+
+pred_model <- glm(Y ~ X1 + X2 + A, data = dat_gaus)
+preds <- predict(pred_model, newdata = dat_gaus, type = "response")
+
+power_general(
+  response = dat_gaus$Y,
+  predictions = preds,
+  target_effect = 2,
+  exposure_prob = exposure_prob
+)
 }
