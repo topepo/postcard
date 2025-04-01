@@ -277,10 +277,30 @@ power_nc <- function(variance,
 #' @export
 #'
 #' @examples
+#' # Generate a data set to use as an example
+#' n <- 100
+#' exposure_prob <- .5
+#'
+#' dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A,
+#'                 X1 = rnorm(n),
+#'                 X2 = rgamma(n, shape = 2),
+#'                 A = rbinom(n, size = 1, prob = exposure_prob),
+#'                 family = gaussian())
+#'
+#' pred_model <- glm(Y ~ X1 + X2 + A, data = dat_gaus)
+#' preds <- predict(pred_model, newdata = dat_gaus, type = "response")
+#'
+#' power_general(
+#'   response = dat_gaus$Y,
+#'   predictions = preds,
+#'   target_effect = 2,
+#'   exposure_prob = exposure_prob
+#' )
 power_general <- function(
     response,
     predictions,
     target_effect,
+    exposure_prob,
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     inv_estimand_fun = NULL,
@@ -288,6 +308,13 @@ power_general <- function(
     verbose = options::opt("verbose"),
     ...
 ) {
+  check_exposure_prob(exposure_prob = exposure_prob)
+
+  n_resp <- length(response)
+  n_pred <- length(predictions)
+  if (n_resp != n_pred)
+    cli::cli_abort("`response` is of length {n_resp} while `predictions` has
+                   length {n_pred}. Specify them with the same length.")
 
   estimand_funs <- estimand_fun_setdefault_findderivs(
     estimand_fun = estimand_fun,
@@ -296,8 +323,8 @@ power_general <- function(
     verbose = verbose
   )
   estimand_fun <- estimand_funs$f
-  estimand_fun_deriv0 <- estimand_funs$d0
-  estimand_fun_deriv1 <- estimand_funs$d1
+  d0_val <- estimand_funs$d0(psi1 = psi1, psi0 = psi0)
+  d1_val <- estimand_funs$d1(psi1 = psi1, psi0 = psi0)
 
   psi0 <- mean(response)
   psi1 <- derive_check_psi1(
@@ -307,4 +334,16 @@ power_general <- function(
     inv_estimand_fun = inv_estimand_fun,
     tolerance = tolerance
   )
+
+  var_Y0 = var(response)
+  var_Y1 = var_Y0
+
+  kappa0_squared <- 1/n_resp * sum((response - predictions)^2)
+  kappa1_squared <- kappa0_squared
+
+  v_bound <- d0_val^2 * var_Y0 + d1_val^2 * var_Y1 +
+    exposure_prob * (1 - exposure_prob) *
+    ((abs(d0_val) * sqrt(kappa0_squared) / (1 - exposure_prob) +
+        abs(d1_val) * sqrt(kappa1_squared) / exposure_prob)^2)
+  return(v_bound)
 }
