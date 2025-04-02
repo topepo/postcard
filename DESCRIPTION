@@ -4,7 +4,7 @@ Title: Estimation of Marginal Effects Using Prognostic Covariate Adjustment
 Version: 0.2.1.9000
 Authors@R: c(
     person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
-    person("Emilie", "Hojbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut")
+    person("Emilie", "Hojbjerre-Frandsen", , "ehfd@novonordisk.com", role = c("aut", "cph"))
   )
 Description: Conducting analysis using robust plug-in GLM estimation with
     influence functions and prognostic covariate adjustment.
