@@ -2,7 +2,9 @@
 #'
 #' The procedure uses [fit_best_learner] to fit a prognostic model to historical data and uses
 #' the model to produce counterfactual predictions as a prognostic score that is then adjusted
-#' for as a covariate in the [rctglm] procedure.
+#' for as a covariate in the [rctglm] procedure. See
+#' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
+#' by Højbjerre-Frandsen et. al (2025) for more details.
 #'
 #' @inheritParams rctglm
 #' @inheritParams fit_best_learner

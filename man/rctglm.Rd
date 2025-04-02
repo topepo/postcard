@@ -48,7 +48,7 @@ the environment from which the function is called.}
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
-more details in the "Estimand" section of this documentation.}
+more details in the "Estimand" section of \link{rctglm}.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -94,7 +94,9 @@ See how to extract information using methods in \link{rctglm_methods}.
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
 estimand in the setting of a randomised clinical trial, even in the case of heterogeneous effect of
-covariates in randomisation groups.
+covariates in randomisation groups. See
+\href{https://arxiv.org/abs/2503.22284}{Powering RCTs for marginal effects with GLMs using prognostic score adjustment}
+by Højbjerre-Frandsen et. al (2025) for more details.
 }
 \details{
 The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary

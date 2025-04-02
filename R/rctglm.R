@@ -1,15 +1,11 @@
-# TODO: Add something along the lines of this:
-## This method of inference using plug-in estimation and influence functions for the variance produces a
-## causal estimate of the estimand, as stated by articles XXXX.
-# when article is out
-
 #' Fit GLM and find any estimand (marginal effect) using plug-in estimation with variance estimation using
 #' influence functions
 #'
 #' The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
 #' estimand in the setting of a randomised clinical trial, even in the case of heterogeneous effect of
-#' covariates in randomisation groups.
-#'
+#' covariates in randomisation groups. See
+#' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
+#' by Højbjerre-Frandsen et. al (2025) for more details.
 #' @inheritParams stats::glm
 #' @inheritParams options
 #'
@@ -29,7 +25,7 @@
 #' @param estimand_fun a `function` with arguments `psi1` and `psi0` specifying
 #' the estimand. Alternative, specify "ate" or "rate_ratio" as a `character`
 #' to use one of the default estimand functions. See
-#' more details in the "Estimand" section of this documentation.
+#' more details in the "Estimand" section of [rctglm].
 #' @param estimand_fun_deriv0 a `function` specifying the derivative of `estimand_fun` wrt. `psi0`. As a default
 #' the algorithm will use symbolic differentiation to automatically find the derivative from `estimand_fun`
 #' @param estimand_fun_deriv1 a `function` specifying the derivative of `estimand_fun` wrt. `psi1`. As a default

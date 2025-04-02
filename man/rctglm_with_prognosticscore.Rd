@@ -51,7 +51,7 @@ the environment from which the function is called.}
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
-more details in the "Estimand" section of this documentation.}
+more details in the "Estimand" section of \link{rctglm}.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -106,7 +106,9 @@ testing models
 \description{
 The procedure uses \link{fit_best_learner} to fit a prognostic model to historical data and uses
 the model to produce counterfactual predictions as a prognostic score that is then adjusted
-for as a covariate in the \link{rctglm} procedure.
+for as a covariate in the \link{rctglm} procedure. See
+\href{https://arxiv.org/abs/2503.22284}{Powering RCTs for marginal effects with GLMs using prognostic score adjustment}
+by Højbjerre-Frandsen et. al (2025) for more details.
 }
 \details{
 More details on prognostic models and scores being predictions of counterfactual means
