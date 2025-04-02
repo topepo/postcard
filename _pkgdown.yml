@@ -21,6 +21,7 @@ reference:
   - rctglm_with_prognosticscore
   - prog
   - fit_best_learner
+  - default_learners
 - title: Power approximation
   desc: >
     Approximation formulas exist to estimate the sample size needed to obtain a power of a chosen

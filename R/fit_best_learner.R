@@ -4,7 +4,11 @@
 #'
 #' @param cv_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
-#' @param learners a `list` of `tidymodels`
+#' @param learners a `list` (preferably named) containing named lists of elements
+#' `model` and optionally `grid`. The `model` element should be a `parsnip`
+#' model specification, which is passed to [workflowsets::workflow_set] as the
+#' `model` argument, while the `grid` element is passed as the `grid` argument
+#' of [workflowsets::option_add]
 #'
 #' @details
 #' Ensure data compatibility with the learners.
@@ -44,19 +48,29 @@ fit_best_learner <- function(data, formula, cv_folds = 5, learners = default_lea
   return(lrnr_fit)
 }
 
-# Default learners used for searching among
+#' Creates a list of learners
+#'
+#' This function creates a list of learners compatible with the `learners`
+#' argument of [fit_best_learner], which is used as the default argument.
+#'
+#' @returns a named `list` of learners, where each element consists of a
+#' - `model`: A `parsnip` model specification
+#' - `grid`: A `data.frame` with columns corresponding to tuning parameters
+#'
+#' @examples
+#' default_learners()
+#'
+#' @export
 default_learners <- function() {
   list(
     mars = list(
       model = parsnip::mars(
         mode = "regression", prod_degree = 3) %>%
-        parsnip::set_engine("earth"),
-      grid = NULL
+        parsnip::set_engine("earth")
     ),
     lm = list(
       model = parsnip::linear_reg() %>%
-        parsnip::set_engine("lm"),
-      grid = NULL
+        parsnip::set_engine("lm")
     ),
     gbt = list(
       model = parsnip::boost_tree(

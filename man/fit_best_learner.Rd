@@ -25,7 +25,11 @@ given under ‘Details’ in the \link{glm} documentation.}
 \item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
-\item{learners}{a \code{list} of \code{tidymodels}}
+\item{learners}{a \code{list} (preferably named) containing named lists of elements
+\code{model} and optionally \code{grid}. The \code{model} element should be a \code{parsnip}
+model specification, which is passed to \link[workflowsets:workflow_set]{workflowsets::workflow_set} as the
+\code{model} argument, while the \code{grid} element is passed as the \code{grid} argument
+of \link[workflowsets:option_add]{workflowsets::option_add}}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
