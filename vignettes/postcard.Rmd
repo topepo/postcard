@@ -2,7 +2,7 @@
 title: "Introduction to postcard"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{postcard}
+  %\VignetteIndexEntry{Introduction to postcard}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

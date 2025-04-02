@@ -13,3 +13,9 @@ options::define_option(
   printed in console. A value of 0 means nothing is printed to console during
   execution"
 )
+
+#' @noRd
+dummy <- function() {
+  earth::earth
+  xgboost::xgboost
+}

@@ -30,6 +30,7 @@ Imports:
     yardstick
 Suggests: 
     gggrid,
+    ggplot2,
     knitr,
     LiblineaR,
     MASS,
