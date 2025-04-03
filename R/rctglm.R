@@ -90,19 +90,19 @@
 #' @examples
 #' # Generate some data to showcase example
 #' n <- 100
-#' exposure_prob <- .5
+#' exp_prob <- .5
 #'
 #' dat_gaus <- glm_data(
 #'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
-#'   A = rbinom(n, 1, exposure_prob),
+#'   A = rbinom(n, 1, exp_prob),
 #'   family = gaussian()
 #' )
 #'
 #' # Fit the model
 #' ate <- rctglm(formula = Y ~ .,
 #'               exposure_indicator = A,
-#'               exposure_prob = exposure_prob,
+#'               exposure_prob = exp_prob,
 #'               data = dat_gaus,
 #'               family = gaussian)
 #'
@@ -113,13 +113,13 @@
 #' dat_binom <- glm_data(
 #'   Y ~ 1+1.5*X1+2*A,
 #'   X1 = rnorm(n),
-#'   A = rbinom(n, 1, exposure_prob),
+#'   A = rbinom(n, 1, exp_prob),
 #'   family = binomial()
 #' )
 #'
 #' rr <- rctglm(formula = Y ~ .,
 #'               exposure_indicator = A,
-#'               exposure_prob = exposure_prob,
+#'               exposure_prob = exp_prob,
 #'               data = dat_binom,
 #'               family = binomial(),
 #'               estimand_fun = "rate_ratio")
@@ -127,7 +127,7 @@
 #' odds_ratio <- function(psi1, psi0) (psi1*(1-psi0))/(psi0*(1-psi1))
 #' or <- rctglm(formula = Y ~ .,
 #'               exposure_indicator = A,
-#'               exposure_prob = exposure_prob,
+#'               exposure_prob = exp_prob,
 #'               data = dat_binom,
 #'               family = binomial,
 #'               estimand_fun = odds_ratio)
@@ -145,9 +145,6 @@ rctglm <- function(formula,
                    verbose = options::opt("verbose"),
                    ...
 ) {
-
-  # TODO: Right now, estimand_fun needs to have arguments with 0 and 1 in them, and the exposure_indicator
-  # needs to take values 0 and 1. Generalise this to work for factors and be able to set reference level
 
   exposure_indicator <- rlang::enquo(exposure_indicator)
   args <- as.list(environment())
