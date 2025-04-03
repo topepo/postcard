@@ -5,7 +5,7 @@
 #' by Højbjerre-Frandsen et. al (2025). See a bit more context in details.
 #'
 #' @inheritParams rctglm
-#' @inheritParams powerss
+#' @inheritParams power_linear
 #' @param response the response variable from comparator participants
 #' @param predictions predictions of the response
 #' @param target_effect a `numeric` minimum effect size that we should be able to detect.
