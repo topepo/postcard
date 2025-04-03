@@ -69,9 +69,11 @@ validation if \code{cv_variance} is \code{TRUE}.}
 
 \item{data_hist}{a \code{data.frame} with historical data on which to fit a prognostic model}
 
-\item{prog_formula}{a \code{character} or \code{numeric} with the formula for fitting the prognostic
-model on the historical data \code{data_hist}. Default models the response (assumed same as in
-\code{formula}) using all columns in the \code{data_hist} data}
+\item{prog_formula}{an object of class "formula" (or one that can be coerced to that class):
+a symbolic description of the prognostic model to be fitted to \code{data_hist}. Passed in a
+list as the \code{preproc} argument in \code{\link[=fit_best_learner]{fit_best_learner()}}. As a default,
+the formula is created by modelling the response (assumed to have the same name as in
+\code{formula}) using all columns in \code{data_hist}.}
 
 \item{cv_prog_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
@@ -115,8 +117,23 @@ for as a covariate in the \link{rctglm} procedure. See
 by Højbjerre-Frandsen et. al (2025) for more details.
 }
 \details{
-More details on prognostic models and scores being predictions of counterfactual means
-in control group.
+Prognostic covariate adjustment involves training a prognostic model (using
+\link{fit_best_learner}) on historical data (\code{data_hist}) to predict the response
+in that data.
+
+Assuming that the
+historical data is representative of the comparator group in a “new” data
+set (group 0 of the binary \code{exposure_indicator} in \code{data}), we can use the
+prognostic model to predict the counterfactual
+outcome of all observations (including the ones in the comparator group
+for which the prediction of counterfactual outcome coincides with a
+prediction of actual outcome).
+
+This prediction, which is called the prognostic score, is then used as an
+adjustment covariate in the GLM (the prognostic score is added to \code{formula}
+before calling \link{rctglm} with the modified formula).
+
+See much more details in the reference in the description.
 }
 \examples{
 # Generate some data
@@ -125,12 +142,12 @@ b0 <- 1
 b1 <- 1.5
 b2 <- 2
 W1 <- runif(n, min = -2, max = 2)
-exposure_prob <- .5
+exp_prob <- .5
 
 dat_treat <- glm_data(
   Y ~ b0+b1*abs(sin(W1))+b2*A,
   W1 = W1,
-  A = rbinom (n, 1, exposure_prob)
+  A = rbinom (n, 1, exp_prob)
 )
 
 dat_notreat <- glm_data(
@@ -141,7 +158,7 @@ dat_notreat <- glm_data(
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
-  exposure_prob = exposure_prob,
+  exposure_prob = exp_prob,
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",

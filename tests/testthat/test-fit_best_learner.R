@@ -65,6 +65,7 @@ test_that("`add_learners` returns data.frame with correct information", {
 
 # get_best_learner
 test_that("`get_best_learner` returns a workflow object", {
+  withr::local_seed(42)
   dat <- glm_data(
     y ~ 1+2*x1,
     x1 = rnorm(10)
@@ -72,7 +73,7 @@ test_that("`get_best_learner` returns a workflow object", {
   cv_folds <- rsample::vfold_cv(dat, v = 2)
   lrnr <- get_best_learner(resamples = cv_folds,
                            learners = default_learners(),
-                           formula = "y ~ .",
+                           preproc = list(mod = y ~ .),
                            verbose = 0)
 
   expect_s3_class(lrnr, "workflow")
@@ -101,6 +102,7 @@ test_that("`get_best_learner` returns a workflow object", {
 cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
   testthat::local_edition(3)
 
+  withr::local_seed(42)
   dat <- glm_data(
     y ~ 1+2*x1,
     x1 = rnorm(10)
@@ -110,7 +112,7 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
   testthat::expect_snapshot({
     get_best_learner(resamples = cv_folds,
                      learners = default_learners(),
-                     formula = "y ~ x1",
+                     preproc = list(mod = y ~ x1),
                      verbose = 2)
   },
   transform = function(x) gsub(elapsed_time_pattern, "", x))
@@ -118,11 +120,12 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
 
 # fit_best_learner
 test_that("`fit_best_learner` returns a workflow object", {
+  withr::local_seed(42)
   dat <- glm_data(
     y ~ 1+2*x1,
     x1 = rnorm(10)
   )
 
-  fit <- fit_best_learner(y ~ ., data = dat, verbose = 0)
+  fit <- fit_best_learner(preproc = list(mod = y ~ .), data = dat, verbose = 0)
   expect_s3_class(fit, "workflow")
 })

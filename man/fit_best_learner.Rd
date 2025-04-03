@@ -6,21 +6,18 @@
 \usage{
 fit_best_learner(
   data,
-  formula,
+  preproc,
   cv_folds = 5,
   learners = default_learners(),
   verbose = options::opt("verbose")
 )
 }
 \arguments{
-\item{data}{an optional data frame, list or environment (or object coercible
-by as.data.frame to a data frame) containing the variables in the model. If
-not found in data, the variables are taken from environment(formula), typically
-the environment from which the function is called.}
+\item{data}{A data frame.}
 
-\item{formula}{an object of class "formula" (or one that can be coerced to that class):
-a symbolic description of the model to be fitted. The details of model specification are
-given under ‘Details’ in the \link{glm} documentation.}
+\item{preproc}{A list (preferably named) with preprocessing objects:
+formulas, recipes, or \code{\link[workflows:add_variables]{workflows::workflow_variables()}}. Passed to
+\code{\link[workflowsets:workflow_set]{workflowsets::workflow_set()}}.}
 
 \item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
@@ -60,7 +57,7 @@ dat_hist <- glm_data(
 )
 
 # Fit a learner to the historical control data with default learners
-fit <- fit_best_learner(Y ~ ., data = dat_hist)
+fit <- fit_best_learner(preproc = list(mod = Y ~ .), data = dat_hist)
 
 # Use it fx. to predict the "control outcome" in the 2-armed RCT
 predict(fit, new_data = dat_rct)

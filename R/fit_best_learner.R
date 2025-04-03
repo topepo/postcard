@@ -2,6 +2,10 @@
 #'
 #' @inheritParams rctglm
 #'
+#' @param data A data frame.
+#' @param preproc A list (preferably named) with preprocessing objects:
+#' formulas, recipes, or [workflows::workflow_variables()]. Passed to
+#' [workflowsets::workflow_set()].
 #' @param cv_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
 #' @param learners a `list` (preferably named) containing named lists of elements
@@ -32,16 +36,16 @@
 #' )
 #'
 #' # Fit a learner to the historical control data with default learners
-#' fit <- fit_best_learner(Y ~ ., data = dat_hist)
+#' fit <- fit_best_learner(preproc = list(mod = Y ~ .), data = dat_hist)
 #'
 #' # Use it fx. to predict the "control outcome" in the 2-armed RCT
 #' predict(fit, new_data = dat_rct)
-fit_best_learner <- function(data, formula, cv_folds = 5, learners = default_learners(),
+fit_best_learner <- function(data, preproc, cv_folds = 5, learners = default_learners(),
                              verbose = options::opt("verbose")) {
   cv_folds <- rsample::vfold_cv(data, v = cv_folds)
-  lrnr <- cv_folds %>%
-    get_best_learner(learners = learners,
-                     formula = formula,
+  lrnr <- get_best_learner(resamples = cv_folds,
+                     learners = learners,
+                     preproc = preproc,
                      verbose = verbose)
   lrnr_fit <- generics::fit(lrnr, data)
 
@@ -118,14 +122,11 @@ add_learners <- function(preproc, learners) {
 # K fold cross validation with recipe -------------------------------------
 get_best_learner <- function(
     resamples,
+    preproc,
     learners = default_learners(),
-    formula,
     verbose = options::opt("verbose")
 ) {
-
-  formula <- check_formula(formula)
-
-  wfs <- add_learners(preproc = list(mod = formula),
+  wfs <- add_learners(preproc = preproc,
                       learners = learners)
 
   if (verbose >= 1) {
