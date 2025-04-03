@@ -83,7 +83,8 @@ a \code{numeric} with the estimated power.
 \description{
 The functions implements the algorithm for power estimation described in
 \href{https://arxiv.org/abs/2503.22284}{Powering RCTs for marginal effects with GLMs using prognostic score adjustment}
-by Højbjerre-Frandsen et. al (2025). See a bit more context in details.
+by Højbjerre-Frandsen et. al (2025). See a bit more context in details and
+all details in reference.
 }
 \details{
 The reference in the description shows in its "Prospective power" section a

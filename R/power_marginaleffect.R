@@ -2,7 +2,8 @@
 #'
 #' The functions implements the algorithm for power estimation described in
 #' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
-#' by Højbjerre-Frandsen et. al (2025). See a bit more context in details.
+#' by Højbjerre-Frandsen et. al (2025). See a bit more context in details and
+#' all details in reference.
 #'
 #' @inheritParams rctglm
 #' @inheritParams power_linear
