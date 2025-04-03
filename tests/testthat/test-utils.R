@@ -84,11 +84,12 @@ test_that("`formula_to_str` returns character of length 1", {
 })
 
 # check_formula
-test_that("`test_formula` works", {
+test_that("`check_formula` works", {
   expect_s3_class(check_formula("Y ~ 1 + X"), "formula")
-  expect_error(check_formula(2))
+  expect_error(check_formula(2),
+               regexp = "This usually means you did not include a response")
   expect_error(check_formula(1+2*x1),
-               regexp = "was not of class")
+               regexp = "This usually means you did not include a response")
 })
 
 # get01args
