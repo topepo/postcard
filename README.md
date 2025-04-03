@@ -47,7 +47,8 @@ the historical data is representative of the comparator group in a
 *“new”* data set, we can use the prognostic model to predict the
 *comparator counterfactual outcome* for all observations (including the
 ones in the comparator group). This prediction, which is called the
-**prognostic score** is then used as an adjustment covariate in the GLM.
+**prognostic score**, is then used as an adjustment covariate in the
+GLM.
 
 ## Power approximation for linear models
 
