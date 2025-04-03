@@ -20,7 +20,12 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Emilie Hojbjerre-Frandsen \email{ehfd@novonordisk.com} [copyright holder]
+  \item Emilie Hojbjerre-Frandsen \email{ehfd@novonordisk.com}
+}
+
+Other contributors:
+\itemize{
+  \item Novo Nordisk A/S [copyright holder]
 }
 
 }
