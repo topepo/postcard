@@ -9,10 +9,14 @@
 #' @param response the response variable from comparator participants
 #' @param predictions predictions of the response
 #' @param target_effect a `numeric` minimum effect size that we should be able to detect.
-#' @param var1 a `numeric` variance of the potential outcome corresponding to group 1.
+#' @param var1 a `numeric` variance of the potential outcome corresponding to group 1,
+#' or a `function` with a single argument meant to obtain `var1` as a tranformation
+#' of the variance of the potential outcome corresponding to group 0.
 #' See more in details.
 #' @param kappa1_squared a `numeric` mean-squared error from predicting potential
-#' outcome corresponding to group 1. See more in details.
+#' outcome corresponding to group 1, or a `function` with a single arguments meant
+#' to obtain `kappa1_squared` as a transformation of the MSE in group 0.
+#' See more in details.
 #' @param inv_estimand_fun (optional) a `function` with arguments `psi0` and
 #' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
 #' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
@@ -57,7 +61,8 @@
 #' - `var1`: \eqn{\sigma_1^2}. As a default, chosen to be the same as
 #' \eqn{\sigma_0^2}. Can specify differently through this argument fx. by
 #'    - Inflating or deflating the value of \eqn{\sigma_0^2} by a scalar according
-#' to prior beliefs
+#' to prior beliefs. Fx. specify `var1 = function(x) 1.2 * x` to inflate
+#' \eqn{\sigma_0^2} by 1.2.
 #'    - If historical data is available for group 1, an estimate of the variance
 #' from that data can be provided here.
 #' - `kappa1_squared`: \eqn{\kappa_1}. Same as for `var1`, default is to assume
@@ -78,7 +83,9 @@
 #'                 A = rbinom(n, size = 1, prob = exposure_prob),
 #'                 family = gaussian())
 #'
+#' # ---------------------------------------------------------------------------
 #' # Obtain out-of-sample (OOS) prediction using glm model
+#' # ---------------------------------------------------------------------------
 #' gaus1 <- dat_gaus[1:(n/2), ]
 #' gaus2 <- dat_gaus[(n/2+1):n, ]
 #'
@@ -96,19 +103,23 @@
 #'   exposure_prob = exposure_prob
 #' )
 #'
-#' # Get OOS predictions using discrete super learner fitted by fit_best_learner
+#' # ---------------------------------------------------------------------------
+#' # Get OOS predictions using discrete super learner and adjust variance
+#' # ---------------------------------------------------------------------------
 #' lrnr1 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus1)
 #' lrnr2 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus2)
 #' preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
 #' preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
 #' preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
 #'
-#' # Estimate the power
+#' # Estimate the power AND adjust the assumed variance in the "unknown"
+#' # group 1 to be 20% larger than in group 0
 #' power_marginaleffect(
 #'   response = dat_gaus$Y,
 #'   predictions = preds_lrnr,
 #'   target_effect = 2,
-#'   exposure_prob = exposure_prob
+#'   exposure_prob = exposure_prob,
+#'   var1 = function(var0) 1.2 * var0
 #' )
 #'
 #' @export
@@ -154,8 +165,8 @@ power_marginaleffect <- function(
   tryCatch(
     force(margin),
     error = function(e) {
-      bullets <- c("The default value of `margin` produced an error.",
-                   i = "Specify `margin` explicitly.")
+      bullets <- c("The value of `margin` produced an error.",
+                   i = "Specify `margin` explicitly as a `numeric`.")
       cli::cli_abort(bullets)
     }
   )
@@ -163,18 +174,18 @@ power_marginaleffect <- function(
   d1_val <- estimand_funs$d1(psi1 = psi1, psi0 = psi0)
 
   var0 <- var(response)
-  if (is.null(var1))
-    var1 <- var0
+  var1 <- setdefault_transform(val = var1, default = var0)
 
   kappa0_squared <- 1/n_resp * sum((response - predictions)^2)
-  if (is.null(kappa1_squared))
-    kappa1_squared <- kappa0_squared
+  kappa1_squared <- setdefault_transform(val = kappa1_squared, default = kappa0_squared)
 
-  v_bound <- var_bound_marginaleffect(var1 = var1, var0 = var0,
-                               d0 = d0_val, d1 = d1_val,
-                               kappa0_squared = kappa0_squared,
-                               kappa1_squared = kappa1_squared,
-                               exposure_prob = exposure_prob)
+  v_bound <- var_bound_marginaleffect(
+    var1 = var1, var0 = var0,
+    d0 = d0_val, d1 = d1_val,
+    kappa0_squared = kappa0_squared,
+    kappa1_squared = kappa1_squared,
+    exposure_prob = exposure_prob
+  )
 
   sd <- sqrt(v_bound / n_resp)
   f0 <- qnorm(1 - alpha, mean = margin, sd = sd)
@@ -193,10 +204,19 @@ var_bound_marginaleffect <- function(
         abs(d1) * sqrt(kappa1_squared) / exposure_prob)^2)
 }
 
+setdefault_transform <- function(val, default) {
+  if (is.null(val))
+    return(default)
+  if (is.function(val))
+    val <- return(val(default))
+  return(val)
+}
+
+
 # Check if lower_upper default of -1e3 and 1e3 gives an error and if so set
 # lower to be positive
-check_lower_upper <- function(f, f_arg, lower = NULL, upper = NULL,
-                              default_lu_times, default_lu_scale = 1e4,
+check_lower_upper <- function(f = NULL, f_arg = NULL, lower = NULL, upper = NULL,
+                              default_lu_times = 0, default_lu_scale = 1e4,
                               ...) {
   lower_upper_notgiven <- is.null(lower) || is.null(upper)
   if (lower_upper_notgiven) {
@@ -215,7 +235,7 @@ check_lower_upper <- function(f, f_arg, lower = NULL, upper = NULL,
       warning = function(w) TRUE
     )
 
-    if (lower_upper_bad)
+    if (isTRUE(lower_upper_bad))
       lower <- 1 / lu_range
   }
 
@@ -247,7 +267,7 @@ derive_check_psi1 <- function(
     target_effect,
     estimand_fun,
     inv_estimand_fun = NULL,
-    tolerance = sqrt(.Machine$double.eps),
+    tolerance = 1e-2,
     ...) {
   if (!is.null(inv_estimand_fun))
     psi1 <- inv_estimand_fun(psi0 = psi0, target_effect = target_effect)
@@ -273,7 +293,8 @@ derive_check_psi1 <- function(
       produce a good result. The calculated `target_effect` varies from the
       assumed/given `target_effect` by {.arg {diff_target_effect}}. Either",
       i = "specify `inv_estimand_fun` manually, or",
-      i = "specify arguments `lower` and `upper` passed to `uniroot` that finds the inverse"
+      i = "specify arguments `lower` and `upper` passed to `uniroot` that finds the inverse, or",
+      i = "increase the value of the `tolerance` argument."
     )
     cli::cli_warn(bullets)
   }

@@ -33,11 +33,15 @@ power_marginaleffect(
 "group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
 As a default, the ratio of 1's in data is used.}
 
-\item{var1}{a \code{numeric} variance of the potential outcome corresponding to group 1.
+\item{var1}{a \code{numeric} variance of the potential outcome corresponding to group 1,
+or a \code{function} with a single argument meant to obtain \code{var1} as a tranformation
+of the variance of the potential outcome corresponding to group 0.
 See more in details.}
 
 \item{kappa1_squared}{a \code{numeric} mean-squared error from predicting potential
-outcome corresponding to group 1. See more in details.}
+outcome corresponding to group 1, or a \code{function} with a single arguments meant
+to obtain \code{kappa1_squared} as a transformation of the MSE in group 0.
+See more in details.}
 
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
@@ -112,7 +116,8 @@ variance of the response) and \eqn{\kappa_0}.
 \eqn{\sigma_0^2}. Can specify differently through this argument fx. by
 \itemize{
 \item Inflating or deflating the value of \eqn{\sigma_0^2} by a scalar according
-to prior beliefs
+to prior beliefs. Fx. specify \code{var1 = function(x) 1.2 * x} to inflate
+\eqn{\sigma_0^2} by 1.2.
 \item If historical data is available for group 1, an estimate of the variance
 from that data can be provided here.
 }
@@ -136,7 +141,9 @@ dat_gaus <- glm_data(Y ~ 1+2*X1-X2+3*A+1.6*A*X2,
                 A = rbinom(n, size = 1, prob = exposure_prob),
                 family = gaussian())
 
+# ---------------------------------------------------------------------------
 # Obtain out-of-sample (OOS) prediction using glm model
+# ---------------------------------------------------------------------------
 gaus1 <- dat_gaus[1:(n/2), ]
 gaus2 <- dat_gaus[(n/2+1):n, ]
 
@@ -154,19 +161,23 @@ power_marginaleffect(
   exposure_prob = exposure_prob
 )
 
-# Get OOS predictions using discrete super learner fitted by fit_best_learner
+# ---------------------------------------------------------------------------
+# Get OOS predictions using discrete super learner and adjust variance
+# ---------------------------------------------------------------------------
 lrnr1 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus1)
 lrnr2 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus2)
 preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
 preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
 preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
 
-# Estimate the power
+# Estimate the power AND adjust the assumed variance in the "unknown"
+# group 1 to be 20\% larger than in group 0
 power_marginaleffect(
   response = dat_gaus$Y,
   predictions = preds_lrnr,
   target_effect = 2,
-  exposure_prob = exposure_prob
+  exposure_prob = exposure_prob,
+  var1 = function(var0) 1.2 * var0
 )
 
 }
