@@ -72,7 +72,7 @@ derive_check_psi1 <- function(
   calc_target_effect <- estimand_fun(psi0 = psi0, psi1 = psi1)
   diff_target_effect <- calc_target_effect - target_effect
   psi1_correct <- all.equal(diff_target_effect, 0, tolerance = tolerance)
-  if (!psi1_correct) {
+  if (!isTRUE(psi1_correct)) {
     bullets <- c(
       "The inverse of the estimand fun `inv_estimand_fun` did not
       produce a good result. The calculated `target_effect` varies from the
