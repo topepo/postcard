@@ -106,7 +106,8 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' @param variance  a `numeric` variance to use for the approximation. See more details
 #' in documentation sections of each power approximating function.
 #' @param ate             a `numeric` minimum effect size that we should be able to detect.
-#' @param margin          a `numeric` superiority margin (for non-inferiority margin, a negative value can be provided).
+#' @param margin          a `numeric` superiority margin
+#' (for non-inferiority margin, a negative value can be provided).
 #' @param alpha           a `numeric` significance level. Due to regulatory guidelines when
 #' using a one-sided test, half the specified significance level is used.
 #' Thus, for standard significance level of 5%, the default is `alpha = 0.025`.
@@ -277,6 +278,9 @@ power_nc <- function(variance,
 #' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
 #' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
 #' If left as `NULL`, the inverse will be found automatically
+#' @param margin a `numeric` superiority margin. As a default, the `estimand_fun`
+#' is evaluated with the same counterfactual means `psi1` and `psi0`, corresponding
+#' to a superiority margin assumin no difference (fx. 0 for ATE and 1 for rate ratio).
 #' @param tolerance passed to [all.equal] when comparing calculated `target_effect`
 #' from derivations and given `target_effect`.
 #' @param ... arguments passed to `[stats::uniroot]`, which is used to find the
@@ -379,8 +383,9 @@ power_general <- function(
     estimand_fun = "ate",
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     inv_estimand_fun = NULL,
+    margin = estimand_fun(1,1),
     alpha = 0.025,
-    tolerance = sqrt(.Machine$double.eps),
+    tolerance = 1e-2,
     verbose = options::opt("verbose"),
     ...
 ) {
@@ -407,6 +412,14 @@ power_general <- function(
     inv_estimand_fun = inv_estimand_fun,
     tolerance = tolerance
   )
+  tryCatch(
+    force(margin),
+    error = function(e) {
+      bullets <- c("The default value of `margin` produced an error.",
+                   i = "Specify `margin` explicitly.")
+      cli::cli_abort(bullets)
+    }
+  )
   d0_val <- estimand_funs$d0(psi1 = psi1, psi0 = psi0)
   d1_val <- estimand_funs$d1(psi1 = psi1, psi0 = psi0)
 
@@ -419,14 +432,13 @@ power_general <- function(
     kappa1_squared <- kappa0_squared
 
   v_bound <- var_bound_general(var1 = var1, var0 = var0,
-                    d0 = d0_val, d1 = d1_val,
-                    kappa0_squared = kappa0_squared,
-                    kappa1_squared = kappa1_squared,
-                    exposure_prob = exposure_prob)
+                               d0 = d0_val, d1 = d1_val,
+                               kappa0_squared = kappa0_squared,
+                               kappa1_squared = kappa1_squared,
+                               exposure_prob = exposure_prob)
 
-  estimand_nodiff <- estimand_fun(1,1)
   sd <- sqrt(v_bound / n_resp)
-  f0 <- qnorm(1 - alpha, mean = estimand_nodiff, sd = sd)
+  f0 <- qnorm(1 - alpha, mean = margin, sd = sd)
   f1 <- pnorm(f0, mean = target_effect, sd = sd)
   1 - f1
 }

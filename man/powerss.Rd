@@ -47,7 +47,8 @@ and the control group is \eqn{n1=(1/(1+r))n}.}
 
 \item{r}{a \code{numeric} allocation ratio \eqn{r=n1/n0}. For one-to-one randomisation \code{r=1}.}
 
-\item{margin}{a \code{numeric} superiority margin (for non-inferiority margin, a negative value can be provided).}
+\item{margin}{a \code{numeric} superiority margin
+(for non-inferiority margin, a negative value can be provided).}
 
 \item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
 using a one-sided test, half the specified significance level is used.

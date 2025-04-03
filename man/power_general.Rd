@@ -15,8 +15,9 @@ power_general(
   estimand_fun_deriv0 = NULL,
   estimand_fun_deriv1 = NULL,
   inv_estimand_fun = NULL,
+  margin = estimand_fun(1, 1),
   alpha = 0.025,
-  tolerance = sqrt(.Machine$double.eps),
+  tolerance = 0.01,
   verbose = options::opt("verbose"),
   ...
 )
@@ -41,7 +42,7 @@ outcome corresponding to group 1. See more in details.}
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
-more details in the "Estimand" section of \link{rctglm}.}
+more details in the "Estimand" section of this documentation.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -53,6 +54,10 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \code{target_effect}, so \code{estimand_fun(psi1 = y, psi0 = x) = z} and
 \code{inv_estimand_fun(psi0 = x, target_effect = z) = y} for all x, y, z.
 If left as \code{NULL}, the inverse will be found automatically}
+
+\item{margin}{a \code{numeric} superiority margin. As a default, the \code{estimand_fun}
+is evaluated with the same counterfactual means \code{psi1} and \code{psi0}, corresponding
+to a superiority margin assumin no difference (fx. 0 for ATE and 1 for rate ratio).}
 
 \item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
 using a one-sided test, half the specified significance level is used.
