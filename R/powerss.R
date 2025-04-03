@@ -350,7 +350,7 @@ power_nc <- function(variance,
 #' preds_glm <- c(preds_glm1, preds_glm2)
 #'
 #' # Obtain power
-#' power_general(
+#' power_marginaleffect(
 #'   response = dat_gaus$Y,
 #'   predictions = preds_glm,
 #'   target_effect = 2,
@@ -365,7 +365,7 @@ power_nc <- function(variance,
 #' preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
 #'
 #' # Estimate the power
-#' power_general(
+#' power_marginaleffect(
 #'   response = dat_gaus$Y,
 #'   predictions = preds_lrnr,
 #'   target_effect = 2,
@@ -373,7 +373,7 @@ power_nc <- function(variance,
 #' )
 #'
 #' @export
-power_general <- function(
+power_marginaleffect <- function(
     response,
     predictions,
     target_effect,
