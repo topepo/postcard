@@ -226,7 +226,7 @@ It's possible to view information regarding the fit of the prognostic model in t
 
 Inside this list element are elements
 
-- `formula`: The formula used when fitting models in `fit_best_learner()`
+- `formula`: The formula used as `preproc` when fitting models in `fit_best_learner()`
 - `model_fit`: The result of `fit_best_learner()`
 - `learners`: The list of learners used
 - `cv_folds`: The number of folds used for cross validation

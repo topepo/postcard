@@ -22,6 +22,8 @@ withr::local_seed(1395878)
 withr::local_options(list(postcard.verbose = 0))
 ```
 
+postcard provides tools for accurately estimating marginal effects using plug-in estimation with GLMs, including increasing precision using prognostic covariate adjustment. See [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284) by Højbjerre-Frandsen et. al (2025).
+
 # Plug-in estimation of marginal effects and variance estimation using influence functions
 
 The use of plug-in estimation and influence functions can help us obtain more accurate estimates. Coupled with prognostic covariate adjustment, we can increase the precision of our estimates and obtain a higher power with sacrificing control over the type I error rate.
