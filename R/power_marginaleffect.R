@@ -10,6 +10,9 @@
 #' @param response the response variable from comparator participants
 #' @param predictions predictions of the response
 #' @param target_effect a `numeric` minimum effect size that we should be able to detect.
+#' See more in details.
+#' @param exposure_prob a `numeric` with the probability of being in
+#' "group 1" (rather than group 0). See more in details.
 #' @param var1 a `numeric` variance of the potential outcome corresponding to group 1,
 #' or a `function` with a single argument meant to obtain `var1` as a tranformation
 #' of the variance of the potential outcome corresponding to group 0.
@@ -43,7 +46,7 @@
 #' }
 #'
 #' where \eqn{r_a'} is the derivative of the `estimand_fun` with respect to
-#' `psia`, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
+#' \eqn{\Psi_a}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
 #' group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
 #' and \eqn{\kappa_a} is the expected mean-squared error when predicting the
 #' potential outcome corresponding to group \eqn{a}.

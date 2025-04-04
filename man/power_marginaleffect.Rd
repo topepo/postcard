@@ -27,11 +27,11 @@ power_marginaleffect(
 
 \item{predictions}{predictions of the response}
 
-\item{target_effect}{a \code{numeric} minimum effect size that we should be able to detect.}
+\item{target_effect}{a \code{numeric} minimum effect size that we should be able to detect.
+See more in details.}
 
-\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
-"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
-As a default, the ratio of 1's in data is used.}
+\item{exposure_prob}{a \code{numeric} with the probability of being in
+"group 1" (rather than group 0). See more in details.}
 
 \item{var1}{a \code{numeric} variance of the potential outcome corresponding to group 1,
 or a \code{function} with a single argument meant to obtain \code{var1} as a tranformation
@@ -46,7 +46,7 @@ See more in details.}
 \item{estimand_fun}{a \code{function} with arguments \code{psi1} and \code{psi0} specifying
 the estimand. Alternative, specify "ate" or "rate_ratio" as a \code{character}
 to use one of the default estimand functions. See
-more details in the "Estimand" section of this documentation.}
+more details in the "Estimand" section of \link{rctglm}.}
 
 \item{estimand_fun_deriv0}{a \code{function} specifying the derivative of \code{estimand_fun} wrt. \code{psi0}. As a default
 the algorithm will use symbolic differentiation to automatically find the derivative from \code{estimand_fun}}
@@ -97,7 +97,7 @@ r_1'^{\, 2}\sigma_1^2+
 }
 
 where \eqn{r_a'} is the derivative of the \code{estimand_fun} with respect to
-\code{psia}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
+\eqn{\Psi_a}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
 group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
 and \eqn{\kappa_a} is the expected mean-squared error when predicting the
 potential outcome corresponding to group \eqn{a}.
