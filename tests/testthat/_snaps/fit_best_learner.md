@@ -1,8 +1,8 @@
 # `get_best_learner` print information when verbose > 0 [plain]
 
     Code
-      get_best_learner(resamples = cv_folds, learners = default_learners(), formula = "y ~ x1",
-      verbose = 2)
+      get_best_learner(resamples = cv_folds, learners = default_learners(), preproc = list(
+        mod = y ~ x1), verbose = 2)
     Message
       i Fitting learners
       * mod_mars
@@ -34,8 +34,8 @@
 # `get_best_learner` print information when verbose > 0 [ansi]
 
     Code
-      get_best_learner(resamples = cv_folds, learners = default_learners(), formula = "y ~ x1",
-      verbose = 2)
+      get_best_learner(resamples = cv_folds, learners = default_learners(), preproc = list(
+        mod = y ~ x1), verbose = 2)
     Message
       [36mi[39m Fitting learners
       * mod_mars
@@ -67,8 +67,8 @@
 # `get_best_learner` print information when verbose > 0 [unicode]
 
     Code
-      get_best_learner(resamples = cv_folds, learners = default_learners(), formula = "y ~ x1",
-      verbose = 2)
+      get_best_learner(resamples = cv_folds, learners = default_learners(), preproc = list(
+        mod = y ~ x1), verbose = 2)
     Message
       ℹ Fitting learners
       • mod_mars
@@ -100,8 +100,8 @@
 # `get_best_learner` print information when verbose > 0 [fancy]
 
     Code
-      get_best_learner(resamples = cv_folds, learners = default_learners(), formula = "y ~ x1",
-      verbose = 2)
+      get_best_learner(resamples = cv_folds, learners = default_learners(), preproc = list(
+        mod = y ~ x1), verbose = 2)
     Message
       [36mℹ[39m Fitting learners
       • mod_mars

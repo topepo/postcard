@@ -60,7 +60,7 @@ Using the training part of the historical data, we fit a prognostic model using 
 ```{r}
 lrnr <- fit_best_learner(
   data = data_train,
-  formula = Y ~ .,
+  preproc = list(mod = Y ~ .),
   cv_folds = 10,
   verbose = 0
 )

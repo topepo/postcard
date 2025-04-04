@@ -12,7 +12,10 @@ coverage](https://codecov.io/gh/NNpackages/postcard/graph/badge.svg)](https://ap
 
 postcard provides tools for accurately estimating marginal effects using
 plug-in estimation with GLMs, including increasing precision using
-prognostic covariate adjustment.
+prognostic covariate adjustment. See [Powering RCTs for marginal effects
+with GLMs using prognostic score
+adjustment](https://arxiv.org/abs/2503.22284) by Højbjerre-Frandsen et.
+al (2025).
 
 ### Estimating marginal effects
 
@@ -44,7 +47,8 @@ the historical data is representative of the comparator group in a
 *“new”* data set, we can use the prognostic model to predict the
 *comparator counterfactual outcome* for all observations (including the
 ones in the comparator group). This prediction, which is called the
-**prognostic score** is then used as an adjustment covariate in the GLM.
+**prognostic score**, is then used as an adjustment covariate in the
+GLM.
 
 ## Power approximation
 

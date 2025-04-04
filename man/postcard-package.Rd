@@ -23,5 +23,10 @@ Authors:
   \item Emilie Hojbjerre-Frandsen \email{ehfd@novonordisk.com}
 }
 
+Other contributors:
+\itemize{
+  \item Novo Nordisk A/S [copyright holder]
+}
+
 }
 \keyword{internal}

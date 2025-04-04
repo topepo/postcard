@@ -33,9 +33,6 @@
       Computational engine: earth 
       
       
-      $learners$mars$grid
-      NULL
-      
       
       $learners$lm
       $learners$lm$model
@@ -43,9 +40,6 @@
       
       Computational engine: lm 
       
-      
-      $learners$lm$grid
-      NULL
       
       
       $learners$gbt

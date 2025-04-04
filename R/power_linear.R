@@ -80,7 +80,7 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
     var() %>%
     chol() %>%
     chol2inv()
-  sigma_XY <- cov(X, Y)
+  sigma_XY <- stats::cov(X, Y)
 
   R2 <- as.numeric((t(sigma_XY) %*% Sigma_X.I %*% sigma_XY) / var_Y_inf)
   R2_def <- R2 * deflation

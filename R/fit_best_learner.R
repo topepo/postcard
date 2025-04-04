@@ -2,9 +2,17 @@
 #'
 #' @inheritParams rctglm
 #'
+#' @param data A data frame.
+#' @param preproc A list (preferably named) with preprocessing objects:
+#' formulas, recipes, or [workflows::workflow_variables()]. Passed to
+#' [workflowsets::workflow_set()].
 #' @param cv_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
-#' @param learners a `list` of `tidymodels`
+#' @param learners a `list` (preferably named) containing named lists of elements
+#' `model` and optionally `grid`. The `model` element should be a `parsnip`
+#' model specification, which is passed to [workflowsets::workflow_set] as the
+#' `model` argument, while the `grid` element is passed as the `grid` argument
+#' of [workflowsets::option_add]
 #'
 #' @details
 #' Ensure data compatibility with the learners.
@@ -28,35 +36,45 @@
 #' )
 #'
 #' # Fit a learner to the historical control data with default learners
-#' fit <- fit_best_learner(Y ~ ., data = dat_hist)
+#' fit <- fit_best_learner(preproc = list(mod = Y ~ .), data = dat_hist)
 #'
 #' # Use it fx. to predict the "control outcome" in the 2-armed RCT
 #' predict(fit, new_data = dat_rct)
-fit_best_learner <- function(data, formula, cv_folds = 5, learners = default_learners(),
+fit_best_learner <- function(data, preproc, cv_folds = 5, learners = default_learners(),
                              verbose = options::opt("verbose")) {
   cv_folds <- rsample::vfold_cv(data, v = cv_folds)
-  lrnr <- cv_folds %>%
-    get_best_learner(learners = learners,
-                     formula = formula,
+  lrnr <- get_best_learner(resamples = cv_folds,
+                     learners = learners,
+                     preproc = preproc,
                      verbose = verbose)
   lrnr_fit <- generics::fit(lrnr, data)
 
   return(lrnr_fit)
 }
 
-# Default learners used for searching among
+#' Creates a list of learners
+#'
+#' This function creates a list of learners compatible with the `learners`
+#' argument of [fit_best_learner], which is used as the default argument.
+#'
+#' @returns a named `list` of learners, where each element consists of a
+#' - `model`: A `parsnip` model specification
+#' - `grid`: A `data.frame` with columns corresponding to tuning parameters
+#'
+#' @examples
+#' default_learners()
+#'
+#' @export
 default_learners <- function() {
   list(
     mars = list(
       model = parsnip::mars(
         mode = "regression", prod_degree = 3) %>%
-        parsnip::set_engine("earth"),
-      grid = NULL
+        parsnip::set_engine("earth")
     ),
     lm = list(
       model = parsnip::linear_reg() %>%
-        parsnip::set_engine("lm"),
-      grid = NULL
+        parsnip::set_engine("lm")
     ),
     gbt = list(
       model = parsnip::boost_tree(
@@ -104,14 +122,11 @@ add_learners <- function(preproc, learners) {
 # K fold cross validation with recipe -------------------------------------
 get_best_learner <- function(
     resamples,
+    preproc,
     learners = default_learners(),
-    formula,
     verbose = options::opt("verbose")
 ) {
-
-  formula <- check_formula(formula)
-
-  wfs <- add_learners(preproc = list(mod = formula),
+  wfs <- add_learners(preproc = preproc,
                       learners = learners)
 
   if (verbose >= 1) {

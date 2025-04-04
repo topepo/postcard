@@ -2,21 +2,40 @@
 #'
 #' The procedure uses [fit_best_learner] to fit a prognostic model to historical data and uses
 #' the model to produce counterfactual predictions as a prognostic score that is then adjusted
-#' for as a covariate in the [rctglm] procedure.
+#' for as a covariate in the [rctglm] procedure. See
+#' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
+#' by Højbjerre-Frandsen et. al (2025) for more details.
 #'
 #' @inheritParams rctglm
 #' @inheritParams fit_best_learner
 #'
 #' @param data_hist a `data.frame` with historical data on which to fit a prognostic model
-#' @param prog_formula a `character` or `numeric` with the formula for fitting the prognostic
-#' model on the historical data `data_hist`. Default models the response (assumed same as in
-#' `formula`) using all columns in the `data_hist` data
+#' @param prog_formula an object of class "formula" (or one that can be coerced to that class):
+#' a symbolic description of the prognostic model to be fitted to `data_hist`. Passed in a
+#' list as the `preproc` argument in [fit_best_learner()]. As a default,
+#' the formula is created by modelling the response (assumed to have the same name as in
+#' `formula`) using all columns in `data_hist`.
 #' @param cv_prog_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
 #'
 #' @details
-#' More details on prognostic models and scores being predictions of counterfactual means
-#' in control group.
+#' Prognostic covariate adjustment involves training a prognostic model (using
+#' [fit_best_learner]) on historical data (`data_hist`) to predict the response
+#' in that data.
+#'
+#' Assuming that the
+#' historical data is representative of the comparator group in a “new” data
+#' set (group 0 of the binary `exposure_indicator` in `data`), we can use the
+#' prognostic model to predict the counterfactual
+#' outcome of all observations (including the ones in the comparator group
+#' for which the prediction of counterfactual outcome coincides with a
+#' prediction of actual outcome).
+#'
+#' This prediction, which is called the prognostic score, is then used as an
+#' adjustment covariate in the GLM (the prognostic score is added to `formula`
+#' before calling [rctglm] with the modified formula).
+#'
+#' See much more details in the reference in the description.
 #'
 #' @return `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
 #' which inherits from [rctglm].
@@ -42,12 +61,12 @@
 #' b1 <- 1.5
 #' b2 <- 2
 #' W1 <- runif(n, min = -2, max = 2)
-#' exposure_prob <- .5
+#' exp_prob <- .5
 #'
 #' dat_treat <- glm_data(
 #'   Y ~ b0+b1*abs(sin(W1))+b2*A,
 #'   W1 = W1,
-#'   A = rbinom (n, 1, exposure_prob)
+#'   A = rbinom (n, 1, exp_prob)
 #' )
 #'
 #' dat_notreat <- glm_data(
@@ -58,7 +77,7 @@
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
 #'   exposure_indicator = A,
-#'   exposure_prob = exposure_prob,
+#'   exposure_prob = exp_prob,
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
@@ -98,22 +117,10 @@ rctglm_with_prognosticscore <- function(
     prog_formula <- formula_everything(formula)
     if (verbose >= 1)
       cli::cli_alert_info("Created formula for fitting prognostic model as: {deparse(prog_formula)}")
-  } else if (is.character(prog_formula)) {
-    prog_formula <- formula(prog_formula)
   }
+  prog_formula <- check_formula(prog_formula)
 
-  data_hist <- do.call(
-    model.frame,
-    c(
-      list(
-        formula = prog_formula,
-        data = data_hist
-      ),
-      extra_glm_args
-    )
-  )
-
-  lrnr_fit <- fit_best_learner(formula = prog_formula,
+  lrnr_fit <- fit_best_learner(preproc = list(mod = prog_formula),
                                data = data_hist,
                                cv_folds = cv_prog_folds,
                                learners = learners,
@@ -121,7 +128,7 @@ rctglm_with_prognosticscore <- function(
 
   lrnr_pred <- predict(lrnr_fit, data) %>%
     dplyr::pull(.data$.pred)
-  data %<>%
+  data <- data %>%
     dplyr::mutate(link_prog = family$linkfun(lrnr_pred))
 
   if (verbose >= 2)
