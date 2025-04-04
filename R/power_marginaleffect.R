@@ -110,8 +110,8 @@
 #' # ---------------------------------------------------------------------------
 #' # Get OOS predictions using discrete super learner and adjust variance
 #' # ---------------------------------------------------------------------------
-#' lrnr1 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus1)
-#' lrnr2 <- fit_best_learner(Y ~ X1 + X2 + A, data = gaus2)
+#' lrnr1 <- fit_best_learner(list(mod = Y ~ X1 + X2 + A), data = gaus1)
+#' lrnr2 <- fit_best_learner(list(mod = Y ~ X1 + X2 + A), data = gaus2)
 #' preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
 #' preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
 #' preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
