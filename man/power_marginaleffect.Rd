@@ -17,7 +17,7 @@ power_marginaleffect(
   inv_estimand_fun = NULL,
   margin = estimand_fun(1, 1),
   alpha = 0.025,
-  tolerance = 0.01,
+  tolerance = 0.001,
   verbose = options::opt("verbose"),
   ...
 )

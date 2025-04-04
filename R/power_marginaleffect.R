@@ -139,7 +139,7 @@ power_marginaleffect <- function(
     inv_estimand_fun = NULL,
     margin = estimand_fun(1,1),
     alpha = 0.025,
-    tolerance = 1e-2,
+    tolerance = 1e-3,
     verbose = options::opt("verbose"),
     ...
 ) {
@@ -271,7 +271,7 @@ derive_check_psi1 <- function(
     target_effect,
     estimand_fun,
     inv_estimand_fun = NULL,
-    tolerance = 1e-2,
+    tolerance = 1e-3,
     ...) {
   if (!is.null(inv_estimand_fun))
     psi1 <- inv_estimand_fun(psi0 = psi0, target_effect = target_effect)
