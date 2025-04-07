@@ -12,10 +12,10 @@ vignette: >
   collapse = TRUE,
   comment = "#>"
   )
-```
+  ```
   
-```{r setup, message = FALSE}
-library(postcard)
+  ```{r setup, message = FALSE}
+  library(postcard)
 withr::local_seed(1395878)
 withr::local_options(list(postcard.verbose = 0))
 ```
@@ -38,23 +38,26 @@ b2 <- 2.3
 b3 <- 1
 b4 <- 1.8
 
-train_pois <- glm_data(
-  Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
-  X1 = runif(n_train, min = -2, max = 2),
-  X2 = rnorm(n_train, mean = 2, sd = 2),
-  X3 = rgamma(n_train, shape = 1),
-  family = gaussian()
-) %>% 
-  dplyr::mutate(Y = round(abs(Y)))
-
-test_pois <- glm_data(
-  Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
-  X1 = runif(n_test, min = -2, max = 2),
-  X2 = rnorm(n_test, mean = 2, sd = 2),
-  X3 = rgamma(n_test, shape = 1),
-  family = gaussian()
-) %>% 
-  dplyr::mutate(Y = round(abs(Y)))
+train_pois <- dplyr::mutate(
+  glm_data(
+    Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
+    X1 = runif(n_train, min = -2, max = 2),
+    X2 = rnorm(n_train, mean = 2, sd = 2),
+    X3 = rgamma(n_train, shape = 1),
+    family = gaussian()
+  ),
+  Y = round(abs(Y))
+)
+test_pois <- dplyr::mutate(
+  glm_data(
+    Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
+    X1 = runif(n_test, min = -2, max = 2),
+    X2 = rnorm(n_test, mean = 2, sd = 2),
+    X3 = rgamma(n_test, shape = 1),
+    family = gaussian()
+  ),
+  Y = round(abs(Y))
+)
 ```
 
 ## Controlling assumptions
