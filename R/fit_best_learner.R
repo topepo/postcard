@@ -40,7 +40,7 @@
 #'
 #' # Use it fx. to predict the "control outcome" in the 2-armed RCT
 #' predict(fit, new_data = dat_rct)
-fit_best_learner <- function(data, preproc, cv_folds = 5, learners = default_learners(),
+fit_best_learner <- function(preproc, data, cv_folds = 5, learners = default_learners(),
                              verbose = options::opt("verbose")) {
   cv_folds <- rsample::vfold_cv(data, v = cv_folds)
   lrnr <- get_best_learner(resamples = cv_folds,
