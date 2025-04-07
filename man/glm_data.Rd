@@ -57,4 +57,5 @@ glm_data(resp ~ 1+2*x1-x2,
                   x2 = rgamma(10, shape = 2)
                 ),
                 family = MASS::negative.binomial(2))
+
 }

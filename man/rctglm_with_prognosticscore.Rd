@@ -165,4 +165,11 @@ ate <- rctglm_with_prognosticscore(
 
 # Pull information on estimand
 estimand(ate)
+
+}
+\seealso{
+Method to extract information of the prognostic model in \link{prog}. Function
+used to fit the prognostic model is \code{\link[=fit_best_learner]{fit_best_learner()}}.
+
+See \code{\link[=rctglm]{rctglm()}} for the function and class this inherits from.
 }

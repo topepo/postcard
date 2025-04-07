@@ -17,8 +17,11 @@
 #' @details
 #' Ensure data compatibility with the learners.
 #'
-#' @return a trained `workflow`
-#' @export
+#' @returns a trained `workflow`
+#'
+#' @seealso
+#' See [rctglm_with_prognosticscore()] for a function that utilises this
+#' function to perform prognostic covariate adjustment.
 #'
 #' @examples
 #' # Generate some synthetic 2-armed RCT data along with historical controls
@@ -40,6 +43,8 @@
 #'
 #' # Use it fx. to predict the "control outcome" in the 2-armed RCT
 #' predict(fit, new_data = dat_rct)
+#'
+#' @export
 fit_best_learner <- function(preproc, data, cv_folds = 5, learners = default_learners(),
                              verbose = options::opt("verbose")) {
   cv_folds <- rsample::vfold_cv(data, v = cv_folds)

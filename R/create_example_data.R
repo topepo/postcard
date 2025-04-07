@@ -18,7 +18,6 @@
 #' family relevant `r<family_name>` function for simulating the data
 #'
 #' @returns a `data.frame`
-#' @export
 #'
 #' @examples
 #' # Generate a gaussian response from a single covariate
@@ -44,6 +43,8 @@
 #'                   x2 = rgamma(10, shape = 2)
 #'                 ),
 #'                 family = MASS::negative.binomial(2))
+#'
+#' @export
 glm_data <- function(formula,
                      ...,
                      family = gaussian(),

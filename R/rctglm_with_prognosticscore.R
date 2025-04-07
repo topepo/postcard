@@ -37,7 +37,7 @@
 #'
 #' See much more details in the reference in the description.
 #'
-#' @return `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
+#' @returns `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
 #' which inherits from [rctglm].
 #'
 #' An `rctglm_prog` object is a list with the same components as an [rctglm] object
@@ -52,7 +52,12 @@
 #'    - `cv_folds`: The amount of folds used for cross validation
 #'    - `data`: The historical data used for cross validation when fitting and
 #'    testing models
-#' @export
+#'
+#' @seealso
+#' Method to extract information of the prognostic model in [prog]. Function
+#' used to fit the prognostic model is [fit_best_learner()].
+#'
+#' See [rctglm()] for the function and class this inherits from.
 #'
 #' @examples
 #' # Generate some data
@@ -85,6 +90,8 @@
 #'
 #' # Pull information on estimand
 #' estimand(ate)
+#'
+#' @export
 rctglm_with_prognosticscore <- function(
     formula,
     exposure_indicator,

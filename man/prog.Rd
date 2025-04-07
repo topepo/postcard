@@ -14,7 +14,8 @@ prog(x)
 \link{rctglm_with_prognosticscore})}
 }
 \value{
-description
+a list with the structure described of \code{prognostic_info} in the
+\code{Value} section of \link{rctglm_with_prognosticscore}.
 }
 \description{
 Extracts the \code{prognostic_info} list element from an \code{rctglm_prog} object. See
@@ -50,4 +51,9 @@ ate <- rctglm_with_prognosticscore(
   data_hist = dat_notreat)
 
 prog(ate)
+
+}
+\seealso{
+The generic \code{\link[=rctglm_with_prognosticscore]{rctglm_with_prognosticscore()}} for which this method
+works.
 }

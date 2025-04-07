@@ -6,9 +6,12 @@
 #' @param x an object of class `rctglm_prog` (returned by
 #' [rctglm_with_prognosticscore])
 #'
-#' @return description
+#' @returns a list with the structure described of `prognostic_info` in the
+#' `Value` section of [rctglm_with_prognosticscore].
 #'
-#' @export
+#' @seealso The generic [rctglm_with_prognosticscore()] for which this method
+#' works.
+#'
 #' @examples
 #' # Generate some data
 #' n <- 100
@@ -39,6 +42,8 @@
 #'   data_hist = dat_notreat)
 #'
 #' prog(ate)
+#'
+#' @export
 prog <- function(x) {
   UseMethod("prog")
 }

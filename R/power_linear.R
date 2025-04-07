@@ -24,7 +24,7 @@
 #'
 #' The user can estimate the `variance` any way they see fit.
 #'
-#' @return
+#' @returns
 #' All functions return a `numeric`. `variance_ancova` returns a `numeric` with
 #' a variance estimated from data to used for power estimation and sample size
 #' estimation. `power_xx` and `samplesize_xx` functions return a `numeric` with

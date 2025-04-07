@@ -76,6 +76,9 @@
 #' - `target_effect`: \eqn{\Psi}.
 #' - `exposure_prob`: \eqn{\pi_1}
 #'
+#' @seealso
+#' See [power_linear] for power approximation functionalities for linear models.
+#'
 #' @examples
 #' # Generate a data set to use as an example
 #' n <- 100
