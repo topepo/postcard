@@ -11,7 +11,7 @@ Conducting analysis using robust plug-in GLM estimation with influence functions
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://nnpackages.github.io/postcard/}
+  \item \url{https://novonordisk-opensource.github.io/postcard/}
 }
 
 }
