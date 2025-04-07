@@ -119,7 +119,7 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
 #' }
 #'
-#' where \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
+#' where \eqn{\widehat{R}^2= \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 #' we denote by \eqn{\widehat{\sigma^2}} an estimate of the variance of the outcome,
 #' \eqn{\widehat{\Sigma_X}} and estimate of the covariance matrix of the
 #' covariates, and \eqn{\widehat{\sigma_{XY}}} a \eqn{p}-dimensional column vector consisting of
@@ -222,7 +222,7 @@ samplesize_gs <- function(variance,
 #'
 #' \deqn{nc =\frac{\beta_1-\beta_0-\Delta_s}{\sqrt{\left(\frac{1}{n_1}+\frac{1}{n_0} + X_d^\top\left((n-2)\Sigma_X\right)^{-1}X_d \right)\sigma^2\left(1-\widehat{R}^2\right)}}.}
 #'
-#' where \eqn{X_d \coloneqq \left(\overline{X}_1^1-\overline{X}_0^1, \ldots, \overline{X}_1^p-\overline{X}_0^p\right)^\top}, \eqn{\widehat{R}^2\coloneqq \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
+#' where \eqn{X_d = \left(\overline{X}_1^1-\overline{X}_0^1, \ldots, \overline{X}_1^p-\overline{X}_0^p\right)^\top}, \eqn{\widehat{R}^2= \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
 #' we denote by \eqn{\widehat{\sigma^2}} an estimate of the variance of the outcome,
 #' \eqn{\widehat{\Sigma_X}} and estimate of the covariance matrix of the
 #' covariates, and \eqn{\widehat{\sigma_{XY}}} a \eqn{p}-dimensional column vector consisting of

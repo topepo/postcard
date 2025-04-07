@@ -73,8 +73,12 @@ include functions `variance_ancova`, `power_gs`, `samplesize_gs`,
 
 ## Installation
 
-You can install the development version of postcard from GitHub with:
+To install the package:
 
 ``` r
+install.packages("postcard")
+
+# Development version:
+# install.packages("pak")
 pak::pak("NovoNordisk-OpenSource/postcard")
 ```

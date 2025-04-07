@@ -50,8 +50,12 @@ Functionalities available to estimate the power for linear models include functi
 
 ## Installation
 
-You can install the development version of postcard from GitHub with:
+To install the package:
 
 ```{r, eval = FALSE}
+install.packages("postcard")
+
+# Development version:
+# install.packages("pak")
 pak::pak("NovoNordisk-OpenSource/postcard")
 ```

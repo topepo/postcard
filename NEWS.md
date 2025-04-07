@@ -1,4 +1,4 @@
-# postcard 0.2.1.9000 (development version)
+# postcard 1.0.0
 
 Major overhaul of package. Still focuses on analysing data with the use of
 prognostic scores, but takes a more general approach that allows any
