@@ -19,9 +19,8 @@
 #' @param exposure_indicator (name of) the *binary* variable in `data` that
 #' identifies randomisation groups. The variable is required to be binary to
 #' make the "orientation" of the `estimand_fun` clear.
-#' @param exposure_prob a `numeric` with the probabiliy of being in
+#' @param exposure_prob a `numeric` with the probability of being in
 #' "group 1" (rather than group 0) in groups defined by `exposure_indicator`.
-#' As a default, the ratio of 1's in data is used.
 #' @param estimand_fun a `function` with arguments `psi1` and `psi0` specifying
 #' the estimand. Alternative, specify "ate" or "rate_ratio" as a `character`
 #' to use one of the default estimand functions. See
