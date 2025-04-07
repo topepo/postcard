@@ -136,13 +136,33 @@ It's evident that in this case where there is a non-linear relationship between 
 
 Information on the prognostic model is available in the list element `prognostic_info`, which the method `prog()` can be used to extract. A breakdown of what this list includes, see the **`Value`** section of the `rctglm_with_prognosticscore()` documentation.
 
-# Power approximation in linear models
+# Power approximation
 
 In cases of seeking to conduct new studies, sample size/power analyses are vital to the successful planning of such studies. Here, we present implementations in this package that take advantage of power approximation formulas to perform such analyses.
 
-See a more detailed walkthrough of a use case in `vignette("prospective-power")`, where power curves are drawn and compared for a standard ANCOVA model and one utilising *prognostic covariate adjustment*.
+See a more detailed walkthrough of a use case in `vignette("prospective-power")`.
 
-## Estimating the assumed variance
+## Method robust to model misspecification
+
+The method proposed in [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284) by Højbjerre-Frandsen et. al (2025), which can be used to estimate the power when estimating any marginal effect, is implemented in the function `power_marginaleffect()`.
+
+> Note that predictions can be obtained in any way the user sees fit. Here we showcase a simple use of a `glm()`, but fx. `fit_best_learner()` could be used to fit a discrete super learner as the prediction model. Could also add steps to get out-of-sample (OOS) predictions (see examples).
+
+```{r}
+pred_mod <- glm(Y ~ W + A, data = dat_treat)
+preds <- predict(pred_mod, dat_treat)
+
+power_marginaleffect(
+  response = dat_treat$Y,
+  predictions = preds,
+  target_effect = 0.4,
+  exposure_prob = 1/2
+)
+```
+
+## Methods specific to linear models
+
+### Estimating the assumed variance
 
 Finding the assumed variance to use for your power analysis with an ANCOVA model can be done using the `variance_ancova` function, which estimates the term $\sigma^2(1-R^2)$ given a `formula` and `data`.
 
@@ -151,7 +171,7 @@ vanc <- variance_ancova(Y ~ A + W, data = dat_treat)
 vanc
 ```
 
-## Finding the power (or sample size)
+### Finding the power (or sample size)
 
 Functions `power_gs()` and `power_nc()` exist, which estimate the power given a sample size `n` using approximation formulas. The functions are the results of two different approximation formulas but behave exactly the same except for a mandatory specification of a `df` argument for the `power_nc` function, which gives the degrees of freedom in the t-distribution used.
 

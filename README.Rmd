@@ -40,13 +40,13 @@ Implementations of sample size/power approximation formulas are available, enabl
 
 Introductory examples are available in `vignette("postcard")` and more details in `vignette("prospective-power")`.
 
-### For linear models
+### When estimating marginal effects using any model
 
-Functionalities available include functions `variance_ancova`, `power_gs`, `samplesize_gs`, `power_nc`. 
+A method of estimating power in any case of estimating marginal effects is described in the reference at the top of this page, and the algorithm is implemented in the function `power_marginaleffect`.
 
-### For generalized linear models
+### Specifically for linear models
 
-The functionalities assume a linear model, whereas the function `power_glm` can be used for generalized linear models.
+Functionalities available to estimate the power for linear models include functions `variance_ancova`, `power_gs`, `samplesize_gs`, `power_nc`. 
 
 ## Installation
 
