@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/NNpackages/postcard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NNpackages/postcard/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/NovoNordisk-OpenSource/postcard/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NovoNordisk-OpenSource/postcard/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/NNpackages/postcard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/postcard)
+coverage](https://codecov.io/gh/NovoNordisk-OpenSource/postcard/graph/badge.svg)](https://app.codecov.io/gh/NovoNordisk-OpenSource/postcard)
 <!-- badges: end -->
 
 postcard provides tools for accurately estimating marginal effects using
@@ -76,5 +76,5 @@ include functions `variance_ancova`, `power_gs`, `samplesize_gs`,
 You can install the development version of postcard from GitHub with:
 
 ``` r
-pak::pak("NNpackages/postcard")
+pak::pak("NovoNordisk-OpenSource/postcard")
 ```
