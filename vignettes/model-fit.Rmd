@@ -161,7 +161,7 @@ The variance is estimated as the variance of the influence function of the margi
 
 ## Prognostic covariate adjustment
 
-The `rctglm_with_prognosticscore()` uses the function `fit_best_learner()` to fit a prognostic model to the historical data, `data_hist`. Thereafter, the model is used to predict prognostic scores for all observations in `data` before using these scores as a covariate when performing plug-in etimation in a GLM using `rctglm`.
+The `rctglm_with_prognosticscore()` uses the function `fit_best_learner()` to fit a prognostic model to the historical data, `data_hist`. Thereafter, the model is used to predict prognostic scores for all observations in `data` before using these scores as a covariate when performing plug-in estimation in a GLM using `rctglm`.
 
 The behavior of `fit_best_learner()` and subsequently fitting the prognostic model on `data_hist` in `rctglm_with_prognosticscore()` is to fit a discrete super learner (discrete to avoid overfitting) by finding the model with the lowest RMSE among a list of models. The algorithm uses a default of 5 folds for cross validation (`cv_prog_folds`) and if no formula is given for the prognostic model (`prog_formula`), the function attempts to model a response with the same name as given in the `formula` using an intercept and main effect from all variables in `data_hist`.
 

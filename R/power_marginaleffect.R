@@ -27,7 +27,7 @@
 #' If left as `NULL`, the inverse will be found automatically
 #' @param margin a `numeric` superiority margin. As a default, the `estimand_fun`
 #' is evaluated with the same counterfactual means `psi1` and `psi0`, corresponding
-#' to a superiority margin assumin no difference (fx. 0 for ATE and 1 for rate ratio).
+#' to a superiority margin assuming no difference (fx. 0 for ATE and 1 for rate ratio).
 #' @param tolerance passed to [all.equal] when comparing calculated `target_effect`
 #' from derivations and given `target_effect`.
 #' @param ... arguments passed to `[stats::uniroot]`, which is used to find the
@@ -47,7 +47,7 @@
 #'
 #' where \eqn{r_a'} is the derivative of the `estimand_fun` with respect to
 #' \eqn{\Psi_a}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
-#' group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
+#' group \eqn{a}, \eqn{\pi_a} is the probability of being assigned to group \eqn{a},
 #' and \eqn{\kappa_a} is the expected mean-squared error when predicting the
 #' potential outcome corresponding to group \eqn{a}.
 #'

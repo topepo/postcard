@@ -61,7 +61,7 @@ If left as \code{NULL}, the inverse will be found automatically}
 
 \item{margin}{a \code{numeric} superiority margin. As a default, the \code{estimand_fun}
 is evaluated with the same counterfactual means \code{psi1} and \code{psi0}, corresponding
-to a superiority margin assumin no difference (fx. 0 for ATE and 1 for rate ratio).}
+to a superiority margin assuming no difference (fx. 0 for ATE and 1 for rate ratio).}
 
 \item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
 using a one-sided test, half the specified significance level is used.
@@ -98,7 +98,7 @@ r_1'^{\, 2}\sigma_1^2+
 
 where \eqn{r_a'} is the derivative of the \code{estimand_fun} with respect to
 \eqn{\Psi_a}, \eqn{\sigma_a^2} is the variance of the potential outcome corresponding to
-group \eqn{a}, \eqn{\pi_a} is the probablity of being assigned to group \eqn{a},
+group \eqn{a}, \eqn{\pi_a} is the probability of being assigned to group \eqn{a},
 and \eqn{\kappa_a} is the expected mean-squared error when predicting the
 potential outcome corresponding to group \eqn{a}.
 

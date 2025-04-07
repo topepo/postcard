@@ -113,7 +113,7 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' Thus, for standard significance level of 5%, the default is `alpha = 0.025`.
 #'
 #' @section Guenther-Schouten power approximation:
-#' The estimation formula in the case of an ANCOVA model with multiple covariate adjustement is (see description for reference):
+#' The estimation formula in the case of an ANCOVA model with multiple covariate adjustment is (see description for reference):
 #'
 #' \deqn{
 #' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
@@ -196,7 +196,7 @@ samplesize_gs <- function(variance,
 #' The function `power_nc` calculates the power for ANOVA or ANCOVA based on the
 #' non-centrality parameter and the exact t-distributions.
 #'
-#' See more details about each funtion in `Details` and in sections after `Value`.
+#' See more details about each function in `Details` and in sections after `Value`.
 #'
 #' @param df a `numeric` degrees of freedom to use in the t-distribution.
 #'

@@ -78,7 +78,7 @@ a continuous outcome for unequal group sizes and unequal variances. Statistics i
 The function \code{power_nc} calculates the power for ANOVA or ANCOVA based on the
 non-centrality parameter and the exact t-distributions.
 
-See more details about each funtion in \code{Details} and in sections after \code{Value}.
+See more details about each function in \code{Details} and in sections after \code{Value}.
 }
 \details{
 This details section provides information about relation between arguments to
@@ -104,7 +104,7 @@ The user can estimate the \code{variance} any way they see fit.
 }
 \section{Guenther-Schouten power approximation}{
 
-The estimation formula in the case of an ANCOVA model with multiple covariate adjustement is (see description for reference):
+The estimation formula in the case of an ANCOVA model with multiple covariate adjustment is (see description for reference):
 
 \deqn{
 n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
