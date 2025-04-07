@@ -1,14 +1,19 @@
 Type: Package
 Package: postcard
-Title: Estimating Marginal Effects Using Prognostic Covariate Adjustment
+Title: Estimating Marginal Effects With Prognostic Covariate Adjustment
 Version: 0.2.1.9000
 Authors@R: c(
-    person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
-    person("Emilie", "Hojbjerre-Frandsen", , "ehfd@novonordisk.com", role = "aut"),
+    person("Mathias Lerbech", "Jeppesen", ,
+           "mathiasljeppesen@outlook.com", role = c("aut", "cre")),
+    person("Emilie", "Hojbjerre-Frandsen", ,
+           "ehfd@novonordisk.com", role = "aut"),
     person("Novo Nordisk A/S", role = "cph")
   )
-Description: Conduct power analyses and perform inference using robust plug-in
-    GLM estimation with influence functions and prognostic covariate adjustment.
+Description: Conduct power analyses and inference of marginal effects. 
+    Uses plug-in estimation and influence functions to perform robust inference,
+    optionally leveraging historical data to increase precision with
+    prognostic covariate adjustment. The methods are described in
+    Højbjerre-Frandsen et. al (2025) <arXiv:2503.22284>.
 License: MIT + file LICENSE
 URL: https://novonordisk-opensource.github.io/postcard/, https://github.com/NovoNordisk-OpenSource/postcard
 BugReports: https://github.com/NovoNordisk-OpenSource/postcard/issues

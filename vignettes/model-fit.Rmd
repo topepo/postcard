@@ -176,7 +176,7 @@ Below we show the code of the unexported `default_learners` function, which crea
 > The body of the function thus represents a valid way of specifying the `learners` argument.
 
 ```{r default-learners-show}
-postcard:::default_learners
+default_learners
 ```
 
 #### Creating own list of learners

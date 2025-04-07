@@ -142,11 +142,13 @@ In cases of seeking to conduct new studies, sample size/power analyses are vital
 
 See a more detailed walkthrough of a use case in `vignette("prospective-power")`.
 
-## Method robust to model misspecification
+## For marginal effects
 
 The method proposed in [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284) by Højbjerre-Frandsen et. al (2025), which can be used to estimate the power when estimating any marginal effect, is implemented in the function `power_marginaleffect()`.
 
-> Note that predictions can be obtained in any way the user sees fit. Here we showcase a simple use of a `glm()`, but fx. `fit_best_learner()` could be used to fit a discrete super learner as the prediction model. Could also add steps to get out-of-sample (OOS) predictions (see examples).
+According to the conservative approach in the article, if wanting to conduct power analyses to figure out how many participants is needed for an upcoming trial, where you are planning to use *prognostic covariate adjustment*, predictions should be obtained from a discrete super learner identical to the one planned to use for generating prognostic scores when adjusting in the analysis when estimating the marginal effect.
+
+> Here we showcase a simple use of a `glm()`, but fx. `fit_best_learner()` could be used to fit a discrete super learner as the prediction model. Could also add steps to get out-of-sample (OOS) predictions (see examples).
 
 ```{r}
 pred_mod <- glm(Y ~ W + A, data = dat_treat)
@@ -160,7 +162,7 @@ power_marginaleffect(
 )
 ```
 
-## Methods specific to linear models
+## Specific to linear models
 
 ### Estimating the assumed variance
 
