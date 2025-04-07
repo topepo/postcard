@@ -42,42 +42,6 @@
       
       
       
-      $learners$gbt
-      $learners$gbt$model
-      Boosted Tree Model Specification (regression)
-      
-      Main Arguments:
-        trees = parsnip::tune("trees")
-        tree_depth = parsnip::tune("tree_depth")
-        learn_rate = 0.1
-      
-      Computational engine: xgboost 
-      
-      
-      $learners$gbt$grid
-         trees tree_depth
-      1     25          3
-      2     50          3
-      3     75          3
-      4    100          3
-      5    125          3
-      6    150          3
-      7    175          3
-      8    200          3
-      9    225          3
-      10   250          3
-      11   275          3
-      12   300          3
-      13   325          3
-      14   350          3
-      15   375          3
-      16   400          3
-      17   425          3
-      18   450          3
-      19   475          3
-      20   500          3
-      
-      
       
       $cv_folds
       [1] 5

@@ -56,8 +56,23 @@ dat_hist <- glm_data(
   family = gaussian()
 )
 
-# Fit a learner to the historical control data with default learners
-fit <- fit_best_learner(preproc = list(mod = Y ~ .), data = dat_hist)
+# Fit a learner to the historical control data
+learners <- list(
+  mars = list(
+    model = parsnip::mars(
+    mode = "regression", prod_degree = 3) \%>\%
+    parsnip::set_engine("earth")
+  ),
+  lm = list(
+    model = parsnip::linear_reg() \%>\%
+    parsnip::set_engine("lm")
+  )
+)
+fit <- fit_best_learner(
+  preproc = list(mod = Y ~ .),
+  data = dat_hist,
+  learners = learners
+)
 
 # Use it fx. to predict the "control outcome" in the 2-armed RCT
 predict(fit, new_data = dat_rct)

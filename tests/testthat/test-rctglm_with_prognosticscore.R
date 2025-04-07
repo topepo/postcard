@@ -18,6 +18,18 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
     W1 = W1
   )
 
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
+
   elapsed_time_pattern <- "\\d+\\.?\\d*m?s"
   expect_snapshot({
     ate <- withr::with_seed(42, {
@@ -29,6 +41,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
+        learners = learners,
         cv_variance = TRUE,
         verbose = 2)
     })
@@ -48,6 +61,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
+        learners = learners,
         cv_variance = FALSE,
         verbose = 0)
     })
@@ -80,6 +94,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = poisson(),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      learners = learners,
       cv_variance = FALSE,
       verbose = 0)
   })
@@ -94,6 +109,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = poisson(),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      learners = learners,
       cv_variance = TRUE,
       verbose = 0)
   })
@@ -108,6 +124,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = MASS::negative.binomial(2),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      learners = learners,
       cv_variance = FALSE,
       verbose = 0)
   })
@@ -122,6 +139,7 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
       family = MASS::negative.binomial(2),
       estimand_fun = "rate_ratio",
       data_hist = dat_notreat_pois,
+      learners = learners,
       cv_variance = TRUE,
       verbose = 0)
   })
@@ -130,6 +148,9 @@ test_that("`rctglm_with_prognosticscore` snapshot tests", {
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
 
   n <- 100
   b0 <- 1
@@ -148,6 +169,18 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
     W1 = W1
   )
 
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
+
   ate_w_cvvariance <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
         formula = Y ~ .,
@@ -157,8 +190,8 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
-        cv_variance = TRUE,
-        verbose = 0)
+        learners = learners,
+        cv_variance = TRUE)
     })
   ate_wo_cvvariance <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
@@ -169,8 +202,8 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
-        cv_variance = FALSE,
-        verbose = 0)
+        learners = learners,
+        cv_variance = FALSE)
     })
 
   expect_equal(
@@ -187,6 +220,9 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
 
 test_that("`prog_formula` manual specification consistent with default behavior", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
 
   n <- 100
   b0 <- 1
@@ -205,6 +241,18 @@ test_that("`prog_formula` manual specification consistent with default behavior"
     W1 = W1
   )
 
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
+
   # Note default behavior models response as all variables in data, in this case just W1
   ate_wo_prog_formula <- withr::with_seed(42, {
       rctglm_with_prognosticscore(
@@ -215,8 +263,8 @@ test_that("`prog_formula` manual specification consistent with default behavior"
         family = gaussian(),
         estimand_fun = "ate",
         data_hist = dat_notreat,
-        cv_variance = FALSE,
-        verbose = 2)
+        learners = learners,
+        cv_variance = FALSE)
     })
 
   ate_w_prog_formula <- withr::with_seed(42, {
@@ -228,6 +276,7 @@ test_that("`prog_formula` manual specification consistent with default behavior"
       family = gaussian(),
       estimand_fun = "ate",
       data_hist = dat_notreat,
+      learners = learners,
       cv_variance = FALSE,
       prog_formula = "Y ~ W1")
   })

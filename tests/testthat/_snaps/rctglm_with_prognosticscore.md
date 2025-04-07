@@ -4,7 +4,8 @@
       ate <- withr::with_seed(42, {
         rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A,
         exposure_prob = exposure_prob, data = dat_treat, family = gaussian(),
-        estimand_fun = "ate", data_hist = dat_notreat, cv_variance = TRUE, verbose = 2)
+        estimand_fun = "ate", data_hist = dat_notreat, learners = learners,
+        cv_variance = TRUE, verbose = 2)
       })
     Message
       
@@ -14,16 +15,13 @@
       i Fitting learners
       * mod_mars
       * mod_lm
-      * mod_gbt
       i	No tuning parameters. `fit_resamples()` will be attempted
-      i 1 of 3 resampling: mod_mars
-      v 1 of 3 resampling: mod_mars ()
+      i 1 of 2 resampling: mod_mars
+      v 1 of 2 resampling: mod_mars ()
       i	No tuning parameters. `fit_resamples()` will be attempted
-      i 2 of 3 resampling: mod_lm
-      v 2 of 3 resampling: mod_lm ()
-      i 3 of 3 tuning:     mod_gbt
-      v 3 of 3 tuning:     mod_gbt ()
-      i Model with lowest RMSE: mod_gbt
+      i 2 of 2 resampling: mod_lm
+      v 2 of 2 resampling: mod_lm ()
+      i Model with lowest RMSE: mod_mars
       i Investigate trained learners and fitted model in `prognostic_info` list element
       
       -- Symbolic differentiation of estimand function --
@@ -41,7 +39,8 @@
       ate_wo_cvvariance <- withr::with_seed(42, {
         rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A,
         exposure_prob = exposure_prob, data = dat_treat, family = gaussian(),
-        estimand_fun = "ate", data_hist = dat_notreat, cv_variance = FALSE, verbose = 0)
+        estimand_fun = "ate", data_hist = dat_notreat, learners = learners,
+        cv_variance = FALSE, verbose = 0)
       })
 
 ---
@@ -55,7 +54,7 @@
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
           exposure_prob = exposure_prob, data = dat_treat_pois, family = poisson(), 
           estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
-          verbose = 0)
+          learners = learners, verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
       Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 58.48
@@ -73,7 +72,7 @@
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
           exposure_prob = exposure_prob, data = dat_treat_pois, family = poisson(), 
           estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
-          verbose = 0)
+          learners = learners, verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 7.981
       Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 58.48
@@ -91,7 +90,7 @@
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
           exposure_prob = exposure_prob, data = dat_treat_pois, family = MASS::negative.binomial(2), 
           estimand_fun = "rate_ratio", cv_variance = FALSE, data_hist = dat_notreat_pois, 
-          verbose = 0)
+          learners = learners, verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067
       Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 57.7
@@ -109,7 +108,7 @@
       Call:  rctglm_with_prognosticscore(formula = Y ~ ., exposure_indicator = A, 
           exposure_prob = exposure_prob, data = dat_treat_pois, family = MASS::negative.binomial(2), 
           estimand_fun = "rate_ratio", cv_variance = TRUE, data_hist = dat_notreat_pois, 
-          verbose = 0)
+          learners = learners, verbose = 0)
       
       Counterfactual control mean (psi_0=E[Y|X, A=0]) estimate: 8.067
       Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: 57.7

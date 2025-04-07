@@ -18,6 +18,18 @@ test_that("`rctglm_with_prognosticscore` returns object of correct class", {
     W1 = W1
   )
 
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
+
   ate <- rctglm_with_prognosticscore(
     formula = Y ~ .,
     exposure_indicator = A,
@@ -26,6 +38,7 @@ test_that("`rctglm_with_prognosticscore` returns object of correct class", {
     family = gaussian(),
     estimand_fun = "ate",
     data_hist = dat_notreat,
+    learners = learners,
     cv_variance = FALSE)
 
   expect_equal(ate$prognostic_info, prog(ate))

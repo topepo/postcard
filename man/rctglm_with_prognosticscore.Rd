@@ -154,6 +154,17 @@ dat_notreat <- glm_data(
   W1 = W1
 )
 
+learners <- list(
+  mars = list(
+    model = parsnip::mars(
+    mode = "regression", prod_degree = 3) \%>\%
+    parsnip::set_engine("earth")
+  ),
+  lm = list(
+    model = parsnip::linear_reg() \%>\%
+    parsnip::set_engine("lm")
+  )
+)
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
@@ -161,7 +172,8 @@ ate <- rctglm_with_prognosticscore(
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",
-  data_hist = dat_notreat)
+  data_hist = dat_notreat,
+  learners = learners)
 
 # Pull information on estimand
 estimand(ate)
