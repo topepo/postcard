@@ -4,9 +4,9 @@
 \name{postcard-package}
 \alias{postcard}
 \alias{postcard-package}
-\title{postcard: Estimating Marginal Effects With Prognostic Covariate Adjustment}
+\title{postcard: Estimating Marginal Effects with Prognostic Covariate Adjustment}
 \description{
-Conduct power analyses and inference of any marginal effect. Uses plug-in estimation and influence functions to perform robust inference, optionally leveraging historical data to increase precision with prognostic covariate adjustment. The methods are described in Højbjerre-Frandsen et. al (2025) \href{https://arxiv.org/abs/2503.22284}{arXiv:2503.22284}.
+Conduct power analyses and inference of marginal effects. Uses plug-in estimation and influence functions to perform robust inference, optionally leveraging historical data to increase precision with prognostic covariate adjustment. The methods are described in Højbjerre-Frandsen et. al (2025) \href{https://arxiv.org/abs/2503.22284}{arXiv:2503.22284}.
 }
 \seealso{
 Useful links:

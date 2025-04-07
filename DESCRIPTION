@@ -1,6 +1,6 @@
 Type: Package
 Package: postcard
-Title: Estimating Marginal Effects With Prognostic Covariate Adjustment
+Title: Estimating Marginal Effects with Prognostic Covariate Adjustment
 Version: 0.2.1.9000
 Authors@R: c(
     person("Mathias Lerbech", "Jeppesen", ,
