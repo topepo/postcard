@@ -165,8 +165,28 @@ power_marginaleffect(
 # ---------------------------------------------------------------------------
 # Get OOS predictions using discrete super learner and adjust variance
 # ---------------------------------------------------------------------------
-lrnr1 <- fit_best_learner(list(mod = Y ~ X1 + X2 + A), data = gaus1)
-lrnr2 <- fit_best_learner(list(mod = Y ~ X1 + X2 + A), data = gaus2)
+learners <- list(
+  mars = list(
+    model = parsnip::set_engine(
+      parsnip::mars(
+        mode = "regression", prod_degree = 3
+      ),
+      "earth"
+    )
+ ),
+    lm = list(
+      model = parsnip::set_engine(
+        parsnip::linear_reg(),
+        "lm"
+      )
+    )
+)
+lrnr1 <- fit_best_learner(preproc = list(mod = Y ~ X1 + X2 + A),
+                          data = gaus1,
+                          learners = learners)
+lrnr2 <- fit_best_learner(preproc = list(mod = Y ~ X1 + X2 + A),
+                          data = gaus2,
+                          learners = learners)
 preds_lrnr1 <- dplyr::pull(predict(lrnr2, new_data = gaus1))
 preds_lrnr2 <- dplyr::pull(predict(lrnr1, new_data = gaus2))
 preds_lrnr <- c(preds_lrnr1, preds_lrnr2)
@@ -181,4 +201,7 @@ power_marginaleffect(
   var1 = function(var0) 1.2 * var0
 )
 
+}
+\seealso{
+See \link{power_linear} for power approximation functionalities for linear models.
 }

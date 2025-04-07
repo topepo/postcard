@@ -51,6 +51,10 @@ test_that("`rctglm` snapshot tests", {
 
 test_that("`cv_variance` produces same point estimates but different SE estimates", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   n <- 100
   exposure_prob <- .5
   dat_gaus <- glm_data(
@@ -86,6 +90,10 @@ test_that("`cv_variance` produces same point estimates but different SE estimate
 
 test_that("Different `cv_variance_folds` produces same estimate but different estimated SE", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   n <- 100
   exposure_prob <- .5
   dat_gaus <- glm_data(
@@ -122,6 +130,11 @@ test_that("Different `cv_variance_folds` produces same estimate but different es
 })
 
 test_that("`rctglm` fails when `exposure_indicator` is non-binary", {
+  withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   n <- 100
   exposure_prob <- .5
   dat_gaus <- glm_data(
@@ -146,6 +159,11 @@ test_that("`rctglm` fails when `exposure_indicator` is non-binary", {
 })
 
 test_that("`estimand_fun` argument can be specified as function or character", {
+  withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   n <- 100
   exposure_prob <- .5
   dat_gaus <- glm_data(
@@ -230,13 +248,18 @@ test_that("`estimand_fun_derivX` can be left as NULL or specified manually", {
            estimand_fun = "ate",
            estimand_fun_deriv0 = function(psi1, psi0) -1,
            estimand_fun_deriv1 = function(psi1, psi0) 1,
-           cv_variance = FALSE)
+           cv_variance = FALSE,
+           verbose = 0)
   })
   expect_equal(ate_auto$estimand, ate_man$estimand)
 })
 
 test_that("`rctglm` provides error if `exposure_prob` is not a numeric between 0 and 1", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   n <- 100
   exposure_prob <- 0.5
 

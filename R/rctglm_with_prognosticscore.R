@@ -37,7 +37,7 @@
 #'
 #' See much more details in the reference in the description.
 #'
-#' @return `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
+#' @returns `rctglm_with_prognosticscore` returns an object of class `rctglm_prog`,
 #' which inherits from [rctglm].
 #'
 #' An `rctglm_prog` object is a list with the same components as an [rctglm] object
@@ -52,7 +52,12 @@
 #'    - `cv_folds`: The amount of folds used for cross validation
 #'    - `data`: The historical data used for cross validation when fitting and
 #'    testing models
-#' @export
+#'
+#' @seealso
+#' Method to extract information of the prognostic model in [prog]. Function
+#' used to fit the prognostic model is [fit_best_learner()].
+#'
+#' See [rctglm()] for the function and class this inherits from.
 #'
 #' @examples
 #' # Generate some data
@@ -74,6 +79,22 @@
 #'   W1 = W1
 #' )
 #'
+#' learners <- list(
+#'   mars = list(
+#'     model = parsnip::set_engine(
+#'       parsnip::mars(
+#'         mode = "regression", prod_degree = 3
+#'       ),
+#'       "earth"
+#'     )
+#'  ),
+#'     lm = list(
+#'       model = parsnip::set_engine(
+#'         parsnip::linear_reg(),
+#'         "lm"
+#'       )
+#'     )
+#' )
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
 #'   exposure_indicator = A,
@@ -81,10 +102,13 @@
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
-#'   data_hist = dat_notreat)
+#'   data_hist = dat_notreat,
+#'   learners = learners)
 #'
 #' # Pull information on estimand
 #' estimand(ate)
+#'
+#' @export
 rctglm_with_prognosticscore <- function(
     formula,
     exposure_indicator,

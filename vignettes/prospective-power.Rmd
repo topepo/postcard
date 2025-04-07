@@ -14,15 +14,82 @@ vignette: >
   )
 ```
   
-```{r setup}
-library(postcard)
+```{r setup, message = FALSE}
+  library(postcard)
+withr::local_seed(1395878)
+withr::local_options(list(postcard.verbose = 0))
 ```
 
-The functions described in the help page `power_linear()` provide utilities for prospective power calculations using linear models. In this vignette, we will conduct sample size calculations by constructing power curves using a **standard ANCOVA method** implemented in the package and compare this to using prognostic covariate adjustment.
+# Estimating the power for marginal effects
 
-In usual cases of wanting to conduct sample size/power analyses prospectively, data of the new exposure is not available at the time of the analysis. What we can do is use historical data of the comparator group to estimate a variance and adjust this according to beliefs we might have about data from the novel group.
+The method proposed in [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284) by Højbjerre-Frandsen et. al (2025), which can be used to estimate the power when estimating any marginal effect, is implemented in the function `power_marginaleffect()`.
 
-## Data
+An introductory example is available in `vignette("postcard")`, but here we describe how to specify arguments to change the default behavior of the function to align with assumptions for the power estimation.
+
+### Simulating some data
+
+We generate count data to showcase the flexibility of `power_marginaleffect()` that does not assume a linear model.
+
+```{r}
+n_train <- 2000
+n_test <- 200
+b1 <- 1.2
+b2 <- 2.3
+b3 <- 1
+b4 <- 1.8
+
+train_pois <- dplyr::mutate(
+  glm_data(
+    Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
+    X1 = runif(n_train, min = -2, max = 2),
+    X2 = rnorm(n_train, mean = 2, sd = 2),
+    X3 = rgamma(n_train, shape = 1),
+    family = gaussian()
+  ),
+  Y = round(abs(Y))
+)
+test_pois <- dplyr::mutate(
+  glm_data(
+    Y ~ b1*abs(sin(X1))-b2*X2+b3*X3-b4*X2*X3,
+    X1 = runif(n_test, min = -2, max = 2),
+    X2 = rnorm(n_test, mean = 2, sd = 2),
+    X3 = rgamma(n_test, shape = 1),
+    family = gaussian()
+  ),
+  Y = round(abs(Y))
+)
+```
+
+## Controlling assumptions
+
+As a default, the variance in group 0 is estimated from the sample variance of the response, and the variance in group 1 is assumed to be the same as the estimated variance in group 0. Use argument `var1` to change the variance estimate in group 1, either with a function that modifies the estimate obtained for group 0 or as a `numeric`.
+
+The same is true for the MSE, where `kappa1_squared` as a default is taken to be the same as the MSE in group 0 unless a `function` or `numeric` is specified.
+
+Below is an example showcasing the specification of `var1` and `kappa1_squared` according to prior beliefs.
+
+```{r}
+lrnr <- fit_best_learner(list(mod = Y ~ X1 + X2 + X3), data = train_pois)
+preds <- dplyr::pull(predict(lrnr, new_data = test_pois))
+
+power_marginaleffect(
+  response = test_pois$Y,
+  predictions = preds,
+  var1 = function(var0) 1.2 * var0,
+  kappa1_squared = 2,
+  estimand_fun = "rate_ratio",
+  target_effect = 1.3,
+  exposure_prob = 1/2
+)
+```
+
+# For linear models
+
+The functions described in the help page `power_linear()` provide utilities for prospective power calculations using linear models. We conduct sample size calculations by constructing power curves using a **standard ANCOVA method** as described in (Guenther WC. Sample Size Formulas for Normal Theory T Tests. The American Statistician. 1981;35(4):243–244) and (Schouten HJA. Sample size formula with a continuous outcome for unequal group sizes and unequal variances. Statistics in Medicine. 1999;18(1):87–91).
+
+We compare the resulting power for ANCOVA models that leverage prognostic covariate adjustment and ones that don't. In usual cases of wanting to conduct sample size/power analyses prospectively, data of the new exposure is not available at the time of the analysis. What we can do is use historical data of the comparator group to estimate a variance and adjust this according to beliefs we might have about data from the novel group.
+
+### Simulating data
 
 As described above, data is not available at the time of a prospective power analysis. To showcase a common use case, we here simulate historical data, which we use to estimate the variance of the response adjusted by the coefficient of determination with the function `variance_ancova()`.
 
@@ -30,22 +97,20 @@ As described above, data is not available at the time of a prospective power ana
 
 ```{r}
 # Generate some data
-n_train <- 2000
-n_test <- 200
 b0 <- 1
 b1 <- 1.6
 b2 <- 1.4
 b3 <- 2
 b4 <- 0.8
 
-data_train <- glm_data(
+train <- glm_data(
   Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
   X1 = runif(n_train, min = -2, max = 2),
   X2 = rnorm(n_train, mean = 2, sd = 2),
   X3 = rbinom(n_train, 1, 0.5)
 )
 
-data_test <- glm_data(
+test <- glm_data(
   Y ~ b0+b1*abs(sin(X1))+b2*X2+b3*X3+b4*X2*X3,
   X1 = runif(n_test, min = -2, max = 2),
   X2 = rnorm(n_test, mean = 2, sd = 2),
@@ -53,19 +118,19 @@ data_test <- glm_data(
 )
 ```
 
-## Fitting a prognostic model
+### Fitting a prognostic model
 
 Using the training part of the historical data, we fit a prognostic model using the `fit_best_learner()` function. This fits a discrete super learner and returns it as a trained workflow, we can use for prediction to construct our prognostic scores.
 
 ```{r}
 lrnr <- fit_best_learner(
-  data = data_train,
+  data = train,
   preproc = list(mod = Y ~ .),
   cv_folds = 10,
   verbose = 0
 )
 
-data_test <- dplyr::bind_cols(data_test, predict(lrnr, data_test))
+test <- dplyr::bind_cols(test, predict(lrnr, test))
 ```
 
 ## Estimating the variance used for power approximation
@@ -73,8 +138,8 @@ data_test <- dplyr::bind_cols(data_test, predict(lrnr, data_test))
 We use the function `variance_ancova` to estimate the entity $\sigma^2(1-R^2)$ in case of a "standard" ANCOVA model adjusting for covariates in data, and in case of an ANCOVA utilising **prognostic covariate adjustment** by adjusting for the prognostic score as a covariate.
 
 ```{r}
-var_bound_ancova <- variance_ancova(Y ~ X1 + X2 + X3, data = data_test)
-var_bound_prog <- variance_ancova(Y ~ X1 + X2 + X3 + .pred, data = data_test)
+var_bound_ancova <- variance_ancova(Y ~ X1 + X2 + X3, data = test)
+var_bound_prog <- variance_ancova(Y ~ X1 + X2 + X3 + .pred, data = test)
 ```
 
 ## Creating a plot of power curves
@@ -181,4 +246,6 @@ data_power %>%
   )) +
   ggplot2::theme_minimal()
 ```
+
+
 

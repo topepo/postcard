@@ -154,6 +154,22 @@ dat_notreat <- glm_data(
   W1 = W1
 )
 
+learners <- list(
+  mars = list(
+    model = parsnip::set_engine(
+      parsnip::mars(
+        mode = "regression", prod_degree = 3
+      ),
+      "earth"
+    )
+ ),
+    lm = list(
+      model = parsnip::set_engine(
+        parsnip::linear_reg(),
+        "lm"
+      )
+    )
+)
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
@@ -161,8 +177,16 @@ ate <- rctglm_with_prognosticscore(
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",
-  data_hist = dat_notreat)
+  data_hist = dat_notreat,
+  learners = learners)
 
 # Pull information on estimand
 estimand(ate)
+
+}
+\seealso{
+Method to extract information of the prognostic model in \link{prog}. Function
+used to fit the prognostic model is \code{\link[=fit_best_learner]{fit_best_learner()}}.
+
+See \code{\link[=rctglm]{rctglm()}} for the function and class this inherits from.
 }

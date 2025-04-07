@@ -28,6 +28,13 @@ est(object)
 
 \item{digits}{a \code{numeric} with the number of digits to display when printing}
 }
+\value{
+\code{estimand}/\code{est} returns a \code{data.frame} with columns \code{Estimate} and
+\verb{Std. Error} with the estimate and standard error of the estimand.
+
+\code{coef} returns a named \code{numeric}, being the result of the \code{glm} method of
+\code{coef} on the \code{glm} object contained within an \link{rctglm} object.
+}
 \description{
 Methods mostly to extract information from model fit and inference. See
 details for more information on each method.
@@ -62,4 +69,7 @@ ate <- rctglm(formula = Y ~ .,
 print(ate)
 estimand(ate)
 coef(ate)
+}
+\seealso{
+The generic \code{\link[=rctglm]{rctglm()}} which these are methods for.
 }

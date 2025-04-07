@@ -4,14 +4,16 @@
 \name{postcard-package}
 \alias{postcard}
 \alias{postcard-package}
-\title{postcard: Estimation of Marginal Effects Using Prognostic Covariate Adjustment}
+\title{postcard: Estimating Marginal Effects with Prognostic Covariate Adjustment}
 \description{
-Conducting analysis using robust plug-in GLM estimation with influence functions and prognostic covariate adjustment.
+Conduct power analyses and inference of marginal effects. Uses plug-in estimation and influence functions to perform robust inference, optionally leveraging historical data to increase precision with prognostic covariate adjustment. The methods are described in Højbjerre-Frandsen et. al (2025) \href{https://arxiv.org/abs/2503.22284}{arXiv:2503.22284}.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://novonordisk-opensource.github.io/postcard/}
+  \item \url{https://github.com/NovoNordisk-OpenSource/postcard}
+  \item Report bugs at \url{https://github.com/NovoNordisk-OpenSource/postcard/issues}
 }
 
 }

@@ -6,9 +6,12 @@
 #' @param x an object of class `rctglm_prog` (returned by
 #' [rctglm_with_prognosticscore])
 #'
-#' @return description
+#' @returns a list with the structure described of `prognostic_info` in the
+#' `Value` section of [rctglm_with_prognosticscore].
 #'
-#' @export
+#' @seealso The generic [rctglm_with_prognosticscore()] for which this method
+#' works.
+#'
 #' @examples
 #' # Generate some data
 #' n <- 100
@@ -29,6 +32,16 @@
 #'   W1 = W1
 #' )
 #'
+#' learners <- list(
+#'   mars = list(
+#'     model = parsnip::set_engine(
+#'       parsnip::mars(
+#'         mode = "regression", prod_degree = 3
+#'       ),
+#'       "earth"
+#'     )
+#'   )
+#' )
 #' ate <- rctglm_with_prognosticscore(
 #'   formula = Y ~ .,
 #'   exposure_indicator = A,
@@ -36,9 +49,12 @@
 #'   data = dat_treat,
 #'   family = gaussian(),
 #'   estimand_fun = "ate",
-#'   data_hist = dat_notreat)
+#'   data_hist = dat_notreat,
+#'   learners = learners)
 #'
 #' prog(ate)
+#'
+#' @export
 prog <- function(x) {
   UseMethod("prog")
 }

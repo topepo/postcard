@@ -14,7 +14,8 @@ prog(x)
 \link{rctglm_with_prognosticscore})}
 }
 \value{
-description
+a list with the structure described of \code{prognostic_info} in the
+\code{Value} section of \link{rctglm_with_prognosticscore}.
 }
 \description{
 Extracts the \code{prognostic_info} list element from an \code{rctglm_prog} object. See
@@ -40,6 +41,16 @@ dat_notreat <- glm_data(
   W1 = W1
 )
 
+learners <- list(
+  mars = list(
+    model = parsnip::set_engine(
+      parsnip::mars(
+        mode = "regression", prod_degree = 3
+      ),
+      "earth"
+    )
+  )
+)
 ate <- rctglm_with_prognosticscore(
   formula = Y ~ .,
   exposure_indicator = A,
@@ -47,7 +58,13 @@ ate <- rctglm_with_prognosticscore(
   data = dat_treat,
   family = gaussian(),
   estimand_fun = "ate",
-  data_hist = dat_notreat)
+  data_hist = dat_notreat,
+  learners = learners)
 
 prog(ate)
+
+}
+\seealso{
+The generic \code{\link[=rctglm_with_prognosticscore]{rctglm_with_prognosticscore()}} for which this method
+works.
 }

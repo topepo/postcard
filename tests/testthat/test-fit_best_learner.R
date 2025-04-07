@@ -70,9 +70,20 @@ test_that("`get_best_learner` returns a workflow object", {
     y ~ 1+2*x1,
     x1 = rnorm(10)
   )
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
   cv_folds <- rsample::vfold_cv(dat, v = 2)
   lrnr <- get_best_learner(resamples = cv_folds,
-                           learners = default_learners(),
+                           learners = learners,
                            preproc = list(mod = y ~ .),
                            verbose = 0)
 
@@ -107,11 +118,22 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
     y ~ 1+2*x1,
     x1 = rnorm(10)
   )
+  learners <- list(
+    mars = list(
+      model = parsnip::mars(
+        mode = "regression", prod_degree = 3) %>%
+        parsnip::set_engine("earth")
+    ),
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
   cv_folds <- rsample::vfold_cv(dat, v = 2)
   elapsed_time_pattern <- "\\d+\\.?\\d*m?s"
   testthat::expect_snapshot({
     get_best_learner(resamples = cv_folds,
-                     learners = default_learners(),
+                     learners = learners,
                      preproc = list(mod = y ~ x1),
                      verbose = 2)
   },
@@ -121,11 +143,23 @@ cli::test_that_cli("`get_best_learner` print information when verbose > 0", {
 # fit_best_learner
 test_that("`fit_best_learner` returns a workflow object", {
   withr::local_seed(42)
+  withr::local_options(
+    list(postcard.verbose = 0)
+  )
+
   dat <- glm_data(
     y ~ 1+2*x1,
     x1 = rnorm(10)
   )
+  learners <- list(
+    lm = list(
+      model = parsnip::linear_reg() %>%
+        parsnip::set_engine("lm")
+    )
+  )
 
-  fit <- fit_best_learner(preproc = list(mod = y ~ .), data = dat, verbose = 0)
+  fit <- fit_best_learner(
+    preproc = list(mod = y ~ .), data = dat, learners = learners
+  )
   expect_s3_class(fit, "workflow")
 })

@@ -87,15 +87,13 @@ by the inverse of the link function.
 \item \code{glm}: A \code{glm} object returned from running \link[stats:glm]{stats::glm} within the procedure
 \item \code{call}: The matched \code{call}
 }
-
-See how to extract information using methods in \link{rctglm_methods}.
 }
 \description{
 The procedure uses plug-in-estimation and influence functions to perform robust inference of any specified
 estimand in the setting of a randomised clinical trial, even in the case of heterogeneous effect of
 covariates in randomisation groups. See
 \href{https://arxiv.org/abs/2503.22284}{Powering RCTs for marginal effects with GLMs using prognostic score adjustment}
-by Højbjerre-Frandsen et. al (2025) for more details.
+by Højbjerre-Frandsen et. al (2025) for more details on methodology.
 }
 \details{
 The procedure assumes the setup of a randomised clinical trial with observations grouped by a binary
@@ -171,5 +169,11 @@ or <- rctglm(formula = Y ~ .,
               family = binomial,
               estimand_fun = odds_ratio)
 
+}
+\seealso{
+See how to extract information using methods in \link{rctglm_methods}.
 
+Use \code{\link[=rctglm_with_prognosticscore]{rctglm_with_prognosticscore()}} to include prognostic covariate adjustment.
+
+See vignettes
 }

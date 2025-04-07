@@ -5,10 +5,10 @@
 #' estimand in the setting of a randomised clinical trial, even in the case of heterogeneous effect of
 #' covariates in randomisation groups. See
 #' [Powering RCTs for marginal effects with GLMs using prognostic score adjustment](https://arxiv.org/abs/2503.22284)
-#' by Højbjerre-Frandsen et. al (2025) for more details.
+#' by Højbjerre-Frandsen et. al (2025) for more details on methodology.
+#'
 #' @inheritParams stats::glm
 #' @inheritParams options
-#'
 #' @param data an optional data frame, list or environment (or object coercible
 #' by as.data.frame to a data frame) containing the variables in the model. If
 #' not found in data, the variables are taken from environment(formula), typically
@@ -62,7 +62,7 @@
 #' As a default, the `Deriv` package is used to perform symbolic differentiation to find the derivatives of
 #' the `estimand_fun`.
 #'
-#' @return `rctglm` returns an object of class inheriting from `"rctglm"`.
+#' @returns `rctglm` returns an object of class inheriting from `"rctglm"`.
 #'
 #' An object of class `rctglm` is a list containing the following components:
 #' \itemize{
@@ -82,9 +82,12 @@
 #'    \item `call`: The matched `call`
 #'  }
 #'
+#' @seealso
 #' See how to extract information using methods in [rctglm_methods].
 #'
-#' @export
+#' Use [rctglm_with_prognosticscore()] to include prognostic covariate adjustment.
+#'
+#' See vignettes
 #'
 #' @examples
 #' # Generate some data to showcase example
@@ -131,7 +134,7 @@
 #'               family = binomial,
 #'               estimand_fun = odds_ratio)
 #'
-#'
+#' @export
 rctglm <- function(formula,
                    exposure_indicator,
                    exposure_prob,
