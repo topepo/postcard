@@ -12,9 +12,9 @@ vignette: >
   collapse = TRUE,
   comment = "#>"
   )
-  ```
+```
   
-  ```{r setup, message = FALSE}
+```{r setup, message = FALSE}
   library(postcard)
 withr::local_seed(1395878)
 withr::local_options(list(postcard.verbose = 0))
