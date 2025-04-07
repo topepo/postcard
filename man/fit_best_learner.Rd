@@ -5,19 +5,19 @@
 \title{Find the best learner in terms of RMSE among specified learners using cross validation}
 \usage{
 fit_best_learner(
-  data,
   preproc,
+  data,
   cv_folds = 5,
   learners = default_learners(),
   verbose = options::opt("verbose")
 )
 }
 \arguments{
-\item{data}{A data frame.}
-
 \item{preproc}{A list (preferably named) with preprocessing objects:
 formulas, recipes, or \code{\link[workflows:add_variables]{workflows::workflow_variables()}}. Passed to
 \code{\link[workflowsets:workflow_set]{workflowsets::workflow_set()}}.}
+
+\item{data}{A data frame.}
 
 \item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}

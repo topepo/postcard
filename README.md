@@ -50,13 +50,26 @@ ones in the comparator group). This prediction, which is called the
 **prognostic score**, is then used as an adjustment covariate in the
 GLM.
 
-## Power approximation for linear models
+## Power approximation
 
-Additionally, implementations of sample size/power approximation
-formulas are available, enabling retrospective power analyses to be
-performed using the package. Functionalities are available at the help
-page `powerss()`, introductory examples in `vignette("postcard")` and
-more details in `vignette("prospective-power")`.
+Implementations of sample size/power approximation formulas are
+available, enabling retrospective power analyses to be performed using
+the package.
+
+Introductory examples are available in `vignette("postcard")` and more
+details in `vignette("prospective-power")`.
+
+### When estimating marginal effects using any model
+
+A method of estimating power in any case of estimating marginal effects
+is described in the reference at the top of this page, and the algorithm
+is implemented in the function `power_marginaleffect`.
+
+### Specifically for linear models
+
+Functionalities available to estimate the power for linear models
+include functions `variance_ancova`, `power_gs`, `samplesize_gs`,
+`power_nc`.
 
 ## Installation
 

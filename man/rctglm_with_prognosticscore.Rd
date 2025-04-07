@@ -32,9 +32,8 @@ given under ‘Details’ in the \link{glm} documentation.}
 identifies randomisation groups. The variable is required to be binary to
 make the "orientation" of the \code{estimand_fun} clear.}
 
-\item{exposure_prob}{a \code{numeric} with the probabiliy of being in
-"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.
-As a default, the ratio of 1's in data is used.}
+\item{exposure_prob}{a \code{numeric} with the probability of being in
+"group 1" (rather than group 0) in groups defined by \code{exposure_indicator}.}
 
 \item{data}{an optional data frame, list or environment (or object coercible
 by as.data.frame to a data frame) containing the variables in the model. If
