@@ -115,14 +115,19 @@
 #' # ---------------------------------------------------------------------------
 #' learners <- list(
 #'   mars = list(
-#'     model = parsnip::mars(
-#'     mode = "regression", prod_degree = 3) %>%
-#'     parsnip::set_engine("earth")
-#'   ),
-#'   lm = list(
-#'     model = parsnip::linear_reg() %>%
-#'     parsnip::set_engine("lm")
-#'   )
+#'     model = parsnip::set_engine(
+#'       parsnip::mars(
+#'         mode = "regression", prod_degree = 3
+#'       ),
+#'       "earth"
+#'     )
+#'  ),
+#'     lm = list(
+#'       model = parsnip::set_engine(
+#'         parsnip::linear_reg(),
+#'         "lm"
+#'       )
+#'     )
 #' )
 #' lrnr1 <- fit_best_learner(preproc = list(mod = Y ~ X1 + X2 + A),
 #'                           data = gaus1,

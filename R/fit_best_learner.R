@@ -41,13 +41,12 @@
 #' # Fit a learner to the historical control data
 #' learners <- list(
 #'   mars = list(
-#'     model = parsnip::mars(
-#'     mode = "regression", prod_degree = 3) %>%
-#'     parsnip::set_engine("earth")
-#'   ),
-#'   lm = list(
-#'     model = parsnip::linear_reg() %>%
-#'     parsnip::set_engine("lm")
+#'     model = parsnip::set_engine(
+#'       parsnip::mars(
+#'         mode = "regression", prod_degree = 3
+#'       ),
+#'       "earth"
+#'     )
 #'   )
 #' )
 #' fit <- fit_best_learner(

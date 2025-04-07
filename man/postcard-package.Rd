@@ -6,7 +6,7 @@
 \alias{postcard-package}
 \title{postcard: Estimating Marginal Effects Using Prognostic Covariate Adjustment}
 \description{
-Conduct power analyses and perform inference using robust plug-in GLM estimation with influence functions and prognostic covariate adjustment.
+Conduct power analyses and inference of any marginal effect. Uses plug-in estimation and influence functions to perform robust inference as described in (Højbjerre-Frandsen et. al, 2025)(\href{https://arxiv.org/abs/2503.22284}{arXiv:2503.22284}). Enables use of prognostic covariate adjustment to increase precision of estimates by leveraging historical data.
 }
 \seealso{
 Useful links:
