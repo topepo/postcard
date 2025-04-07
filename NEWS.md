@@ -12,6 +12,16 @@ The package provides novel methods for:
   influence functions to avoid inflation of type 1 error
 * `rctglm_with_prognosticscore`: Do the above, but leveraging historical data
   to increase precision with prognostic scores.
+  
+Additionally, the package includes functionalities for
+
+* fitting a discrete super learner in `fit_best_learner`, which is leveraged in
+`rctglm_with_prognosticscore`
+* approximating power using
+  * standard methods for ANCOVA models (see help topic `power_linear`)
+  * a novel method for any model estimating marginal effects
+  (`power_marginaleffect`)
+* generating data from a GLM (`glm_data`)
 
 # postcard 0.2.1
 
