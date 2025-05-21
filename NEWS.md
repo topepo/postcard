@@ -1,3 +1,5 @@
+# postcard (development version)
+
 # postcard 1.0.0
 
 Major overhaul of package. Still focuses on analysing data with the use of
