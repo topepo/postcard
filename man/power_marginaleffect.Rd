@@ -16,7 +16,7 @@ power_marginaleffect(
   estimand_fun_deriv1 = NULL,
   inv_estimand_fun = NULL,
   margin = estimand_fun(1, 1),
-  alpha = 0.025,
+  alpha = 0.05,
   tolerance = 0.001,
   verbose = options::opt("verbose"),
   ...
@@ -63,9 +63,9 @@ If left as \code{NULL}, the inverse will be found automatically}
 is evaluated with the same counterfactual means \code{psi1} and \code{psi0}, corresponding
 to a superiority margin assuming no difference (fx. 0 for ATE and 1 for rate ratio).}
 
-\item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
-using a one-sided test, half the specified significance level is used.
-Thus, for standard significance level of 5\%, the default is \code{alpha = 0.025}.}
+\item{alpha}{a \code{numeric} significance level. The critical value used for
+testing corresponds to using the significance level for a two-sided test. I.e.
+we use the quantile \eqn{1-\alpha/2} of the null distribution as the critical value.}
 
 \item{tolerance}{passed to \link{all.equal} when comparing calculated \code{target_effect}
 from derivations and given \code{target_effect}.}

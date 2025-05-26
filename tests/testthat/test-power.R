@@ -12,10 +12,10 @@ test_that("snapshot tests", {
   expect_snapshot(va2)
   expect_snapshot(va3)
 
-  pgs <- power_gs(variance = 6, ate = 1, n = 200, r = 2, margin = 0.5, alpha = 0.5)
+  pgs <- power_gs(variance = 6, ate = 1, n = 200, r = 2, margin = 0.5, alpha = 0.05)
   expect_snapshot(pgs)
 
-  ssgs2 <- samplesize_gs(variance = 27.3, ate = 2, r = 2/3, margin = -1, alpha = 0.025)
+  ssgs2 <- samplesize_gs(variance = 27.3, ate = 2, r = 2/3, margin = -1, alpha = 0.05)
   expect_snapshot(ssgs2)
 })
 

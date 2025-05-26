@@ -161,7 +161,7 @@ power_marginaleffect <- function(
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     inv_estimand_fun = NULL,
     margin = estimand_fun(1,1),
-    alpha = 0.025,
+    alpha = 0.05,
     tolerance = 1e-3,
     verbose = options::opt("verbose"),
     ...
@@ -215,7 +215,7 @@ power_marginaleffect <- function(
   )
 
   sd <- sqrt(v_bound / n_resp)
-  f0 <- qnorm(1 - alpha, mean = margin, sd = sd)
+  f0 <- qnorm(1 - alpha / 2, mean = margin, sd = sd)
   f1 <- pnorm(f0, mean = target_effect, sd = sd)
   1 - f1
 }
