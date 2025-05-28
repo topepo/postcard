@@ -1,5 +1,6 @@
 url: https://novonordisk-opensource.github.io/postcard/
 template:
+  math-rendering: mathjax
   bootstrap: 5
 
 reference:
