@@ -23,9 +23,10 @@ power_marginaleffect(
 )
 }
 \arguments{
-\item{response}{the response variable from comparator participants}
+\item{response}{a vector of mode \code{numeric} with the response variable from
+comparator participants}
 
-\item{predictions}{predictions of the response}
+\item{predictions}{a vector of mode \code{numeric} with predictions of the response}
 
 \item{target_effect}{a \code{numeric} minimum effect size that we should be able to detect.
 See more in details.}
@@ -34,7 +35,7 @@ See more in details.}
 "group 1" (rather than group 0). See more in details.}
 
 \item{var1}{a \code{numeric} variance of the potential outcome corresponding to group 1,
-or a \code{function} with a single argument meant to obtain \code{var1} as a tranformation
+or a \code{function} with a single argument meant to obtain \code{var1} as a transformation
 of the variance of the potential outcome corresponding to group 0.
 See more in details.}
 
@@ -57,7 +58,7 @@ the algorithm will use symbolic differentiation to automatically find the deriva
 \item{inv_estimand_fun}{(optional) a \code{function} with arguments \code{psi0} and
 \code{target_effect}, so \code{estimand_fun(psi1 = y, psi0 = x) = z} and
 \code{inv_estimand_fun(psi0 = x, target_effect = z) = y} for all x, y, z.
-If left as \code{NULL}, the inverse will be found automatically}
+If left as \code{NULL}, the inverse will be found numerically.}
 
 \item{margin}{a \code{numeric} superiority margin. As a default, the \code{estimand_fun}
 is evaluated with the same counterfactual means \code{psi1} and \code{psi0}, corresponding
@@ -68,13 +69,14 @@ testing corresponds to using the significance level for a two-sided test. I.e.
 we use the quantile \eqn{1-\alpha/2} of the null distribution as the critical value.}
 
 \item{tolerance}{passed to \link{all.equal} when comparing calculated \code{target_effect}
-from derivations and given \code{target_effect}.}
+from derivations and given \code{target_effect} during numeric derivation of
+\code{inv_estimand_fun}. Thus only relevant when \code{inv_estimand_fun} is \code{NULL}.}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
 execution (Defaults to \code{2}, overwritable using option 'postcard.verbose' or environment variable 'R_POSTCARD_VERBOSE')}
 
-\item{...}{arguments passed to \verb{[stats::uniroot]}, which is used to find the
+\item{...}{arguments passed to \link[stats:uniroot]{stats::uniroot}, which is used to find the
 inverse of \code{estimand_fun}, when \code{inv_estimand_fun} is \code{NULL}.}
 }
 \value{
