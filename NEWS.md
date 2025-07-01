@@ -1,4 +1,7 @@
-# postcard (development version)
+# postcard 1.0.1
+
+Updated ALL `power_xx` functions to use `1-alpha/2` as the quantile of the
+critical value when testing (changed from `1-alpha`) (#65).
 
 # postcard 1.0.0
 

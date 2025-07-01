@@ -7,14 +7,15 @@
 #'
 #' @inheritParams rctglm
 #' @inheritParams power_linear
-#' @param response the response variable from comparator participants
-#' @param predictions predictions of the response
+#' @param response a vector of mode `numeric` with the response variable from
+#' comparator participants
+#' @param predictions a vector of mode `numeric` with predictions of the response
 #' @param target_effect a `numeric` minimum effect size that we should be able to detect.
 #' See more in details.
 #' @param exposure_prob a `numeric` with the probability of being in
 #' "group 1" (rather than group 0). See more in details.
 #' @param var1 a `numeric` variance of the potential outcome corresponding to group 1,
-#' or a `function` with a single argument meant to obtain `var1` as a tranformation
+#' or a `function` with a single argument meant to obtain `var1` as a transformation
 #' of the variance of the potential outcome corresponding to group 0.
 #' See more in details.
 #' @param kappa1_squared a `numeric` mean-squared error from predicting potential
@@ -24,13 +25,14 @@
 #' @param inv_estimand_fun (optional) a `function` with arguments `psi0` and
 #' `target_effect`, so `estimand_fun(psi1 = y, psi0 = x) = z` and
 #' `inv_estimand_fun(psi0 = x, target_effect = z) = y` for all x, y, z.
-#' If left as `NULL`, the inverse will be found automatically
+#' If left as `NULL`, the inverse will be found numerically.
 #' @param margin a `numeric` superiority margin. As a default, the `estimand_fun`
 #' is evaluated with the same counterfactual means `psi1` and `psi0`, corresponding
 #' to a superiority margin assuming no difference (fx. 0 for ATE and 1 for rate ratio).
 #' @param tolerance passed to [all.equal] when comparing calculated `target_effect`
-#' from derivations and given `target_effect`.
-#' @param ... arguments passed to `[stats::uniroot]`, which is used to find the
+#' from derivations and given `target_effect` during numeric derivation of
+#' `inv_estimand_fun`. Thus only relevant when `inv_estimand_fun` is `NULL`.
+#' @param ... arguments passed to [stats::uniroot], which is used to find the
 #' inverse of `estimand_fun`, when `inv_estimand_fun` is `NULL`.
 #'
 #' @returns a `numeric` with the estimated power.
@@ -161,7 +163,7 @@ power_marginaleffect <- function(
     estimand_fun_deriv0 = NULL, estimand_fun_deriv1 = NULL,
     inv_estimand_fun = NULL,
     margin = estimand_fun(1,1),
-    alpha = 0.025,
+    alpha = 0.05,
     tolerance = 1e-3,
     verbose = options::opt("verbose"),
     ...
@@ -215,7 +217,7 @@ power_marginaleffect <- function(
   )
 
   sd <- sqrt(v_bound / n_resp)
-  f0 <- qnorm(1 - alpha, mean = margin, sd = sd)
+  f0 <- qnorm(1 - alpha / 2, mean = margin, sd = sd)
   f1 <- pnorm(f0, mean = target_effect, sd = sd)
   1 - f1
 }

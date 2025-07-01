@@ -108,15 +108,15 @@ variance_ancova <- function(formula, data, inflation = 1, deflation = 1) {
 #' @param ate             a `numeric` minimum effect size that we should be able to detect.
 #' @param margin          a `numeric` superiority margin
 #' (for non-inferiority margin, a negative value can be provided).
-#' @param alpha           a `numeric` significance level. Due to regulatory guidelines when
-#' using a one-sided test, half the specified significance level is used.
-#' Thus, for standard significance level of 5%, the default is `alpha = 0.025`.
+#' @param alpha           a `numeric` significance level. The critical value used for
+#' testing corresponds to using the significance level for a two-sided test. I.e.
+#' we use the quantile \eqn{1-\alpha/2} of the null distribution as the critical value.
 #'
 #' @section Guenther-Schouten power approximation:
 #' The estimation formula in the case of an ANCOVA model with multiple covariate adjustment is (see description for reference):
 #'
 #' \deqn{
-#' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
+#' n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha/2}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha/2})^2}{2}
 #' }
 #'
 #' where \eqn{\widehat{R}^2= \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
@@ -159,14 +159,14 @@ power_gs <- function(variance,
                      n,
                      r = 1,
                      margin = 0,
-                     alpha = 0.025) {
+                     alpha = 0.05) {
 
   power <- stats::pnorm(
     sqrt(
       r/(1 + r)^2 *
         (ate - margin)^2/variance *
-        (n - stats::qnorm(1 - alpha)^2/2)
-    ) - stats::qnorm(1 - alpha)
+        (n - stats::qnorm(1 - alpha / 2)^2/2)
+    ) - stats::qnorm(1 - alpha / 2)
   )
   return(power)
 }
@@ -182,11 +182,11 @@ samplesize_gs <- function(variance,
                           r = 1,
                           margin = 0,
                           power = 0.9,
-                          alpha = 0.025) {
+                          alpha = 0.05) {
   samplesize <- (1 + r)^2 / r *
-    (stats::qnorm(1 - alpha) + stats::qnorm(power))^2 * variance /
+    (stats::qnorm(1 - alpha / 2) + stats::qnorm(power))^2 * variance /
     (ate - margin)^2 +
-    stats::qnorm(1 - alpha)^2/2
+    stats::qnorm(1 - alpha / 2)^2/2
   return(samplesize)
 }
 
@@ -208,7 +208,7 @@ samplesize_gs <- function(variance,
 #'
 #' where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha)\right).}
+#' \deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha/2)\right).}
 #'
 #' The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 #'
@@ -216,7 +216,7 @@ samplesize_gs <- function(variance,
 #'
 #' such that the power can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha)\right).}
+#' \deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha/2)\right).}
 #'
 #' The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 #'
@@ -236,7 +236,7 @@ samplesize_gs <- function(variance,
 #'
 #' Then the power for ANCOVA with `d` degrees of freedom can be estimated as
 #'
-#' \deqn{1-\beta = 1 - F_{t,d,nc}\left(F_{t, d,0), 0}^{-1}(1-\alpha)\right).}
+#' \deqn{1-\beta = 1 - F_{t,d,nc}\left(F_{t, d,0), 0}^{-1}(1-\alpha/2)\right).}
 #'
 #' @export
 #'
@@ -252,9 +252,9 @@ power_nc <- function(variance,
                      n,
                      r = 1,
                      margin = 0,
-                     alpha = 0.025){
+                     alpha = 0.05){
 
   nc <- sqrt(r/(1 + r)^2*(n)) * (ate - margin)/sqrt(variance)
-  power <- 1 - stats::pt(q = stats::qt(1 - alpha, df = df), df = df, ncp = nc)
+  power <- 1 - stats::pt(q = stats::qt(1 - alpha / 2, df = df), df = df, ncp = nc)
   return(power)
 }

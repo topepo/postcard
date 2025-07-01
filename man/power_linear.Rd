@@ -10,11 +10,11 @@
 \usage{
 variance_ancova(formula, data, inflation = 1, deflation = 1)
 
-power_gs(variance, ate, n, r = 1, margin = 0, alpha = 0.025)
+power_gs(variance, ate, n, r = 1, margin = 0, alpha = 0.05)
 
-samplesize_gs(variance, ate, r = 1, margin = 0, power = 0.9, alpha = 0.025)
+samplesize_gs(variance, ate, r = 1, margin = 0, power = 0.9, alpha = 0.05)
 
-power_nc(variance, df, ate, n, r = 1, margin = 0, alpha = 0.025)
+power_nc(variance, df, ate, n, r = 1, margin = 0, alpha = 0.05)
 }
 \arguments{
 \item{formula}{an object of class "formula" (or one that can be coerced to that class):
@@ -50,9 +50,9 @@ and the control group is \eqn{n1=(1/(1+r))n}.}
 \item{margin}{a \code{numeric} superiority margin
 (for non-inferiority margin, a negative value can be provided).}
 
-\item{alpha}{a \code{numeric} significance level. Due to regulatory guidelines when
-using a one-sided test, half the specified significance level is used.
-Thus, for standard significance level of 5\%, the default is \code{alpha = 0.025}.}
+\item{alpha}{a \code{numeric} significance level. The critical value used for
+testing corresponds to using the significance level for a two-sided test. I.e.
+we use the quantile \eqn{1-\alpha/2} of the null distribution as the critical value.}
 
 \item{power}{a \code{numeric} giving the desired power when calculating the sample size}
 
@@ -107,7 +107,7 @@ The user can estimate the \code{variance} any way they see fit.
 The estimation formula in the case of an ANCOVA model with multiple covariate adjustment is (see description for reference):
 
 \deqn{
-n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha})^2}{2}
+n=\frac{(1+r)^2}{r}\frac{(z_{1-\alpha/2}+z_{1-\beta})^2\widehat{\sigma}^2(1-\widehat{R}^2)}{(\beta_1-\beta_0-\Delta_s)^2}+\frac{(z_{1-\alpha/2})^2}{2}
 }
 
 where \eqn{\widehat{R}^2= \frac{\widehat{\sigma}_{XY}^\top \widehat{\Sigma}_X^{-1}\widehat{\sigma}_{XY}}{\widehat{\sigma}^2}},
@@ -128,7 +128,7 @@ The ANOVA power is calculated based on the non-centrality parameter given as
 
 where we denote by \eqn{\sigma^2} the variance of the outcome, such that the power can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha)\right).}
+\deqn{1-\beta = 1 - F_{t,n-2,nc}\left(F_{t, n-2, 0}^{-1}(1-\alpha/2)\right).}
 
 The power of ANCOVA with univariate covariate adjustment and no interaction is calculated based on the non-centrality parameter given as
 
@@ -136,7 +136,7 @@ The power of ANCOVA with univariate covariate adjustment and no interaction is c
 
 such that the power can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha)\right).}
+\deqn{1-\beta = 1 - F_{t,n-3,nc}\left(F_{t, n-3, 0}^{-1}(1-\alpha/2)\right).}
 
 The power of ANCOVA with either univariate covariate adjustment and interaction or multiple covariate adjustement with or without interaction is calculated based on the non-centrality parameter given as
 
@@ -156,7 +156,7 @@ the non-centrality parameter as in the univariate case where \eqn{\rho^2} is rep
 
 Then the power for ANCOVA with \code{d} degrees of freedom can be estimated as
 
-\deqn{1-\beta = 1 - F_{t,d,nc}\left(F_{t, d,0), 0}^{-1}(1-\alpha)\right).}
+\deqn{1-\beta = 1 - F_{t,d,nc}\left(F_{t, d,0), 0}^{-1}(1-\alpha/2)\right).}
 }
 
 \examples{
