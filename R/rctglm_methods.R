@@ -89,7 +89,7 @@ print.rctglm <- function(x,
       format(x$means_counterfactual["psi0"], digits = digits),
       "\n",
       sep = "")
-  cat("Counterfactual control mean (psi_1=E[Y|X, A=1]) estimate: ",
+  cat("Counterfactual active mean (psi_1=E[Y|X, A=1]) estimate: ",
       format(x$means_counterfactual["psi1"], digits = digits),
       "\n",
       sep = "")

@@ -1,5 +1,8 @@
 # postcard (development version)
 
+* Fixed print method for `rctglm` and `rctglm_with_prognosticscore` correctly
+say "active" for the counterfactual mean estimate for group A=1 (#67).
+
 # postcard 1.0.1
 
 Updated ALL `power_xx` functions to use `1-alpha/2` as the quantile of the
