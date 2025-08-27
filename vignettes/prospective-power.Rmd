@@ -16,6 +16,7 @@ vignette: >
   
 ```{r setup, message = FALSE}
   library(postcard)
+  library(dplyr)
 withr::local_seed(1395878)
 withr::local_options(list(postcard.verbose = 0))
 ```
